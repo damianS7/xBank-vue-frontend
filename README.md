@@ -1,4 +1,4 @@
-# xbank
+# vue
 
 ## Project setup
 ```
