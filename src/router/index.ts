@@ -26,7 +26,7 @@ const routes: Array<RouteRecordRaw> = [
     children: [
       {
         path: "",
-        name: "login",
+        name: "login2",
         component: LoginView,
       },
     ],

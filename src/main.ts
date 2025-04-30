@@ -2,10 +2,11 @@ import { createApp } from "vue";
 import App from "./App.vue";
 import router from "./router";
 import PrimeVue from "primevue/config";
-import pinia from "./stores";
+// import pinia from "./stores";
+import { createPinia } from "pinia";
+
 // Estilos de PrimeVue
-import "primevue/resources/themes/lara-light-blue/theme.css";
-import "primevue/resources/primevue.min.css";
+import Aura from "@primeuix/themes/aura";
 import "primeicons/primeicons.css";
 // Componente ejemplo
 import Button from "primevue/button";
@@ -13,8 +14,10 @@ import Card from "primevue/card";
 
 const app = createApp(App);
 
-app.use(PrimeVue);
-app.use(pinia);
+app.use(PrimeVue, {
+  theme: { preset: Aura },
+});
+app.use(createPinia);
 app.component("pButton", Button);
 app.component("pCard", Card);
 app.use(router);
