@@ -13,9 +13,9 @@ import Card from "primevue/card";
 
 const app = createApp(App);
 
-app.use(router);
 app.use(PrimeVue);
 app.use(pinia);
 app.component("pButton", Button);
 app.component("pCard", Card);
+app.use(router);
 app.mount("#app");
