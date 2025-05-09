@@ -11,9 +11,10 @@
 </template>
 <script setup lang="ts">
 import { defineProps } from "vue";
+import { IconNode } from "lucide-vue-next";
 defineProps<{
   to: string;
-  icon?: any;
+  icon?: IconNode;
   label: string;
 }>();
 </script>
