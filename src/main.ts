@@ -1,24 +1,17 @@
 import { createApp } from "vue";
 import App from "./App.vue";
 import router from "./router";
-import PrimeVue from "primevue/config";
-// import pinia from "./stores";
+import "./assets/tailwind.css";
 import { createPinia } from "pinia";
 
 // Estilos de PrimeVue
-import Aura from "@primeuix/themes/aura";
-import "primeicons/primeicons.css";
-// Componente ejemplo
-import Button from "primevue/button";
-import Card from "primevue/card";
+// import ToastService from "primevue/toastservice"; // Importa el servicio de Toast
+// import Toast from "primevue/toast"; // Importa el componente Toast
 
 const app = createApp(App);
+const pinia = createPinia();
 
-app.use(PrimeVue, {
-  theme: { preset: Aura },
-});
-app.use(createPinia);
-app.component("pButton", Button);
-app.component("pCard", Card);
+// app.use(ToastService);
 app.use(router);
+app.use(pinia);
 app.mount("#app");

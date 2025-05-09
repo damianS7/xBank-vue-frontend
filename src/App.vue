@@ -1,17 +1,26 @@
 <template>
-  <nav>
-    <router-link to="/">Home</router-link> |
-    <router-link to="/about">About</router-link>
-  </nav>
-  <router-view />
+  <div id="app">
+    <!-- <component
+      v-if="authStore.initialized"
+      :is="authStore.isAuthenticated ? MainLayout : AuthLayout"
+    /> -->
+    <router-view v-if="authStore.initialized" />
+  </div>
 </template>
+<script setup lang="ts">
+import { onMounted } from "vue";
+import { useAuthStore } from "@/stores/auth";
+const authStore = useAuthStore();
 
+onMounted(() => {
+  authStore.initialize();
+});
+</script>
 <style>
 #app {
   font-family: Avenir, Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  text-align: center;
   color: #2c3e50;
 }
 
