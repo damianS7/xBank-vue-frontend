@@ -1,20 +1,26 @@
 <template>
-  <RouterLink
-    :to="to"
-    class="flex items-center gap-3 p-2 rounded hover:bg-gray-200 transition-colors"
-  >
-    <span class="text-lg">
-      <component :is="icon" class="w-5 h-5" />
-    </span>
-    <span class="sidebar-label hidden group-hover:inline">{{ label }}</span>
+  <RouterLink v-slot="{ isActive }" :to="to">
+    <div
+      :class="[
+        'flex items-center gap-4 p-2 rounded transition-colors',
+        isActive ? 'bg-gray-200' : 'hover:bg-gray-200',
+      ]"
+    >
+      <span class="text-lg">
+        <component :is="icon" class="w-6 h-6" />
+      </span>
+      <span
+        class="sidebar-label overflow-hidden whitespace-nowrap transition-all duration-300 group-hover:opacity-100 opacity-0"
+        >{{ label }}</span
+      >
+    </div>
   </RouterLink>
 </template>
 <script setup lang="ts">
 import { defineProps } from "vue";
-import { IconNode } from "lucide-vue-next";
 defineProps<{
   to: string;
-  icon?: IconNode;
+  icon?: unknown;
   label: string;
 }>();
 </script>

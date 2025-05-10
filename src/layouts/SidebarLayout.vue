@@ -1,21 +1,24 @@
 <template>
   <nav
-    class="group sidebar bg-gray-100 w-16 hover:w-48 transition-all duration-300 ease-in-out h-screen flex flex-col p-2 shadow-md space-y-4 overflow-hidden"
+    class="group bg-gray-100 w-14 hover:w-64 transition-all duration-300 ease-in-out h-screen flex flex-col p-2 shadow-md space-y-4 overflow-hidden"
   >
     <SidebarLink to="/home" :icon="Home" label="Home" />
     <SidebarLink to="/accounts" :icon="Accounts" label="Cuentas" />
     <SidebarLink to="/cards" :icon="CreditCard" label="Tarjetas" />
     <SidebarLink to="/profile" :icon="Profile" label="Perfil" />
     <SidebarLink to="/settings" :icon="Settings" label="Configuración" />
-    <a
-      href="#"
-      @click.prevent="logout"
-      class="flex items-center gap-3 p-2 rounded hover:bg-gray-200 transition-colors"
-    >
-      <span class="text-lg">
-        <LogOut />
-      </span>
-      <span class="sidebar-label hidden group-hover:inline">Logout</span>
+    <a href="#" @click.prevent="logout">
+      <div
+        class="flex items-center gap-4 p-2 rounded hover:bg-gray-200 transition-colors"
+      >
+        <span class="text-lg">
+          <LogOut class="w-6 h-6" />
+        </span>
+        <span
+          class="sidebar-label overflow-hidden whitespace-nowrap transition-all duration-300 group-hover:opacity-100 opacity-0"
+          >Logout</span
+        >
+      </div>
     </a>
   </nav>
 </template>

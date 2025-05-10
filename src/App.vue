@@ -1,11 +1,5 @@
 <template>
-  <div id="app">
-    <!-- <component
-      v-if="authStore.initialized"
-      :is="authStore.isAuthenticated ? MainLayout : AuthLayout"
-    /> -->
-    <router-view v-if="authStore.initialized" />
-  </div>
+  <router-view v-if="authStore.initialized" />
 </template>
 <script setup lang="ts">
 import { onMounted } from "vue";

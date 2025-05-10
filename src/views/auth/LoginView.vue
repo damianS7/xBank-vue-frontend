@@ -57,10 +57,14 @@ const authStore = useAuthStore();
 const router = useRouter();
 const route = useRoute();
 
-// Check if the user is already authenticated
-if (authStore.isAuthenticated) {
+function redirectBackToLastPage() {
   const redirectPath = route.query.redirect?.toString() || "/home";
   router.push(redirectPath);
+}
+
+// Check if the user is already authenticated
+if (authStore.isAuthenticated) {
+  redirectBackToLastPage();
 }
 
 // const toast = useToast();
@@ -69,7 +73,9 @@ const form = ref({
   password: "",
 });
 
-const errors = ref<{ form?: string; email?: string; password?: string }>({});
+const errors = ref<{ form?: string; email?: string[]; password?: string[] }>(
+  {}
+);
 
 const resolver = ref(
   z.object({
@@ -98,10 +104,8 @@ const onFormSubmit = async () => {
   errors.value = {};
   try {
     await authStore.login(email, password);
-    // const redirectPath = route.query.redirect?.toString() || "/home";
-    // router.push(redirectPath);
-    router.push({ name: "home" });
-  } catch (error: any) {
+    redirectBackToLastPage();
+  } catch (error: unknown) {
     // toast
     errors.value.form = error.message || "An error occurred.";
   }
