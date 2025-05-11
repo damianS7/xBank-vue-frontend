@@ -2,13 +2,19 @@ import { defineStore } from "pinia";
 
 export const useAuthStore = defineStore("auth", {
   state: () => ({
-    email: "",
     token: "",
-    isAuthenticated: false,
     initialized: false,
   }),
 
-  getters: {},
+  getters: {
+    isAuthenticated: (state) => {
+      if (state.token === "") {
+        return false;
+      }
+
+      return true;
+    },
+  },
 
   actions: {
     async login(email: string, password: string) {
@@ -26,23 +32,20 @@ export const useAuthStore = defineStore("auth", {
         }
 
         const data = await res.json();
-        this.email = data.customer.email;
+        // this.email = data.customer.email;
         this.token = data.token;
         // se recomienda guardar el token en localStorage tambien en caso de que se pulse f5
         localStorage.setItem("token", this.token);
 
         // Opcional: obtener el usuario
         // this.user = await this.fetchUser();
-        this.isAuthenticated = true;
       } catch (error) {
         console.error("Error en login:", error);
         throw error;
       }
     },
     logout() {
-      this.email = "";
       this.token = "";
-      this.isAuthenticated = false;
       localStorage.clear();
     },
     initialize() {

@@ -109,6 +109,7 @@ const onFormSubmit = async () => {
     // toast
     errors.value.form = error.message || "An error occurred.";
   }
+  // get customer /me
 };
 </script>
 <!-- Add "scoped" attribute to limit CSS to this component only -->
