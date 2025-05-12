@@ -27,14 +27,15 @@ export const useCustomerStore = defineStore("customer", {
           },
         });
 
+        const data = await res.json();
+
         if (!res.ok) {
-          throw new Error("Problema al obtener el customer");
+          throw new Error(data.message);
         }
 
-        const customer = await res.json();
-        this.setCustomer(customer);
-      } catch (error) {
-        console.error("Error en login:", error);
+        this.setCustomer(data);
+      } catch (error: any) {
+        console.log(error);
         throw error;
       }
     },

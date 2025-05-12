@@ -3,7 +3,7 @@ import HomeView from "@/views/HomeView.vue";
 import LoginView from "@/views/auth/LoginView.vue";
 import MainLayout from "@/layouts/MainLayout.vue";
 import AuthLayout from "@/layouts/AuthLayout.vue";
-import BankingAccountsView from "@/views/BankingAccountsView.vue";
+import BankingAccountsView from "@/views/account/BankingAccountsView.vue";
 import BankingCardsView from "@/views/BankingCardsView.vue";
 import RegisterView from "@/views/auth/RegisterView.vue";
 import SettingsView from "@/views/SettingsView.vue";

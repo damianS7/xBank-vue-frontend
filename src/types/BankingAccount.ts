@@ -1,8 +1,8 @@
 import { BankingTransaction } from "@/types/BankingTransaction";
 import { BankingCard } from "@/types/BankingCard";
 
-export type BankingAccountType = "SAVINGS" | "CHECKING" | "FIXED";
-export type BankingAccountCurrency = "USD" | "EUR" | "GBP" | "ARS"; // ajusta según tus enums reales
+export type BankingAccountType = "SAVINGS" | "CHECKING";
+export type BankingAccountCurrency = "USD" | "EUR";
 export type BankingAccountStatus = "ACTIVE" | "INACTIVE" | "CLOSED";
 
 export interface BankingAccount {

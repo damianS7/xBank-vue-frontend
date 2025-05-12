@@ -44,16 +44,44 @@ export const useAuthStore = defineStore("auth", {
         throw error;
       }
     },
+    async validateToken(token: string) {
+      const response = await fetch(
+        "http://localhost:8080/api/v1/auth/token/validate",
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      if (!response.ok) {
+        if (response.status === 401) {
+          const data = await response.json();
+          if (data.message === "Token expired") {
+            console.log("Token expired, logging out...");
+            return false;
+          }
+        }
+      }
+      return true;
+    },
     logout() {
       this.token = "";
+      this.initialized = false;
       localStorage.clear();
     },
-    initialize() {
+    async initialize() {
       const savedToken = localStorage.getItem("token");
       if (savedToken) {
+        if (!(await this.validateToken(savedToken))) {
+          this.logout();
+          return;
+        }
         this.token = savedToken;
-        // opcional: podrías hacer una llamada a /me para obtener el usuario
       }
+
       this.initialized = true;
     },
   },

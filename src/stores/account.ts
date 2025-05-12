@@ -11,6 +11,9 @@ export const useAccountStore = defineStore("account", {
     countAccounts: (state) => {
       return state.bankingAccounts.length;
     },
+    getBankingAccounts: (state) => {
+      return state.bankingAccounts;
+    },
   },
 
   actions: {
@@ -32,15 +35,47 @@ export const useAccountStore = defineStore("account", {
         }
 
         const accounts = await res.json();
-        console.log("Banking accounts:", accounts);
         return accounts;
       } catch (error) {
         console.error("Error en login:", error);
         throw error;
       }
     },
+    async openBankingAccount(type: string, currency: string, token: string) {
+      try {
+        const res = await fetch(
+          "http://localhost:8080/api/v1/banking/accounts/open",
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+            body: JSON.stringify({
+              accountType: type,
+              accountCurrency: currency,
+            }),
+          }
+        );
+
+        if (!res.ok) {
+          throw new Error("Problema al abrir la cuenta");
+        }
+
+        const account = await res.json();
+        console.log("Cuenta creada:", account);
+        this.addAccount(account);
+        return account;
+      } catch (error) {
+        console.error("Error:", error);
+        throw error;
+      }
+    },
     setAccounts(accounts: any) {
       this.bankingAccounts = accounts;
+    },
+    addAccount(account: BankingAccount) {
+      this.bankingAccounts.push(account);
     },
     async initialize() {
       if (this.initialized) {
