@@ -1,23 +1,26 @@
 <script setup lang="ts">
-import { ref, defineProps, defineEmits } from "vue";
+import { ref, defineEmits } from "vue";
 import {
   BankingAccountType,
   BankingAccountCurrency,
 } from "@/types/BankingAccount";
 const accountTypes: BankingAccountType[] = ["SAVINGS", "CHECKING"];
 const accountCurrencies: BankingAccountCurrency[] = ["USD", "EUR"];
-// const emit = defineEmits(["submitOpenAccount", "close"]);
-const emit = defineEmits<{
-  (e: "submitOpenAccount", type: string, currency: string): void;
-}>();
+const emit = defineEmits(["submit", "close"]);
+// const emit = defineEmits<{
+//   (e: "submitOpenAccount", { type, currency }): void;
+//   (e: "close"): void;
+// }>();
 const newAccount = ref({
   type: "CHECKING",
   currency: "USD",
 });
 
-function submitForm() {
-  console.log("Submitting form", newAccount.value.type);
-  emit("submitOpenAccount", newAccount.value.type, newAccount.value.currency);
+function submit() {
+  emit("submit", {
+    type: newAccount.value.type,
+    currency: newAccount.value.currency,
+  });
 }
 </script>
 
@@ -28,7 +31,7 @@ function submitForm() {
     <div class="bg-white p-6 rounded shadow-md w-full max-w-md">
       <h2 class="text-xl font-semibold mb-4">Abrir nueva cuenta</h2>
 
-      <form @submit.prevent="submitForm">
+      <form @submit.prevent="submit">
         <div class="mb-4">
           <label class="block mb-1">Tipo de cuenta</label>
           <select v-model="newAccount.type" class="w-full border rounded p-2">
@@ -60,13 +63,13 @@ function submitForm() {
             @click="emit('close')"
             class="bg-gray-300 rounded px-4 py-2"
           >
-            Cancelar
+            Close
           </button>
           <button
             type="submit"
             class="bg-blue-600 text-white rounded px-4 py-2 hover:bg-blue-700"
           >
-            Crear
+            Accept
           </button>
         </div>
       </form>

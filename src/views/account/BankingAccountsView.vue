@@ -4,17 +4,15 @@ import { useAccountStore } from "@/stores/account";
 import { useAuthStore } from "@/stores/auth";
 import ErrorAlert from "@/components/ErrorAlert.vue";
 import OpenAccountModal from "@/views/account/components/OpenAccountModal.vue";
-
-const errorMessage = ref("");
 const accountStore = useAccountStore();
 const authStore = useAuthStore();
+const errorMessage = ref("");
 const showModal = ref(false);
 
-function submitOpenAccount(type: string, currency: string) {
+// function to handle the submission of the open account modal
+function submitOpenAccount(data: { type: string; currency: string }) {
   showModal.value = false;
-  console.log("RECIBIDO", type);
-  console.log("RECIBIDO", currency);
-  // accountStore.openBankingAccount(type, currency, authStore.token);
+  accountStore.openBankingAccount(data.type, data.currency, authStore.token);
 }
 
 onMounted(() => {
@@ -43,48 +41,45 @@ onMounted(() => {
     <div
       v-for="account in accountStore.getBankingAccounts"
       :key="account.id"
-      class="w-full bg-white rounded shadow p-4"
+      class="bg-blue-50 p-4 rounded shadow space-y-2"
     >
-      <div class="flex justify-between items-center bg-blue-50 p-4 rounded">
-        <div>
+      <!-- Primera línea: Alias + etiquetas -->
+      <div class="flex justify-between items-center">
+        <span class="text-sm font-bold text-gray-700">
+          {{ account.alias || "Define an alias" }}
+        </span>
+        <div class="flex gap-2">
           <span
-            class="inline-block bg-blue-100 text-blue-800 text-sm font-medium px-3 py-1 rounded-full"
+            class="bg-blue-100 text-blue-800 text-sm font-bold px-2 py-1 rounded"
           >
             {{ account.accountType }}
           </span>
           <span
-            class="inline-block bg-blue-100 text-blue-800 text-sm font-medium px-3 py-1 rounded-full"
+            class="bg-blue-100 text-blue-800 text-sm font-bold px-2 py-1 rounded"
           >
             {{ account.accountStatus }}
           </span>
-          <span
-            class="inline-block bg-blue-100 text-blue-800 text-sm font-medium px-3 py-1 rounded-full"
-          >
-            {{ account.accountCurrency }}
-          </span>
-          <p class="text-lg font-semibold">
-            {{ account.accountNumber }}
-          </p>
-          <p class="text-sm text-gray-600">
-            <!-- Alias: {{ account?.alias || "Sin alias" }} -->
-          </p>
-        </div>
-        <div class="text-right">
-          <p class="text-sm text-gray-500">Saldo</p>
-          <p class="text-xl font-bold text-green-600">
-            {{ account.balance.toLocaleString() }}
-            {{ account.accountCurrency }}
-          </p>
         </div>
       </div>
 
-      <!-- Modal -->
-      <OpenAccountModal
-        v-if="showModal"
-        :visible="showModal"
-        @submit="submitOpenAccount"
-        @close="showModal = false"
-      />
+      <!-- Segunda línea: Número de cuenta + saldo -->
+      <div class="flex justify-between items-center">
+        <p class="text-lg font-semibold text-gray-800">
+          IBAN {{ account.accountNumber }}
+        </p>
+        <div class="text-right">
+          <p class="text-xl font-bold text-green-600">
+            {{ account.balance.toLocaleString() }} {{ account.accountCurrency }}
+          </p>
+        </div>
+      </div>
     </div>
   </div>
+  <!-- Modal -->
+  <OpenAccountModal
+    v-if="showModal"
+    :visible="showModal"
+    @submit="submitOpenAccount"
+    @close="showModal = false"
+  />
 </template>
