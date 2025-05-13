@@ -16,7 +16,7 @@ function submitOpenAccount(data: { type: string; currency: string }) {
 }
 
 onMounted(() => {
-  accountStore.initialize();
+  // accountStore.initialize();
 });
 </script>
 <template>
@@ -43,36 +43,39 @@ onMounted(() => {
       :key="account.id"
       class="bg-blue-50 p-4 rounded shadow space-y-2"
     >
-      <!-- Primera línea: Alias + etiquetas -->
-      <div class="flex justify-between items-center">
-        <span class="text-sm font-bold text-gray-700">
-          {{ account.alias || "Define an alias" }}
-        </span>
-        <div class="flex gap-2">
-          <span
-            class="bg-blue-100 text-blue-800 text-sm font-bold px-2 py-1 rounded"
-          >
-            {{ account.accountType }}
+      <router-link :to="`/account/${account.id}`">
+        <!-- Primera línea: Alias + etiquetas -->
+        <div class="flex justify-between items-center">
+          <span class="text-sm font-bold text-gray-700">
+            {{ account.alias || "Define an alias" }}
           </span>
-          <span
-            class="bg-blue-100 text-blue-800 text-sm font-bold px-2 py-1 rounded"
-          >
-            {{ account.accountStatus }}
-          </span>
+          <div class="flex gap-2">
+            <span
+              class="bg-blue-100 text-blue-800 text-sm font-bold px-2 py-1 rounded"
+            >
+              {{ account.accountType }}
+            </span>
+            <span
+              class="bg-blue-100 text-blue-800 text-sm font-bold px-2 py-1 rounded"
+            >
+              {{ account.accountStatus }}
+            </span>
+          </div>
         </div>
-      </div>
 
-      <!-- Segunda línea: Número de cuenta + saldo -->
-      <div class="flex justify-between items-center">
-        <p class="text-lg font-semibold text-gray-800">
-          IBAN {{ account.accountNumber }}
-        </p>
-        <div class="text-right">
-          <p class="text-xl font-bold text-green-600">
-            {{ account.balance.toLocaleString() }} {{ account.accountCurrency }}
+        <!-- Segunda línea: Número de cuenta + saldo -->
+        <div class="flex justify-between items-center">
+          <p class="text-lg font-semibold text-gray-800">
+            IBAN {{ account.accountNumber }}
           </p>
+          <div class="text-right">
+            <p class="text-xl font-bold text-green-600">
+              {{ account.balance.toLocaleString() }}
+              {{ account.accountCurrency }}
+            </p>
+          </div>
         </div>
-      </div>
+      </router-link>
     </div>
   </div>
   <!-- Modal -->

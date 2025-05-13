@@ -1,11 +1,6 @@
 <script setup lang="ts">
-import { onMounted } from "vue";
 import { useAccountStore } from "@/stores/account";
 const accountStore = useAccountStore();
-
-onMounted(() => {
-  accountStore.initialize();
-});
 </script>
 <template>
   <div class="home space-y-4 p-4">

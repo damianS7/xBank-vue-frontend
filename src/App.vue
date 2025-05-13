@@ -1,14 +1,12 @@
 <template>
-  <FullScreenLoader v-if="!authStore.initialized" />
-  <router-view v-if="authStore.initialized" />
+  <router-view />
 </template>
 <script setup lang="ts">
-import { onMounted } from "vue";
+import { onMounted, ref } from "vue";
 import { useAuthStore } from "@/stores/auth";
-import { useCustomerStore } from "@/stores/customer";
 import FullScreenLoader from "@/components/FullScreenLoadingSpinner.vue";
+const initialized = ref(false);
 const authStore = useAuthStore();
-const customerStore = useCustomerStore();
 function sleep(ms: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
@@ -16,10 +14,11 @@ async function wait() {
   await sleep(1000); // Espera 2 segundos
 }
 
-onMounted(async () => {
-  await wait();
+onMounted(() => {
+  // wait();
+  // console.log("mounted app");
   authStore.initialize();
-  customerStore.initialize();
+  // initialized.value = true;
 });
 </script>
 <style>

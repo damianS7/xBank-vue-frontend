@@ -7,7 +7,8 @@ export type BankingAccountStatus = "ACTIVE" | "INACTIVE" | "CLOSED";
 
 export interface BankingAccount {
   id: number;
-  customerId: number; // o puedes usar un tipo Customer si necesitas los datos
+  customerId: number;
+  alias: string;
   accountTransactions: BankingTransaction[];
   bankingCards: BankingCard[];
   accountNumber: string;

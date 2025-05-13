@@ -1,6 +1,6 @@
 <template>
   <div
-    class="min-h-screen flex flex-col items-center justify-center bg-gray-100 px-4"
+    class="min-h-screen flex flex-col items-center justify-center bg-gray-100 px-2 py-8"
   >
     <div class="w-full max-w-md">
       <router-view></router-view>
@@ -34,8 +34,12 @@
 </template>
 
 <script setup lang="ts">
+import { onMounted } from "vue";
 import { useRoute } from "vue-router";
 const route = useRoute();
+onMounted(() => {
+  // console.log("mounted authlayout");
+});
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->

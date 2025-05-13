@@ -11,6 +11,11 @@ export const useAccountStore = defineStore("account", {
     countAccounts: (state) => {
       return state.bankingAccounts.length;
     },
+    getBankingAccount: (state) => {
+      return (id: number) => {
+        return state.bankingAccounts.find((a) => a.id === id);
+      };
+    },
     getBankingAccounts: (state) => {
       return state.bankingAccounts;
     },

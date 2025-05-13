@@ -1,19 +1,32 @@
 <template>
-  <div class="flex min-h-screen">
+  <div class="flex h-screen overflow-hidden">
+    <!-- Sidebar fijo -->
     <Sidebar />
-    <main class="flex-1 bg-white">
-      <Header></Header>
-      <router-view class="p-6" />
-    </main>
+
+    <!-- Contenedor principal -->
+    <div class="flex-1 flex flex-col">
+      <!-- Header fijo -->
+      <Header />
+
+      <!-- Contenido scrollable -->
+      <div class="flex-1 overflow-auto p-2 bg-white">
+        <router-view />
+      </div>
+    </div>
   </div>
 </template>
 <script setup lang="ts">
 import Sidebar from "@/layouts/SidebarLayout.vue";
 import Header from "@/components/HeaderBar.vue";
-</script>
+import { onMounted } from "vue";
+import { useCustomerStore } from "@/stores/customer";
+import { useAccountStore } from "@/stores/account";
+import { useAuthStore } from "@/stores/auth";
+const accountStore = useAccountStore();
+const customerStore = useCustomerStore();
 
-<!-- Add "scoped" attribute to limit CSS to this component only -->
-<style scoped>
-.default-layout {
-}
-</style>
+onMounted(() => {
+  customerStore.initialize();
+  accountStore.initialize();
+});
+</script>

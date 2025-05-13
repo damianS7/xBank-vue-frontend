@@ -1,3 +1,4 @@
+import { Customer } from "@/types/Customer";
 import { defineStore } from "pinia";
 
 export const useAuthStore = defineStore("auth", {
@@ -44,6 +45,21 @@ export const useAuthStore = defineStore("auth", {
         throw error;
       }
     },
+    async register(fields: Customer) {
+      const response = await fetch(
+        "http://localhost:8080/api/v1/auth/register",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(fields),
+        }
+      );
+
+      const data = await response.json();
+      return { status: response.status, data };
+    },
     async validateToken(token: string) {
       const response = await fetch(
         "http://localhost:8080/api/v1/auth/token/validate",
@@ -60,7 +76,6 @@ export const useAuthStore = defineStore("auth", {
         if (response.status === 401) {
           const data = await response.json();
           if (data.message === "Token expired") {
-            console.log("Token expired, logging out...");
             return false;
           }
         }
@@ -75,13 +90,12 @@ export const useAuthStore = defineStore("auth", {
     async initialize() {
       const savedToken = localStorage.getItem("token");
       if (savedToken) {
+        this.token = savedToken;
         if (!(await this.validateToken(savedToken))) {
           this.logout();
           return;
         }
-        this.token = savedToken;
       }
-
       this.initialized = true;
     },
   },

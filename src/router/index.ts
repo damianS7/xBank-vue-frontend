@@ -4,10 +4,11 @@ import LoginView from "@/views/auth/LoginView.vue";
 import MainLayout from "@/layouts/MainLayout.vue";
 import AuthLayout from "@/layouts/AuthLayout.vue";
 import BankingAccountsView from "@/views/account/BankingAccountsView.vue";
+import BankingAccountView from "@/views/account/BankingAccountView.vue";
 import BankingCardsView from "@/views/BankingCardsView.vue";
 import RegisterView from "@/views/auth/RegisterView.vue";
 import SettingsView from "@/views/SettingsView.vue";
-import ProfileView from "@/views/ProfileView.vue";
+import ProfileView from "@/views/profile/ProfileView.vue";
 import AboutView from "@/views/AboutView.vue";
 import ResetPasswordView from "@/views/auth/ResetPasswordView.vue";
 import { useAuthStore } from "@/stores/auth";
@@ -27,6 +28,11 @@ const routes: Array<RouteRecordRaw> = [
         path: "accounts",
         name: "accounts",
         component: BankingAccountsView,
+      },
+      {
+        path: "account/:id",
+        name: "account",
+        component: BankingAccountView,
       },
       {
         path: "cards",
