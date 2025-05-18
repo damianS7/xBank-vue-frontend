@@ -1,6 +1,6 @@
 <template>
   <nav
-    class="sidebar p-2 group bg-gray-100 w-14 hover:w-64 transition-all duration-300 ease-in-out h-screen flex flex-col shadow-md space-y-2 overflow-hidden"
+    class="sidebar p-2 group bg-gray-100 w-14 hover:sm:w-64 transition-all duration-300 ease-in-out h-screen flex flex-col drop-shadow space-y-2"
   >
     <SidebarLink to="/home" :icon="Home" label="Home" />
     <SidebarLink to="/accounts" :icon="Accounts" label="Cuentas" />

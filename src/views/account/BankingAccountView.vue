@@ -3,10 +3,44 @@ import ErrorAlert from "@/components/ErrorAlert.vue";
 import { onMounted, ref } from "vue";
 import { useRoute } from "vue-router";
 import { useAccountStore } from "@/stores/account";
+import { useAuthStore } from "@/stores/auth";
+import RequestBankingCardModal from "@/views/account/components/RequestBankingCardModal.vue";
 const errorMessage = ref("");
 const route = useRoute();
 const accountStore = useAccountStore();
+const authStore = useAuthStore();
 const account = ref();
+
+const modals = {
+  bankingCard: {
+    visible: ref(false),
+  },
+};
+
+async function requestCard(cardType: string) {
+  // hide modal
+  modals.bankingCard.visible.value = false;
+
+  // account id from url
+  const accountId = parseInt(route.params.id[0]);
+
+  // token
+  const token = authStore.token;
+
+  // petition
+  const response = await accountStore.requestBankingCard(
+    token,
+    accountId.toString(),
+    cardType
+  );
+
+  if (response.status !== 201 && response.data.error) {
+    errorMessage.value = response.data.message;
+    return;
+  }
+
+  accountStore.addCard(accountId, response.data);
+}
 
 onMounted(() => {
   const accountId = parseInt(route.params.id as string, 10);
@@ -37,6 +71,7 @@ onMounted(() => {
       <button
         type="button"
         class="bg-blue-600 text-white rounded p-2 hover:bg-blue-700 mr-2"
+        @click="modals.bankingCard.visible.value = true"
       >
         Solicit Card
       </button>
@@ -88,6 +123,12 @@ onMounted(() => {
         </p>
       </div>
     </div>
-    <!-- Lista de cuentas -->
   </div>
+  <!-- Modal -->
+  <RequestBankingCardModal
+    v-if="modals.bankingCard.visible.value"
+    :visible="modals.bankingCard.visible.value"
+    @submit="requestCard"
+    @close="modals.bankingCard.visible.value = false"
+  />
 </template>

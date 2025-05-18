@@ -4,21 +4,9 @@
 <script setup lang="ts">
 import { onMounted, ref } from "vue";
 import { useAuthStore } from "@/stores/auth";
-import FullScreenLoader from "@/components/FullScreenLoadingSpinner.vue";
-const initialized = ref(false);
 const authStore = useAuthStore();
-function sleep(ms: number): Promise<void> {
-  return new Promise((resolve) => setTimeout(resolve, ms));
-}
-async function wait() {
-  await sleep(1000); // Espera 2 segundos
-}
-
 onMounted(() => {
-  // wait();
-  // console.log("mounted app");
   authStore.initialize();
-  // initialized.value = true;
 });
 </script>
 <style>

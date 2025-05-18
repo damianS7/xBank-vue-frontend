@@ -20,14 +20,14 @@ onMounted(() => {
 });
 </script>
 <template>
-  <div class="home space-y-4 p-4">
+  <div class="home space-y-4">
     <ErrorAlert
       v-if="errorMessage"
       :message="errorMessage"
       @close="errorMessage = ''"
     />
     <!-- Botón para abrir una nueva cuenta -->
-    <div class="w-full bg-gray-100 rounded p-2 text-right">
+    <div class="w-full rounded p-2 text-right">
       <button
         type="button"
         @click="showModal = true"
@@ -47,7 +47,7 @@ onMounted(() => {
         <!-- Primera línea: Alias + etiquetas -->
         <div class="flex justify-between items-center">
           <span class="text-sm font-bold text-gray-700">
-            {{ account.alias || "Define an alias" }}
+            {{ account.alias || "No alias" }}
           </span>
           <div class="flex gap-2">
             <span
@@ -65,11 +65,11 @@ onMounted(() => {
 
         <!-- Segunda línea: Número de cuenta + saldo -->
         <div class="flex justify-between items-center">
-          <p class="text-lg font-semibold text-gray-800">
+          <span class="sm:text-lg font-semibold text-gray-800">
             IBAN {{ account.accountNumber }}
-          </p>
+          </span>
           <div class="text-right">
-            <p class="text-xl font-bold text-green-600">
+            <p class="sm:text-xl font-bold text-green-600">
               {{ account.balance.toLocaleString() }}
               {{ account.accountCurrency }}
             </p>

@@ -73,16 +73,11 @@ export const useAuthStore = defineStore("auth", {
       );
 
       if (!response.ok) {
-        if (response.status === 401) {
-          const data = await response.json();
-          if (data.message === "Token expired") {
-            return false;
-          }
-        }
+        return false;
       }
       return true;
     },
-    logout() {
+    async logout() {
       this.token = "";
       this.initialized = false;
       localStorage.clear();

@@ -5,7 +5,8 @@ import MainLayout from "@/layouts/MainLayout.vue";
 import AuthLayout from "@/layouts/AuthLayout.vue";
 import BankingAccountsView from "@/views/account/BankingAccountsView.vue";
 import BankingAccountView from "@/views/account/BankingAccountView.vue";
-import BankingCardsView from "@/views/BankingCardsView.vue";
+import BankingCardListView from "@/views/card//BankingCardListView.vue";
+import BankingCardItemView from "@/views/card//BankingCardItemView.vue";
 import RegisterView from "@/views/auth/RegisterView.vue";
 import SettingsView from "@/views/SettingsView.vue";
 import ProfileView from "@/views/profile/ProfileView.vue";
@@ -37,7 +38,12 @@ const routes: Array<RouteRecordRaw> = [
       {
         path: "cards",
         name: "cards",
-        component: BankingCardsView,
+        component: BankingCardListView,
+      },
+      {
+        path: "card/:id",
+        name: "card",
+        component: BankingCardItemView,
       },
       {
         path: "profile",

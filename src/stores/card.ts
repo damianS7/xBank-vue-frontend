@@ -1,8 +1,7 @@
 import { defineStore } from "pinia";
 import type { BankingAccount } from "../types/BankingAccount";
-import type { BankingCard } from "../types/BankingCard";
 
-export const useAccountStore = defineStore("account", {
+export const useAccountStore = defineStore("card", {
   state: () => ({
     bankingAccounts: [] as BankingAccount[],
     initialized: false,
@@ -17,16 +16,8 @@ export const useAccountStore = defineStore("account", {
         return state.bankingAccounts.find((a) => a.id === id);
       };
     },
-    getBankingCard() {
-      return (id: number) => {
-        return this.getBankingCards.find((card) => card.id === id);
-      };
-    },
     getBankingAccounts: (state) => {
       return state.bankingAccounts;
-    },
-    getBankingCards: (state) => {
-      return state.bankingAccounts.flatMap((account) => account.bankingCards);
     },
   },
 
@@ -85,39 +76,11 @@ export const useAccountStore = defineStore("account", {
         throw error;
       }
     },
-    async requestBankingCard(
-      token: string,
-      accountId: string,
-      cardType: string
-    ) {
-      const response = await fetch(
-        "http://localhost:8080/api/v1/banking/accounts/" + accountId + "/cards",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify({
-            cardType,
-          }),
-        }
-      );
-
-      const data = await response.json();
-      return { status: response.status, data };
-    },
     setAccounts(accounts: any) {
       this.bankingAccounts = accounts;
     },
     addAccount(account: BankingAccount) {
       this.bankingAccounts.push(account);
-    },
-    addCard(accountId: number, card: BankingCard) {
-      const account = this.bankingAccounts.find(
-        (account) => account.id === accountId
-      );
-      account?.bankingCards.push(card);
     },
     async initialize() {
       if (this.initialized) {

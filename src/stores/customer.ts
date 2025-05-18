@@ -15,26 +15,16 @@ export const useCustomerStore = defineStore("customer", {
 
   actions: {
     async getCustomer(token: string) {
-      try {
-        const res = await fetch("http://localhost:8080/api/v1/customers/me", {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-        });
+      const res = await fetch("http://localhost:8080/api/v1/customers/me", {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      });
 
-        const data = await res.json();
-
-        if (!res.ok) {
-          throw new Error(data.message);
-        }
-
-        return data;
-      } catch (error: any) {
-        console.log(error);
-        throw error;
-      }
+      const data = await res.json();
+      return data;
     },
     async updateProfile(
       token: string,
@@ -49,6 +39,65 @@ export const useCustomerStore = defineStore("customer", {
         },
         body: JSON.stringify({ currentPassword, fieldsToUpdate }),
       });
+
+      const data = await response.json();
+      return { status: response.status, data };
+    },
+    async changePassword(
+      token: string,
+      currentPassword: string,
+      newPassword: string
+    ) {
+      const response = await fetch(
+        "http://localhost:8080/api/v1/auth/customers/password",
+        {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({ currentPassword, newPassword }),
+        }
+      );
+
+      const data = await response.json();
+      return { status: response.status, data };
+    },
+    async getPhoto(token: string, photo: string) {
+      try {
+        const res = await fetch(
+          "http://localhost:8080/api/v1/profiles/photo/" + photo,
+          {
+            method: "GET",
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+
+        const data = await res.blob();
+
+        return data;
+      } catch (error: any) {
+        console.log(error);
+        throw error;
+      }
+    },
+    async changeAvatar(token: string, currentPassword: string, file: any) {
+      const formData = new FormData();
+      formData.append("file", file);
+      formData.append("currentPassword", currentPassword); // otro campo necesario
+
+      const response = await fetch(
+        "http://localhost:8080/api/v1/profiles/photo",
+        {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+          body: formData,
+        }
+      );
 
       const data = await response.json();
       return { status: response.status, data };
@@ -70,6 +119,7 @@ export const useCustomerStore = defineStore("customer", {
         this.setCustomer(customer);
       }
       this.initialized = true;
+      console.log("initialized customer.");
     },
   },
 });
