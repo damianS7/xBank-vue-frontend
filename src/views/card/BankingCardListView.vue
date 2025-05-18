@@ -15,7 +15,7 @@ onMounted(() => {
 });
 </script>
 <template>
-  <div class="grid md:grid-cols-2 gap-2 justify-items-center">
+  <div class="grid lg:grid-cols-2 gap-2 justify-items-center">
     <MessageAlert
       v-if="messageAlert.message"
       :message="messageAlert.message"

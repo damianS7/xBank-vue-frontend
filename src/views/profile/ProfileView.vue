@@ -2,7 +2,7 @@
 import { useCustomerStore } from "@/stores/customer";
 import ErrorAlert from "@/components/ErrorAlert.vue";
 import { ref } from "vue";
-import { SquarePen, Save, SaveOff } from "lucide-vue-next";
+import ProfileEditableField from "./components/ProfileEditableField.vue";
 import ConfirmPasswordModal from "./components/ConfirmPasswordModal.vue";
 import ChangePasswordModal from "./components/ChangePasswordModal.vue";
 import { useAuthStore } from "@/stores/auth";
@@ -15,11 +15,17 @@ const genderOptions = genderTypes.map((value) => ({
   value,
   label: value.charAt(0) + value.slice(1).toLowerCase(),
 }));
+// message to show
+const messageToShow = ref("");
 const modals = {
   confirmPasswordModal: {
-    // password to be input when user wants to modifiy profile
-    confirmedPassword: ref(""),
     visible: ref(false),
+    onConfirm: (value: string) => {
+      // nothing
+    },
+    onCancel: () => {
+      // nothing
+    },
   },
   changePasswordModal: {
     // new password
@@ -30,16 +36,13 @@ const modals = {
   },
 };
 
-// message to show
-const messageToShow = ref("");
-
 // updatable fields to be displayed
 const formFields = ref([
   {
     name: "firstName",
     type: "text",
     placeholder: "First name",
-    value: ref(customerStore.customer.profile?.firstName),
+    value: customerStore.customer.profile?.firstName,
     error: "",
     isEditing: false,
     edited: false,
@@ -126,39 +129,52 @@ const formFields = ref([
     isEditing: false,
     edited: false,
   },
+  {
+    name: "password",
+    type: "password",
+    placeholder: "New password",
+    value: "*********",
+    error: "",
+    isEditing: false,
+    edited: false,
+  },
 ]);
 
-function updateProfile(currentPassword: string) {
-  // const currentPassword = ConfirmPasswordModal
-  updateFields(currentPassword);
-  updatePhoto(currentPassword);
+async function openConfirmPasswordModal(): Promise<string> {
+  return new Promise((resolve, reject) => {
+    // Abres el modal (puedes usar un ref o store para controlarlo)
+    modals.confirmPasswordModal.visible.value = true;
+
+    // Registras callbacks
+    modals.confirmPasswordModal.onConfirm = (password: string) => {
+      modals.confirmPasswordModal.visible.value = false;
+      resolve(password);
+    };
+
+    modals.confirmPasswordModal.onCancel = () => {
+      modals.confirmPasswordModal.visible.value = false;
+    };
+  });
 }
 
-// updates a field
-async function updateFields(currentPassword: string) {
-  modals.confirmPasswordModal.visible.value = false;
-  // fields to update
-  const fieldsToUpdate = formFields.value
-    .filter((field) => field.edited === true)
-    .reduce((acc, field) => {
-      acc[field.name] = field.value;
-      return acc;
-    }, {} as Record<string, any>);
+// updateds a single field
+async function updateField(
+  index: number,
+  field: { name: string; value: string }
+) {
+  // wait for the user to input his password
+  const currentPassword = await openConfirmPasswordModal();
 
   // nothing to update
-  if (fieldsToUpdate.length == 0) {
-    return;
-  }
-
-  if (currentPassword.length == 0) {
+  if (field.value.length == 0 || currentPassword.length == 0) {
     return;
   }
 
   // request for update
-  const response = await customerStore.updateProfile(
+  const response = await customerStore.patchProfile(
     authStore.token,
     currentPassword,
-    fieldsToUpdate
+    { [field.name]: field.value }
   );
 
   if (response.status === 200) {
@@ -167,8 +183,7 @@ async function updateFields(currentPassword: string) {
     messageToShow.value = response.data.message;
   }
 
-  // we reset the actual password value
-  modals.confirmPasswordModal.confirmedPassword.value = "";
+  formFields.value[index].value = field.value;
 }
 
 // change the password
@@ -223,9 +238,6 @@ async function updatePhoto(currentPassword: string) {
   } else {
     messageToShow.value = response.data.message;
   }
-
-  // we reset the actual password value
-  modals.confirmPasswordModal.confirmedPassword.value = "";
 }
 
 function handleFileChange(event: Event) {
@@ -239,10 +251,6 @@ const selectedFile = ref<File | null>(null);
 
 function showFileDialog() {
   fileInput.value?.click();
-}
-function validateAndConfirmEditing({ field }) {
-  // validate field on the fly???
-  // zod
 }
 
 const photoUrl = ref("");
@@ -265,7 +273,7 @@ async function fetchPhoto() {
       @close="messageToShow = ''"
     />
     <!-- Botón para abrir una nueva cuenta -->
-    <div class="flex justify-end rounded gap-2">
+    <div class="flex justify-end rounded gap-1 p-1">
       <button
         type="button"
         class="bg-blue-600 text-white rounded px-1 hover:bg-blue-700"
@@ -280,13 +288,6 @@ async function fetchPhoto() {
       >
         Save profile
       </button>
-      <button
-        type="button"
-        class="bg-blue-600 text-white rounded px-1 hover:bg-blue-700"
-        @click="fetchPhoto"
-      >
-        LOAD PHOTO
-      </button>
     </div>
 
     <div class="p-4 mt-6 rounded bg-blue-50 shadow">
@@ -297,7 +298,7 @@ async function fetchPhoto() {
         class="grid grid-cols-1 md:grid-cols-2 gap-4 p-4"
       >
         <!-- Foto de perfil -->
-        <div class="flex items-center gap-4 cursor-pointer">
+        <div class="md:col-span-2 cursor-pointer">
           <input
             type="file"
             ref="fileInput"
@@ -319,62 +320,19 @@ async function fetchPhoto() {
             No Image
           </div>
         </div>
+
         <div v-for="(field, index) in formFields" :key="index">
-          <p class="text-gray-500 text-sm">{{ field.placeholder }}</p>
-
-          <div
-            v-if="!field.isEditing"
-            class="flex items-center justify-between font-medium text-lg"
-          >
-            <span>{{ field.value }}</span>
-            <SquarePen
-              class="text-blue-500 cursor-pointer"
-              @click="field.isEditing = true"
-            />
-          </div>
-
-          <div v-else class="flex items-center gap-2">
-            <input
-              v-if="field.type !== 'select'"
-              :type="field.type"
-              class="border rounded p-2 w-full"
-              v-model="field.value"
-            />
-            <select
-              v-if="field.type === 'select'"
-              v-model="field.value"
-              :name="field.name"
-              class="border rounded p-2 w-full"
-            >
-              <option
-                v-for="option in field.options"
-                :key="option.value"
-                :value="option.value"
-              >
-                {{ option.label }}
-              </option>
-            </select>
-            <Save
-              class="text-green-500 cursor-pointer"
-              @click="
-                () => {
-                  field.edited = true;
-                  field.isEditing = false;
-                }
-              "
-            />
-            <SaveOff
-              class="text-red-500 cursor-pointer"
-              @click="field.isEditing = false"
-            />
-          </div>
+          <ProfileEditableField
+            :index="index"
+            :field="field"
+            @update="updateField"
+          />
         </div>
       </div>
       <ConfirmPasswordModal
         v-if="modals.confirmPasswordModal.visible.value"
-        :visible="modals.confirmPasswordModal.visible.value"
-        @submit="updateProfile"
-        @close="modals.confirmPasswordModal.visible.value = false"
+        @confirm="modals.confirmPasswordModal.onConfirm"
+        @cancel="modals.confirmPasswordModal.onCancel"
       />
       <ChangePasswordModal
         v-if="modals.changePasswordModal.visible.value"

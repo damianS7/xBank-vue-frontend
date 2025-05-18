@@ -8,7 +8,7 @@ const props = defineProps<{
 </script>
 <template>
   <div
-    class="bg-gradient-to-br from-cyan-900 to-cyan-500 p-4 rounded-md shadow h-36 w-72 overflow-hidden truncate text-ellipsis"
+    class="bg-gradient-to-br from-cyan-900 to-cyan-500 p-4 rounded-md shadow h-28 w-44 sm:h-36 sm:w-72 overflow-hidden truncate"
   >
     <!-- Segunda línea: Número de cuenta + saldo -->
     <div class="flex justify-between items-center">

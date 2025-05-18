@@ -72,10 +72,10 @@ export const useAuthStore = defineStore("auth", {
         }
       );
 
-      if (!response.ok) {
-        return false;
+      if (response.ok) {
+        return true;
       }
-      return true;
+      return false;
     },
     async logout() {
       this.token = "";

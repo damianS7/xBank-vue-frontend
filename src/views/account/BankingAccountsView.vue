@@ -20,14 +20,15 @@ onMounted(() => {
 });
 </script>
 <template>
-  <div class="home space-y-4">
+  <div>
     <ErrorAlert
       v-if="errorMessage"
       :message="errorMessage"
       @close="errorMessage = ''"
     />
     <!-- Botón para abrir una nueva cuenta -->
-    <div class="w-full rounded p-2 text-right">
+
+    <div class="flex justify-end rounded gap-1 p-1">
       <button
         type="button"
         @click="showModal = true"
@@ -41,7 +42,7 @@ onMounted(() => {
     <div
       v-for="account in accountStore.getBankingAccounts"
       :key="account.id"
-      class="bg-blue-50 p-4 rounded shadow space-y-2"
+      class="bg-blue-50 p-4 rounded shadow mt-6"
     >
       <router-link :to="`/account/${account.id}`">
         <!-- Primera línea: Alias + etiquetas -->

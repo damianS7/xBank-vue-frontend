@@ -17,6 +17,7 @@ let initialized = ref(false);
 
 async function checkIfTokenIsValid() {
   const token = authStore.token;
+
   if (!authStore.validateToken(token)) {
     initialized.value = false;
     clearInterval(tokenValidationInterval);

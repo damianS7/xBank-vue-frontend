@@ -42,10 +42,17 @@ onMounted(() => {
       @close="messageAlert.message = ''"
     />
     <!-- Botón para abrir una nueva cuenta -->
-    <div class="w-full bg-gray-100 rounded p-2 text-right">
+    <div class="flex justify-end rounded gap-1 p-1">
       <button
         type="button"
-        class="bg-blue-600 text-white rounded p-2 hover:bg-blue-700 mr-2"
+        class="bg-blue-600 text-white rounded px-1 hover:bg-blue-700"
+        @click="modals.bankingCard.visible.value = true"
+      >
+        Cancel Card
+      </button>
+      <button
+        type="button"
+        class="bg-blue-600 text-white rounded px-1 hover:bg-blue-700"
         @click="modals.bankingCard.visible.value = true"
       >
         Cancel Card

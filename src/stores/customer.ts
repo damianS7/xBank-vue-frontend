@@ -26,12 +26,12 @@ export const useCustomerStore = defineStore("customer", {
       const data = await res.json();
       return data;
     },
-    async updateProfile(
+    async patchProfile(
       token: string,
       currentPassword: string,
       fieldsToUpdate: Record<string, any>
     ) {
-      const response = await fetch("http://localhost:8080/api/v1/profiles", {
+      const response = await fetch("http://localhost:8080/api/v1/profiles/me", {
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",
@@ -66,7 +66,7 @@ export const useCustomerStore = defineStore("customer", {
     async getPhoto(token: string, photo: string) {
       try {
         const res = await fetch(
-          "http://localhost:8080/api/v1/profiles/photo/" + photo,
+          "http://localhost:8080/api/v1/profiles/me/photo/" + photo,
           {
             method: "GET",
             headers: {
@@ -89,7 +89,7 @@ export const useCustomerStore = defineStore("customer", {
       formData.append("currentPassword", currentPassword); // otro campo necesario
 
       const response = await fetch(
-        "http://localhost:8080/api/v1/profiles/photo",
+        "http://localhost:8080/api/v1/profiles/me/photo",
         {
           method: "POST",
           headers: {
