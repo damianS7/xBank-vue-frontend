@@ -1,5 +1,6 @@
 import { defineStore } from "pinia";
 import type { Customer } from "@/types/Customer";
+import { useAuthStore } from "@/stores/auth";
 
 export const useCustomerStore = defineStore("customer", {
   state: () => ({
@@ -63,27 +64,25 @@ export const useCustomerStore = defineStore("customer", {
       const data = await response.json();
       return { status: response.status, data };
     },
-    async getPhoto(token: string, photo: string) {
-      try {
-        const res = await fetch(
-          "http://localhost:8080/api/v1/profiles/me/photo/" + photo,
-          {
-            method: "GET",
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
+    async getPhoto(photo: string) {
+      const authStore = useAuthStore();
+      const token = authStore.token;
 
-        const data = await res.blob();
+      const res = await fetch(
+        "http://localhost:8080/api/v1/profiles/me/photo/" + photo,
+        {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
 
-        return data;
-      } catch (error: any) {
-        console.log(error);
-        throw error;
-      }
+      const data = await res.blob();
+
+      return data;
     },
-    async changeAvatar(token: string, currentPassword: string, file: any) {
+    async uploadPhoto(token: string, currentPassword: string, file: any) {
       const formData = new FormData();
       formData.append("file", file);
       formData.append("currentPassword", currentPassword); // otro campo necesario

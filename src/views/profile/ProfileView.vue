@@ -3,6 +3,7 @@ import { useCustomerStore } from "@/stores/customer";
 import ErrorAlert from "@/components/ErrorAlert.vue";
 import { ref } from "vue";
 import ProfileEditableField from "./components/ProfileEditableField.vue";
+import ProfilePhoto from "./components/ProfilePhoto.vue";
 import ConfirmPasswordModal from "./components/ConfirmPasswordModal.vue";
 import ChangePasswordModal from "./components/ChangePasswordModal.vue";
 import { useAuthStore } from "@/stores/auth";
@@ -144,7 +145,6 @@ async function openConfirmPasswordModal(): Promise<string> {
   return new Promise((resolve, reject) => {
     // Abres el modal (puedes usar un ref o store para controlarlo)
     modals.confirmPasswordModal.visible.value = true;
-
     // Registras callbacks
     modals.confirmPasswordModal.onConfirm = (password: string) => {
       modals.confirmPasswordModal.visible.value = false;
@@ -153,6 +153,7 @@ async function openConfirmPasswordModal(): Promise<string> {
 
     modals.confirmPasswordModal.onCancel = () => {
       modals.confirmPasswordModal.visible.value = false;
+      resolve("");
     };
   });
 }
@@ -219,18 +220,19 @@ async function changePassword(currentPassword: string, newPassword: string) {
   modals.changePasswordModal.newPasswordConfirmation.value = "";
 }
 
-async function updatePhoto(currentPassword: string) {
-  modals.confirmPasswordModal.visible.value = false;
+async function updatePhoto(photo: any) {
+  // wait for the user to input his password
+  const currentPassword = await openConfirmPasswordModal();
 
   if (currentPassword.length == 0) {
     return;
   }
 
   // request for update
-  const response = await customerStore.changeAvatar(
+  const response = await customerStore.uploadPhoto(
     authStore.token,
     currentPassword,
-    selectedFile.value
+    photo
   );
 
   if (response.status === 200) {
@@ -238,31 +240,6 @@ async function updatePhoto(currentPassword: string) {
   } else {
     messageToShow.value = response.data.message;
   }
-}
-
-function handleFileChange(event: Event) {
-  const target = event.target as HTMLInputElement;
-  const file = target.files?.[0] || null;
-  selectedFile.value = file;
-}
-
-const fileInput = ref<HTMLInputElement | null>(null);
-const selectedFile = ref<File | null>(null);
-
-function showFileDialog() {
-  fileInput.value?.click();
-}
-
-const photoUrl = ref("");
-async function fetchPhoto() {
-  const token = authStore.token;
-  const path = "http://localhost:8080/api/v1/profiles/photo/";
-
-  const photo = customer.profile.photoPath;
-
-  const blob = await customerStore.getPhoto(token, photo);
-
-  photoUrl.value = URL.createObjectURL(blob);
 }
 </script>
 <template>
@@ -272,55 +249,18 @@ async function fetchPhoto() {
       :message="messageToShow"
       @close="messageToShow = ''"
     />
-    <!-- Botón para abrir una nueva cuenta -->
-    <div class="flex justify-end rounded gap-1 p-1">
-      <button
-        type="button"
-        class="bg-blue-600 text-white rounded px-1 hover:bg-blue-700"
-        @click="modals.changePasswordModal.visible.value = true"
-      >
-        Change password
-      </button>
-      <button
-        type="button"
-        class="bg-blue-600 text-white rounded px-1 hover:bg-blue-700"
-        @click="modals.confirmPasswordModal.visible.value = true"
-      >
-        Save profile
-      </button>
-    </div>
 
-    <div class="p-4 mt-6 rounded bg-blue-50 shadow">
+    <div class="p-4 rounded bg-blue-50 shadow">
       <h1 class="text-2xl font-bold">User profile</h1>
 
+      <ProfilePhoto
+        :photoPath="customerStore.customer.profile.photoPath"
+        @update="updatePhoto"
+      />
       <div
         v-if="customerStore.customer.profile"
         class="grid grid-cols-1 md:grid-cols-2 gap-4 p-4"
       >
-        <!-- Foto de perfil -->
-        <div class="md:col-span-2 cursor-pointer">
-          <input
-            type="file"
-            ref="fileInput"
-            class="hidden"
-            @change="handleFileChange"
-          />
-          <img
-            v-if="customer.profile?.photoPath"
-            :src="photoUrl"
-            alt="Foto de perfil"
-            @click="showFileDialog"
-            class="w-24 h-24 rounded-full object-cover border"
-          />
-          <div
-            v-else
-            @click.prevent="showFileDialog"
-            class="w-24 h-24 rounded-full bg-gray-300 flex items-center justify-center text-gray-600"
-          >
-            No Image
-          </div>
-        </div>
-
         <div v-for="(field, index) in formFields" :key="index">
           <ProfileEditableField
             :index="index"
