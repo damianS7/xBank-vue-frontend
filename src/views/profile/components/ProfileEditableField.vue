@@ -28,14 +28,60 @@ const formField = reactive({
   options: props.field?.options,
 });
 
+const newPassword = ref("");
+const repeatedPassword = ref("");
+// zod error field
+
 function updateField() {
   const currentValue = formField.value;
   formField.value = props.field.value;
   emit("update", props.index, { name: formField.name, value: currentValue });
 }
+
+function updatePassword() {
+  // if (newPassword.value != repeatedPassword.value) {
+  // }
+  // updateField();
+}
 </script>
 <template>
-  <div>
+  <div v-if="formField.type !== 'select' && formField.type !== 'password'">
+    <p class="text-gray-500 text-sm">{{ formField.placeholder }}</p>
+
+    <div
+      v-if="!formField.isEditing"
+      class="flex items-center justify-between font-medium text-lg"
+    >
+      <span>{{ props.field.value }}</span>
+      <SquarePen
+        class="text-blue-500 cursor-pointer"
+        @click="formField.isEditing = true"
+      />
+    </div>
+
+    <div v-else class="flex items-center gap-2">
+      <input
+        :type="formField.type"
+        class="border rounded w-full p-2"
+        v-model="formField.value"
+      />
+      <Save
+        class="text-green-500 cursor-pointer"
+        @click="
+          () => {
+            formField.isEditing = false;
+            updateField();
+          }
+        "
+      />
+      <SaveOff
+        class="text-red-500 cursor-pointer"
+        @click="formField.isEditing = false"
+      />
+    </div>
+  </div>
+
+  <div v-else-if="formField.type == 'select'">
     <p class="text-gray-500 text-sm">{{ formField.placeholder }}</p>
 
     <div
@@ -81,6 +127,50 @@ function updateField() {
       />
       <SaveOff
         class="text-red-500 cursor-pointer"
+        @click="formField.isEditing = false"
+      />
+    </div>
+  </div>
+
+  <div class="md:col-span-2" v-if="formField.type == 'password'">
+    <p class="text-gray-500 text-sm">{{ formField.placeholder }}</p>
+
+    <div
+      v-if="!formField.isEditing"
+      class="flex items-center justify-between font-medium text-lg"
+    >
+      <span>{{ props.field.value }}</span>
+      <SquarePen
+        class="text-blue-500 cursor-pointer"
+        @click="formField.isEditing = true"
+      />
+    </div>
+
+    <div v-else class="flex items-center gap-2">
+      <input
+        :type="formField.type"
+        name="new-password"
+        placeholder="Your new password"
+        class="border rounded p-2 w-full"
+      />
+      <input
+        :type="formField.type"
+        placeholder="Repeat new password"
+        name="repeat-password"
+        class="border rounded p-2 w-full"
+      />
+
+      <Save
+        class="text-green-500 cursor-pointer w-32"
+        @click="
+          () => {
+            formField.isEditing = false;
+            updatePassword();
+          }
+        "
+      />
+      <SaveOff
+        class="text-red-500 cursor-pointer w-32"
         @click="formField.isEditing = false"
       />
     </div>

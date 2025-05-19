@@ -60,7 +60,7 @@ export const useAuthStore = defineStore("auth", {
       const data = await response.json();
       return { status: response.status, data };
     },
-    async validateToken(token: string) {
+    async isTokenValid(token: string) {
       const response = await fetch(
         "http://localhost:8080/api/v1/auth/token/validate",
         {
@@ -72,9 +72,11 @@ export const useAuthStore = defineStore("auth", {
         }
       );
 
-      if (response.ok) {
+      if (response.status == 200) {
+        console.log("token is okay");
         return true;
       }
+      console.log("token is bad");
       return false;
     },
     async logout() {
@@ -86,7 +88,7 @@ export const useAuthStore = defineStore("auth", {
       const savedToken = localStorage.getItem("token");
       if (savedToken) {
         this.token = savedToken;
-        if (!(await this.validateToken(savedToken))) {
+        if (!(await this.isTokenValid(savedToken))) {
           this.logout();
           return;
         }

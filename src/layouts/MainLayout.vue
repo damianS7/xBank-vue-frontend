@@ -2,29 +2,31 @@
 import FullScreenLoadingSpinner from "@/components/FullScreenLoadingSpinner.vue";
 import Sidebar from "@/layouts/SidebarLayout.vue";
 import Header from "@/components/HeaderBar.vue";
-import { onMounted, ref } from "vue";
+import { onMounted, onUnmounted, ref } from "vue";
 import { useCustomerStore } from "@/stores/customer";
 import { useAccountStore } from "@/stores/account";
 import { useAuthStore } from "@/stores/auth";
 import { useRoute, useRouter } from "vue-router";
 const authStore = useAuthStore();
 const accountStore = useAccountStore();
-
 const customerStore = useCustomerStore();
-const tokenValidationInterval = setInterval(checkIfTokenIsValid, 3 * 1000);
 const router = useRouter();
+let interval: number;
 let initialized = ref(false);
-
+let times = 0;
 async function checkIfTokenIsValid() {
   const token = authStore.token;
+  const isTokenValid = await authStore.isTokenValid(token);
 
-  if (!authStore.validateToken(token)) {
+  console.log("validating token");
+  if (!isTokenValid) {
+    console.log("logging out for token is invalid", times);
     initialized.value = false;
-    clearInterval(tokenValidationInterval);
     await authStore.logout();
     await wait();
     router.push("/auth/login");
   }
+  times++;
 }
 
 function sleep(ms: number): Promise<void> {
@@ -36,11 +38,16 @@ async function wait() {
 }
 
 onMounted(async () => {
+  interval = setInterval(async () => {
+    await checkIfTokenIsValid();
+  }, 30 * 1000);
+
   await wait();
   await customerStore.initialize();
   await accountStore.initialize();
   initialized.value = true;
 });
+onUnmounted(() => clearInterval(interval));
 </script>
 <template>
   <FullScreenLoadingSpinner v-if="!initialized" />

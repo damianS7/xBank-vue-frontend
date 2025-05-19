@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { useCustomerStore } from "@/stores/customer";
 import ErrorAlert from "@/components/ErrorAlert.vue";
-import { ref } from "vue";
+import { onMounted, ref } from "vue";
 import ProfileEditableField from "./components/ProfileEditableField.vue";
 import ProfilePhoto from "./components/ProfilePhoto.vue";
 import ConfirmPasswordModal from "./components/ConfirmPasswordModal.vue";
@@ -47,6 +47,7 @@ const formFields = ref([
     error: "",
     isEditing: false,
     edited: false,
+    // validation: zod
   },
   {
     name: "lastName",
@@ -158,11 +159,15 @@ async function openConfirmPasswordModal(): Promise<string> {
   });
 }
 
-// updateds a single field
+// update a single field
 async function updateField(
   index: number,
   field: { name: string; value: string }
 ) {
+  if (field.name == "email") {
+    updateEmail(index, field);
+    return;
+  }
   // wait for the user to input his password
   const currentPassword = await openConfirmPasswordModal();
 
@@ -220,6 +225,7 @@ async function changePassword(currentPassword: string, newPassword: string) {
   modals.changePasswordModal.newPasswordConfirmation.value = "";
 }
 
+// update profile photo
 async function updatePhoto(photo: any) {
   // wait for the user to input his password
   const currentPassword = await openConfirmPasswordModal();
@@ -241,6 +247,26 @@ async function updatePhoto(photo: any) {
     messageToShow.value = response.data.message;
   }
 }
+
+async function updateEmail(
+  index: number,
+  field: { name: string; value: string }
+) {
+  console.log("mail update");
+  //
+}
+
+async function updatePassword(
+  index: number,
+  field: { name: string; value: string }
+) {
+  console.log("password update");
+  //
+}
+
+onMounted(() => {
+  console.log("montando profile");
+});
 </script>
 <template>
   <div>
@@ -261,13 +287,13 @@ async function updatePhoto(photo: any) {
         v-if="customerStore.customer.profile"
         class="grid grid-cols-1 md:grid-cols-2 gap-4 p-4"
       >
-        <div v-for="(field, index) in formFields" :key="index">
-          <ProfileEditableField
-            :index="index"
-            :field="field"
-            @update="updateField"
-          />
-        </div>
+        <ProfileEditableField
+          v-for="(field, index) in formFields"
+          :key="index"
+          :index="index"
+          :field="field"
+          @update="updateField"
+        />
       </div>
       <ConfirmPasswordModal
         v-if="modals.confirmPasswordModal.visible.value"

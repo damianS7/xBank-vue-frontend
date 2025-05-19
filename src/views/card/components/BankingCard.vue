@@ -24,6 +24,11 @@ const props = defineProps<{
         >
           {{ card.cardType }}
         </span>
+        <span
+          class="bg-blue-100 text-blue-800 text-sm font-bold px-2 py-1 rounded"
+        >
+          {{ card.cardPIN }}
+        </span>
         <span class="bg-blue-100 text-blue-800 text-sm font-bold py-1 rounded">
           {{ card.cardStatus }}
         </span>

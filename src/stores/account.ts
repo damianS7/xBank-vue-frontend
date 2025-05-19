@@ -12,6 +12,16 @@ export const useAccountStore = defineStore("account", {
     countAccounts: (state) => {
       return state.bankingAccounts.length;
     },
+    countCards: (state) => {
+      return state.bankingAccounts.reduce((total, account) => {
+        return total + (account.bankingCards?.length || 0);
+      }, 0);
+    },
+    totalBalance: (state) => {
+      return state.bankingAccounts.reduce((total, account) => {
+        return total + (account.balance || 0);
+      }, 0);
+    },
     getBankingAccount: (state) => {
       return (id: number) => {
         return state.bankingAccounts.find((a) => a.id === id);
@@ -34,7 +44,7 @@ export const useAccountStore = defineStore("account", {
     async getCustomerBankingAccounts(token: string) {
       try {
         const res = await fetch(
-          "http://localhost:8080/api/v1/banking/accounts/me",
+          "http://localhost:8080/api/v1/customers/me/banking/accounts",
           {
             method: "GET",
             headers: {
@@ -58,7 +68,7 @@ export const useAccountStore = defineStore("account", {
     async openBankingAccount(type: string, currency: string, token: string) {
       try {
         const res = await fetch(
-          "http://localhost:8080/api/v1/banking/accounts/open",
+          "http://localhost:8080/api/v1/customers/me/banking/accounts/open",
           {
             method: "POST",
             headers: {
@@ -91,7 +101,9 @@ export const useAccountStore = defineStore("account", {
       cardType: string
     ) {
       const response = await fetch(
-        "http://localhost:8080/api/v1/banking/accounts/" + accountId + "/cards",
+        "http://localhost:8080/api/v1/customers/me/banking/account/" +
+          accountId +
+          "/cards",
         {
           method: "POST",
           headers: {

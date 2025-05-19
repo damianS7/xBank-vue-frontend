@@ -32,14 +32,17 @@ export const useCustomerStore = defineStore("customer", {
       currentPassword: string,
       fieldsToUpdate: Record<string, any>
     ) {
-      const response = await fetch("http://localhost:8080/api/v1/profiles/me", {
-        method: "PATCH",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({ currentPassword, fieldsToUpdate }),
-      });
+      const response = await fetch(
+        "http://localhost:8080/api/v1/customers/me/profile",
+        {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({ currentPassword, fieldsToUpdate }),
+        }
+      );
 
       const data = await response.json();
       return { status: response.status, data };
@@ -69,7 +72,7 @@ export const useCustomerStore = defineStore("customer", {
       const token = authStore.token;
 
       const res = await fetch(
-        "http://localhost:8080/api/v1/profiles/me/photo/" + photo,
+        "http://localhost:8080/api/v1/customers/me/profile/photo/" + photo,
         {
           method: "GET",
           headers: {
@@ -88,7 +91,7 @@ export const useCustomerStore = defineStore("customer", {
       formData.append("currentPassword", currentPassword); // otro campo necesario
 
       const response = await fetch(
-        "http://localhost:8080/api/v1/profiles/me/photo",
+        "http://localhost:8080/api/v1/customers/me/profile/photo",
         {
           method: "POST",
           headers: {

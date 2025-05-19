@@ -87,6 +87,7 @@ onMounted(() => {
         <div class="flex justify-between items-center">
           <h2 class="text-2xl font-bold text-gray-800">
             {{ account.alias || "Define an alias" }}
+            <input type="text" />
           </h2>
           <div class="flex gap-2">
             <span
