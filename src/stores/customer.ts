@@ -47,6 +47,22 @@ export const useCustomerStore = defineStore("customer", {
       const data = await response.json();
       return { status: response.status, data };
     },
+    async patchEmail(token: string, currentPassword: string, newEmail: string) {
+      const response = await fetch(
+        "http://localhost:8080/api/v1/customers/me/email",
+        {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({ currentPassword, newEmail }),
+        }
+      );
+
+      const data = await response.json();
+      return { status: response.status, data };
+    },
     async changePassword(
       token: string,
       currentPassword: string,
@@ -106,6 +122,9 @@ export const useCustomerStore = defineStore("customer", {
     },
     async setCustomer(customer: any) {
       this.customer = customer;
+    },
+    async setEmail(email: string) {
+      this.customer.email = email;
     },
     async setProfile(profile: any) {
       this.customer.profile = profile;
