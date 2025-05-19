@@ -28,9 +28,8 @@ const formField = reactive({
   isEditing: props.field.isEditing,
   edited: props.field.edited,
   options: props.field?.options,
+  // validation
 });
-
-// zod error field
 
 function updateField() {
   emit("update", props.index, {
@@ -40,9 +39,18 @@ function updateField() {
 }
 
 function updatePassword() {
-  // if (newPassword.value != repeatedPassword.value) {
-  // }
-  // updateField();
+  // password does not match!
+  if (newPassword.value !== repeatedPassword.value) {
+    formField.error = "Password does not match!";
+    return;
+  }
+
+  emit("update", props.index, {
+    name: formField.name,
+    value: newPassword.value,
+  });
+
+  formField.isEditing = false;
 }
 </script>
 <template>
@@ -86,6 +94,10 @@ function updatePassword() {
           />
         </div>
       </div>
+
+      <p class="text-red-500 text-sm mt-1">
+        {{ formField?.error }}
+      </p>
     </div>
   </div>
 
@@ -136,6 +148,8 @@ function updatePassword() {
         />
       </div>
     </div>
+
+    <p class="text-red-500 text-sm mt-1">{{ formField?.error }}</p>
   </div>
 
   <div
@@ -159,9 +173,9 @@ function updatePassword() {
       <div class="w-full">
         <input
           :type="formField.type"
-          v-model="formField.value"
           name="new-password"
           placeholder="Your new password"
+          v-model="newPassword"
           class="border rounded p-2 w-full"
         />
       </div>
@@ -171,6 +185,7 @@ function updatePassword() {
           :type="formField.type"
           placeholder="Repeat new password"
           name="repeat-password"
+          v-model="repeatedPassword"
           class="border rounded p-2 w-full"
         />
       </div>
@@ -179,7 +194,6 @@ function updatePassword() {
           class="text-green-500 cursor-pointer"
           @click="
             () => {
-              formField.isEditing = false;
               updatePassword();
             }
           "
@@ -190,5 +204,7 @@ function updatePassword() {
         />
       </div>
     </div>
+
+    <p class="text-red-500 text-sm mt-1">{{ formField?.error }}</p>
   </div>
 </template>

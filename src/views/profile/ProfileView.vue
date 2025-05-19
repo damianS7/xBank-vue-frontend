@@ -6,7 +6,6 @@ import ProfileEditableField from "./components/ProfileEditableField.vue";
 import ProfilePhoto from "./components/ProfilePhoto.vue";
 import ConfirmPasswordModal from "./components/ConfirmPasswordModal.vue";
 import ConfirmMessageModal from "@/components/ConfirmMessageModal.vue";
-import ChangePasswordModal from "./components/ChangePasswordModal.vue";
 import { useAuthStore } from "@/stores/auth";
 import { GenderType } from "@/types/Profile";
 import { MessageType } from "@/types/Message";
@@ -22,7 +21,7 @@ const genderOptions = genderTypes.map((value) => ({
 const messageAlert = ref({
   message: "",
   type: MessageType.ERROR,
-  timeout: 5,
+  timeout: 12,
   visible: false,
 });
 
@@ -45,13 +44,6 @@ const modals = {
     onCancel: () => {
       // nothing
     },
-  },
-  changePasswordModal: {
-    // new password
-    newPassowrd: ref(""),
-    // newPassword has to be repeated to establish a new password
-    newPasswordConfirmation: ref(""),
-    visible: ref(false),
   },
 };
 
@@ -201,10 +193,18 @@ async function updateField(
   index: number,
   field: { name: string; value: string }
 ) {
+  // updating email requires a different method
   if (field.name == "email") {
     updateEmail(index, field);
     return;
   }
+
+  // updating password requires a different method
+  if (field.name == "password") {
+    updatePassword(index, field.value);
+    return;
+  }
+
   // wait for the user to input his password
   const currentPassword = await openConfirmPasswordModal();
 
@@ -231,8 +231,10 @@ async function updateField(
 }
 
 // change the password
-async function changePassword(currentPassword: string, newPassword: string) {
-  modals.changePasswordModal.visible.value = false;
+async function updatePassword(index: number, newPassword: string) {
+  // wait for the user to input his password
+  const currentPassword = await openConfirmPasswordModal();
+  console.log(currentPassword);
 
   // nothing to update
   if (currentPassword.length == 0 || newPassword.length == 0) {
@@ -247,20 +249,17 @@ async function changePassword(currentPassword: string, newPassword: string) {
   );
 
   if (response.status !== 200) {
+    console.log(response);
     if (response.data.errors) {
       showMessage(response.data.errors?.newPassword, MessageType.ERROR);
     } else {
       showMessage(response.data.message, MessageType.ERROR);
     }
+    return;
   }
 
-  if (response.status == 200) {
-    showMessage("Password updated.", MessageType.ERROR);
-  }
-
-  // we reset the actual password value
-  modals.changePasswordModal.newPassowrd.value = "";
-  modals.changePasswordModal.newPasswordConfirmation.value = "";
+  formFields.value[index].value = currentPassword;
+  showMessage("Password successfully updated.", MessageType.SUCCESS);
 }
 
 // update profile photo
@@ -321,14 +320,6 @@ async function updateEmail(
   showMessage("Field successfully updated.", MessageType.SUCCESS);
 }
 
-async function updatePassword(
-  index: number,
-  field: { name: string; value: string }
-) {
-  console.log("password update");
-  //
-}
-
 // it shows a message
 function showMessage(message: string, type: MessageType, timeout?: number) {
   messageAlert.value.message = message;
@@ -375,12 +366,6 @@ onMounted(() => {
         v-if="modals.confirmPasswordModal.visible.value"
         @confirm="modals.confirmPasswordModal.onConfirm"
         @cancel="modals.confirmPasswordModal.onCancel"
-      />
-      <ChangePasswordModal
-        v-if="modals.changePasswordModal.visible.value"
-        :visible="modals.changePasswordModal.visible.value"
-        @submit="changePassword"
-        @close="modals.changePasswordModal.visible.value = false"
       />
       <ConfirmMessageModal
         v-if="modals.confirmMessageModal.visible.value"
