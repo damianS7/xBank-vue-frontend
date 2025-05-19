@@ -370,6 +370,7 @@ onMounted(() => {
           @update="updateField"
         />
       </div>
+
       <ConfirmPasswordModal
         v-if="modals.confirmPasswordModal.visible.value"
         @confirm="modals.confirmPasswordModal.onConfirm"

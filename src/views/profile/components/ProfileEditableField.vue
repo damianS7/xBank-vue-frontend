@@ -46,48 +46,58 @@ function updatePassword() {
 }
 </script>
 <template>
-  <div v-if="formField.type !== 'select' && formField.type !== 'password'">
-    <p class="text-gray-500 text-sm">{{ formField.placeholder }}</p>
+  <div
+    v-if="formField.type !== 'select' && formField.type !== 'password'"
+    class="p-4 bg-white rounded border shadow-sm"
+  >
+    <div>
+      <p class="text-gray-500 text-sm">{{ formField.placeholder }}</p>
 
-    <div
-      v-if="!formField.isEditing"
-      class="flex items-center justify-between font-medium text-lg"
-    >
-      <span>{{ props.field.value }}</span>
-      <SquarePen
-        class="text-blue-500 cursor-pointer"
-        @click="formField.isEditing = true"
-      />
-    </div>
+      <div
+        v-if="!formField.isEditing"
+        class="flex items-center justify-between font-medium text-lg"
+      >
+        <span>{{ props.field.value }}</span>
+        <SquarePen
+          class="text-blue-500 cursor-pointer"
+          @click="formField.isEditing = true"
+        />
+      </div>
 
-    <div v-else class="flex items-center gap-2">
-      <input
-        :type="formField.type"
-        class="border rounded w-full p-2"
-        v-model="formField.value"
-      />
-      <Save
-        class="text-green-500 cursor-pointer"
-        @click="
-          () => {
-            formField.isEditing = false;
-            updateField();
-          }
-        "
-      />
-      <SaveOff
-        class="text-red-500 cursor-pointer"
-        @click="formField.isEditing = false"
-      />
+      <div v-else class="flex flex-col gap-2 md:flex-row md:items-center">
+        <input
+          :type="formField.type"
+          class="border rounded p-2 w-full"
+          v-model="formField.value"
+        />
+        <div class="flex gap-2 justify-end md:justify-start">
+          <Save
+            class="text-green-500 cursor-pointer"
+            @click="
+              () => {
+                formField.isEditing = false;
+                updateField();
+              }
+            "
+          />
+          <SaveOff
+            class="text-red-500 cursor-pointer"
+            @click="formField.isEditing = false"
+          />
+        </div>
+      </div>
     </div>
   </div>
 
-  <div v-else-if="formField.type == 'select'">
-    <p class="text-gray-500 text-sm">{{ formField.placeholder }}</p>
+  <div
+    v-if="formField.type === 'select'"
+    class="p-4 bg-white rounded border shadow-sm"
+  >
+    <p class="text-sm text-gray-500">{{ formField.placeholder }}</p>
 
     <div
       v-if="!formField.isEditing"
-      class="flex items-center justify-between font-medium text-lg"
+      class="flex justify-between items-center text-lg"
     >
       <span>{{ props.field.value }}</span>
       <SquarePen
@@ -96,15 +106,8 @@ function updatePassword() {
       />
     </div>
 
-    <div v-else class="flex items-center gap-2">
-      <input
-        v-if="formField.type !== 'select'"
-        :type="formField.type"
-        class="border rounded p-2 w-full"
-        v-model="formField.value"
-      />
+    <div v-else class="flex flex-col md:flex-row gap-2 items-center">
       <select
-        v-if="formField.type === 'select'"
         v-model="formField.value"
         :name="formField.name"
         class="border rounded p-2 w-full"
@@ -117,23 +120,28 @@ function updatePassword() {
           {{ option.label }}
         </option>
       </select>
-      <Save
-        class="text-green-500 cursor-pointer"
-        @click="
-          () => {
-            formField.isEditing = false;
-            updateField();
-          }
-        "
-      />
-      <SaveOff
-        class="text-red-500 cursor-pointer"
-        @click="formField.isEditing = false"
-      />
+      <div class="flex gap-2 justify-end md:justify-start">
+        <Save
+          class="text-green-500 cursor-pointer"
+          @click="
+            () => {
+              formField.isEditing = false;
+              updateField();
+            }
+          "
+        />
+        <SaveOff
+          class="text-red-500 cursor-pointer"
+          @click="formField.isEditing = false"
+        />
+      </div>
     </div>
   </div>
 
-  <div class="md:col-span-2" v-if="formField.type == 'password'">
+  <div
+    class="p-4 bg-white rounded border shadow-sm sm:col-span-2"
+    v-if="formField.type == 'password'"
+  >
     <p class="text-gray-500 text-sm">{{ formField.placeholder }}</p>
 
     <div
@@ -147,33 +155,40 @@ function updatePassword() {
       />
     </div>
 
-    <div v-else class="flex items-center gap-2">
-      <input
-        :type="formField.type"
-        name="new-password"
-        placeholder="Your new password"
-        class="border rounded p-2 w-full"
-      />
-      <input
-        :type="formField.type"
-        placeholder="Repeat new password"
-        name="repeat-password"
-        class="border rounded p-2 w-full"
-      />
+    <div v-else class="grid grid-cols-1 sm:grid-cols-[1fr_1fr_auto] gap-2">
+      <div class="w-full">
+        <input
+          :type="formField.type"
+          v-model="formField.value"
+          name="new-password"
+          placeholder="Your new password"
+          class="border rounded p-2 w-full"
+        />
+      </div>
 
-      <Save
-        class="text-green-500 cursor-pointer w-32"
-        @click="
-          () => {
-            formField.isEditing = false;
-            updatePassword();
-          }
-        "
-      />
-      <SaveOff
-        class="text-red-500 cursor-pointer w-32"
-        @click="formField.isEditing = false"
-      />
+      <div class="w-full">
+        <input
+          :type="formField.type"
+          placeholder="Repeat new password"
+          name="repeat-password"
+          class="border rounded p-2 w-full"
+        />
+      </div>
+      <div class="flex justify-end items-center">
+        <Save
+          class="text-green-500 cursor-pointer"
+          @click="
+            () => {
+              formField.isEditing = false;
+              updatePassword();
+            }
+          "
+        />
+        <SaveOff
+          class="text-red-500 cursor-pointer"
+          @click="formField.isEditing = false"
+        />
+      </div>
     </div>
   </div>
 </template>
