@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { useCustomerStore } from "@/stores/customer";
-import ErrorAlert from "@/components/ErrorAlert.vue";
+import MessageAlert from "@/components/MessageAlert.vue";
 import { onMounted, ref } from "vue";
 import ProfileEditableField from "./components/ProfileEditableField.vue";
 import ProfilePhoto from "./components/ProfilePhoto.vue";
@@ -8,6 +8,7 @@ import ConfirmPasswordModal from "./components/ConfirmPasswordModal.vue";
 import ChangePasswordModal from "./components/ChangePasswordModal.vue";
 import { useAuthStore } from "@/stores/auth";
 import { GenderType } from "@/types/Profile";
+import { MessageType } from "@/types/Message";
 const customerStore = useCustomerStore();
 const authStore = useAuthStore();
 const customer = customerStore.getLoggedCustomer;
@@ -17,7 +18,13 @@ const genderOptions = genderTypes.map((value) => ({
   label: value.charAt(0) + value.slice(1).toLowerCase(),
 }));
 // message to show
-const messageToShow = ref("");
+const messageAlert = ref({
+  message: "",
+  type: MessageType.ERROR,
+  timeout: 5,
+  visible: false,
+});
+
 const modals = {
   confirmPasswordModal: {
     visible: ref(false),
@@ -186,10 +193,11 @@ async function updateField(
   if (response.status === 200) {
     customerStore.setProfile(response.data);
   } else {
-    messageToShow.value = response.data.message;
+    showMessage(response.data.message, MessageType.ERROR);
   }
 
   formFields.value[index].value = field.value;
+  showMessage("Field successfully updated.", MessageType.SUCCESS);
 }
 
 // change the password
@@ -210,14 +218,14 @@ async function changePassword(currentPassword: string, newPassword: string) {
 
   if (response.status !== 200) {
     if (response.data.errors) {
-      messageToShow.value = response.data.errors?.newPassword;
+      showMessage(response.data.errors?.newPassword, MessageType.ERROR);
     } else {
-      messageToShow.value = response.data.message;
+      showMessage(response.data.message, MessageType.ERROR);
     }
   }
 
   if (response.status == 200) {
-    messageToShow.value = "Password updated.";
+    showMessage("Password updated.", MessageType.ERROR);
   }
 
   // we reset the actual password value
@@ -243,11 +251,13 @@ async function updatePhoto(photo: any) {
 
   if (response.status === 200) {
     customerStore.setProfile(response.data);
+    showMessage("Photo successfully updated.", MessageType.SUCCESS);
   } else {
-    messageToShow.value = response.data.message;
+    showMessage(response.data.message, MessageType.ERROR);
   }
 }
 
+// upade email field
 async function updateEmail(
   index: number,
   field: { name: string; value: string }
@@ -264,16 +274,26 @@ async function updatePassword(
   //
 }
 
+// it shows a message
+function showMessage(message: string, type: MessageType, timeout?: number) {
+  messageAlert.value.message = message;
+  messageAlert.value.type = type;
+  messageAlert.value.timeout = timeout ?? messageAlert.value.timeout;
+  messageAlert.value.visible = true;
+}
 onMounted(() => {
-  console.log("montando profile");
+  //
 });
 </script>
 <template>
   <div>
-    <ErrorAlert
-      v-if="messageToShow"
-      :message="messageToShow"
-      @close="messageToShow = ''"
+    <MessageAlert
+      v-if="messageAlert.visible"
+      class="mb-4"
+      :message="messageAlert.message"
+      :timeout="messageAlert.timeout"
+      :type="messageAlert.type"
+      @close="messageAlert.visible = false"
     />
 
     <div class="p-4 rounded bg-blue-50 shadow">

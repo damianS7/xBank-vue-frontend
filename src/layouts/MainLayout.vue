@@ -47,7 +47,10 @@ onMounted(async () => {
   await accountStore.initialize();
   initialized.value = true;
 });
-onUnmounted(() => clearInterval(interval));
+
+onUnmounted(() => {
+  clearInterval(interval);
+});
 </script>
 <template>
   <FullScreenLoadingSpinner v-if="!initialized" />

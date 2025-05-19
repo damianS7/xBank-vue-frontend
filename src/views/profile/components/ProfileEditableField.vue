@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import { defineProps, defineEmits, reactive, ref } from "vue";
 import { SquarePen, Save, SaveOff } from "lucide-vue-next";
+const newPassword = ref("");
+const repeatedPassword = ref("");
 const emit = defineEmits(["update", "close"]);
 
 const props = defineProps<{
@@ -28,14 +30,13 @@ const formField = reactive({
   options: props.field?.options,
 });
 
-const newPassword = ref("");
-const repeatedPassword = ref("");
 // zod error field
 
 function updateField() {
-  const currentValue = formField.value;
-  formField.value = props.field.value;
-  emit("update", props.index, { name: formField.name, value: currentValue });
+  emit("update", props.index, {
+    name: formField.name,
+    value: formField.value,
+  });
 }
 
 function updatePassword() {
