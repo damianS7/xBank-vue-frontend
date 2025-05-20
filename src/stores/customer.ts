@@ -12,6 +12,11 @@ export const useCustomerStore = defineStore("customer", {
     getLoggedCustomer: (state) => {
       return state.customer;
     },
+    getFullName: (state) => {
+      return (
+        state.customer.profile.firstName + " " + state.customer.profile.lastName
+      );
+    },
   },
 
   actions: {
