@@ -4,15 +4,20 @@ import { onMounted, ref } from "vue";
 import { useRoute } from "vue-router";
 import { useAccountStore } from "@/stores/account";
 import { useAuthStore } from "@/stores/auth";
-import BankingCard from "@/views/card/components/BankingCard.vue";
+import BankingCardFront from "@/views/card/components/BankingCardFront.vue";
+import BankingCardBack from "@/views/card/components/BankingCardBack.vue";
 import { MessageType } from "@/types/Message";
 const route = useRoute();
 const accountStore = useAccountStore();
 const authStore = useAuthStore();
 const card = ref();
+
+// message to show
 const messageAlert = ref({
   message: "",
-  type: "ERROR" as MessageType,
+  type: MessageType.ERROR,
+  timeout: 12,
+  visible: false,
 });
 
 const modals = {
@@ -36,28 +41,45 @@ onMounted(() => {
 <template>
   <div>
     <MessageAlert
-      v-if="messageAlert.message"
+      v-if="messageAlert.visible"
+      class="mb-4"
       :message="messageAlert.message"
+      :timeout="messageAlert.timeout"
       :type="messageAlert.type"
-      @close="messageAlert.message = ''"
+      @close="messageAlert.visible = false"
     />
-    <!-- Botón para abrir una nueva cuenta -->
-    <div class="flex justify-end rounded gap-1 p-1">
-      <button
-        type="button"
-        class="bg-blue-600 text-white rounded px-1 hover:bg-blue-700"
-        @click="modals.bankingCard.visible.value = true"
-      >
-        Cancel Card
-      </button>
-      <button
-        type="button"
-        class="bg-blue-600 text-white rounded px-1 hover:bg-blue-700"
-        @click="modals.bankingCard.visible.value = true"
-      >
-        Cancel Card
-      </button>
+
+    <div class="p-4 rounded bg-blue-50 shadow">
+      <h1 class="text-2xl font-bold">User Card</h1>
+
+      <div class="flex md:items-center md:justify-center">
+        <div class="grid grid-cols-2 gap-1">
+          <div class="col-span-2 md:col-span-1">
+            <BankingCardFront class="md:w-72 shadow" v-if="card" :card="card" />
+          </div>
+          <div class="col-span-2 md:col-span-1">
+            <BankingCardBack class="md:w-72 shadow" v-if="card" :card="card" />
+          </div>
+        </div>
+      </div>
+
+      <div class="flex items-center justify-center mt-4 text-white p-1 rounded">
+        <button class="bg-stone-300 px-1 mx-1 rounded">SET PIN</button>
+        <button class="bg-stone-300 px-1 mx-1 rounded">SHOW PIN</button>
+        <button class="bg-stone-300 px-1 mx-1 rounded">SHOW CVV</button>
+        <button class="bg-stone-300 px-1 mx-1 rounded">
+          ENABLE / DISABLE CARD
+        </button>
+        <button class="bg-stone-300 px-1 mx-1 rounded">
+          ENABLE / DISABLE NFC
+        </button>
+        <button class="bg-stone-300 px-1 mx-1 rounded">SET DAILY LIMIT</button>
+      </div>
+
+      <div class="flex items-center justify-center mt-4 text-white p-1 rounded">
+        <h1>TRANSACCIONES</h1>
+        <p>ssasdsa</p>
+      </div>
     </div>
-    <BankingCard v-if="card" :card="card" />
   </div>
 </template>

@@ -11,7 +11,7 @@ const props = defineProps<{
 <template>
   <svg
     viewBox="0 0 400 250"
-    class="w-full h-auto rounded-xl shadow-lg"
+    class="h-auto rounded-xl shadow-lg"
     xmlns="http://www.w3.org/2000/svg"
     version="1.1"
     xmlns:xlink="http://www.w3.org/1999/xlink"
@@ -36,9 +36,8 @@ const props = defineProps<{
     <line x1="50" y1="60" x2="50" y2="95" stroke="#eab308" stroke-width="2" />
 
     <!-- NFC -->
-    <svg
-      x="345"
-      y="100"
+    <g
+      transform="translate(345, 100)"
       width="32"
       height="32"
       viewBox="0 0 32 32"
@@ -80,7 +79,7 @@ const props = defineProps<{
         stroke-width="2"
         stroke-linecap="round"
       />
-    </svg>
+    </g>
 
     <!-- Nombre del banco -->
     <text x="30" y="40" fill="white" font-size="26" font-weight="bold">

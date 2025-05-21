@@ -5,9 +5,7 @@
     <div class="w-full max-w-md">
       <router-view></router-view>
     </div>
-    <div
-      class="w-full max-w-md mt-6 text-center text-sm text-gray-600 space-y-1"
-    >
+    <div class="mt-6 text-center text-sm text-gray-600 space-y-1">
       <RouterLink
         v-if="!route.path.includes('/auth/login')"
         to="/auth/login"

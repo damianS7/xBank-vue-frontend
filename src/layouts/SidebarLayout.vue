@@ -3,10 +3,10 @@
     class="sidebar p-2 group bg-gray-100 w-14 hover:sm:w-64 transition-all duration-300 ease-in-out h-screen flex flex-col drop-shadow space-y-2"
   >
     <SidebarLink to="/home" :icon="Home" label="Home" />
-    <SidebarLink to="/accounts" :icon="Accounts" label="Cuentas" />
-    <SidebarLink to="/cards" :icon="CreditCard" label="Tarjetas" />
-    <SidebarLink to="/profile" :icon="Profile" label="Perfil" />
-    <SidebarLink to="/settings" :icon="Settings" label="Configuración" />
+    <SidebarLink to="/accounts" :icon="Accounts" label="Accounts" />
+    <SidebarLink to="/cards" :icon="CreditCard" label="Cards" />
+    <SidebarLink to="/profile" :icon="Profile" label="Profile" />
+    <SidebarLink to="/settings" :icon="Settings" label="Settings" />
     <a href="#" @click.prevent="logout">
       <div
         class="flex items-center gap-4 p-2 rounded hover:bg-gray-200 transition-colors"

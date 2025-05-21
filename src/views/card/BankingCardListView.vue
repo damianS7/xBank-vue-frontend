@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, onMounted, ref } from "vue";
 import { useAccountStore } from "@/stores/account";
-import BankingCard from "@/views/card/components/BankingCard.vue";
+import BankingCardFront from "@/views/card/components/BankingCardFront.vue";
 import { ChevronRight, ChevronLeft } from "lucide-vue-next";
 const accountStore = useAccountStore();
 const cards = accountStore.getBankingCards;
@@ -33,7 +33,7 @@ onMounted(() => {
   <div class="flex flex-col items-center justify-center">
     <div class="flex flex-col items-center">
       <router-link :to="`/card/${currentCard.id}`">
-        <BankingCard :card="currentCard" />
+        <BankingCardFront class="shadow-md" :card="currentCard" />
       </router-link>
     </div>
 
