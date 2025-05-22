@@ -17,16 +17,22 @@ onMounted(() => {
   color: #2c3e50;
 }
 
-nav {
-  padding: 30px;
-}
-
-nav a {
-  font-weight: bold;
-  color: #2c3e50;
+nav a:hover {
+  @apply text-blue-500;
 }
 
 nav a.router-link-exact-active {
-  color: #42b983;
+  @apply font-bold;
+  @apply text-blue-500;
+}
+
+.btn {
+  @apply font-bold py-2 px-4 rounded text-sm;
+}
+.btn-blue {
+  @apply bg-blue-500 text-white;
+}
+.btn-blue:hover {
+  @apply bg-blue-700;
 }
 </style>
