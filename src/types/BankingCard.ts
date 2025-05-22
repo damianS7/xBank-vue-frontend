@@ -1,5 +1,5 @@
 export type BankingCardType = "DEBIT" | "CREDIT"; // ajusta según tu enum real
-export type BankingCardStatus = "ACTIVE" | "BLOCKED" | "EXPIRED"; // idem
+export type BankingCardStatus = "ENABLED" | "DISABLED" | "SUSPENDED"; // idem
 
 export interface BankingCard {
   id: number;
