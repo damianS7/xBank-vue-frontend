@@ -73,10 +73,8 @@ export const useAuthStore = defineStore("auth", {
       );
 
       if (response.status == 200) {
-        console.log("token is okay");
         return true;
       }
-      console.log("token is bad");
       return false;
     },
     async logout() {

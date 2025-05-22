@@ -29,11 +29,7 @@ onMounted(() => {
     <!-- Botón para abrir una nueva cuenta -->
 
     <div class="flex justify-end rounded gap-1 p-1">
-      <button
-        type="button"
-        @click="showModal = true"
-        class="bg-blue-600 text-white rounded p-2 hover:bg-blue-700"
-      >
+      <button type="button" @click="showModal = true" class="btn btn-blue">
         Open account
       </button>
     </div>

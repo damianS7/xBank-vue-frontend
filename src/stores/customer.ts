@@ -138,14 +138,12 @@ export const useCustomerStore = defineStore("customer", {
       // if (this.initialized) {
       //   return;
       // }
-
       const savedToken = localStorage.getItem("token");
       if (savedToken) {
         const customer = await this.getCustomer(savedToken);
         this.setCustomer(customer);
       }
       this.initialized = true;
-      console.log("initialized customer.");
     },
   },
 });

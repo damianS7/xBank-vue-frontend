@@ -7,6 +7,7 @@ import { useAuthStore } from "@/stores/auth";
 import BankingCardFront from "@/views/card/components/BankingCardFront.vue";
 import BankingCardBack from "@/views/card/components/BankingCardBack.vue";
 import { MessageType } from "@/types/Message";
+import { ChevronRight, ChevronLeft } from "lucide-vue-next";
 const route = useRoute();
 const accountStore = useAccountStore();
 const authStore = useAuthStore();
@@ -47,7 +48,20 @@ onMounted(() => {
   if (!card.value) {
     messageAlert.value.message = "No se encontró la tarjeta.";
   }
-  console.log("STATUS", card.value.cardStatus);
+  card.value.transactions = [
+    {
+      description: "Compra en Amazon",
+      amount: -50,
+    },
+    {
+      description: "Ingreso de nómina",
+      amount: 1500,
+    },
+    {
+      description: "Compra en supermercado",
+      amount: -100,
+    },
+  ];
 });
 </script>
 <template>
@@ -88,32 +102,59 @@ onMounted(() => {
       </div>
 
       <div class="flex flex-wrap justify-center gap-1 mt-2">
-        <button
-          @click="setPin"
-          class="w-full text-sm sm:w-auto bg-stone-300 px-1 mx-1 rounded"
-        >
+        <button @click="setPin" class="btn btn-blue w-full sm:w-auto">
           SET PIN
         </button>
         <button
           @click="enableDisableCard"
-          class="w-full sm:w-auto bg-stone-300 px-1 mx-1 rounded"
+          class="btn btn-blue w-full sm:w-auto"
         >
           {{ card?.cardStatus === "ENABLED" ? "DISABLE" : "ENABLE" }} CARD
         </button>
-        <button class="w-full sm:w-auto bg-stone-300 px-1 mx-1 rounded">
+        <button class="btn btn-blue w-full sm:w-auto">
           ENABLE / DISABLE NFC
         </button>
-        <button class="w-full sm:w-auto bg-stone-300 px-1 mx-1 rounded">
-          SET DAILY LIMIT
-        </button>
+        <button class="btn btn-blue w-full sm:w-auto">SET DAILY LIMIT</button>
       </div>
 
-      <div class="flex mt-4 p-1 rounded">
-        <h1>TRANSACCIONES</h1>
-        <!-- <p v-for="(transaction, index) in card.transactions" :key="index">
-          {{ transaction }}
-        </p> -->
+      <div
+        class="mt-6 p-4 bg-white rounded-xl shadow-md w-full max-w-xl mx-auto"
+      >
+        <h3 class="text-lg font-semibold text-gray-800 border-b pb-2 mb-4">
+          TRANSACCIONES
+        </h3>
+        <ul class="space-y-2">
+          <li
+            v-for="(transaction, index) in card?.transactions"
+            :key="index"
+            class="flex justify-between items-center bg-gray-50 hover:bg-gray-100 p-3 rounded-md"
+          >
+            <span class="text-sm text-gray-700">{{
+              transaction.description
+            }}</span>
+            <span
+              class="text-sm font-medium"
+              :class="
+                transaction.amount > 0 ? 'text-green-600' : 'text-red-600'
+              "
+            >
+              {{ transaction.amount > 0 ? "+" : "" }}{{ transaction.amount }}€
+            </span>
+          </li>
+        </ul>
+        <div
+          class="flex items-center justify-end mt-4 text-white bg-stone-300 p-1 rounded"
+        >
+          <span class="mx-2">
+            <ChevronLeft class="cursor-pointer" />
+          </span>
+          <span> 1 / 2 </span>
+          <span class="mx-2">
+            <ChevronRight class="cursor-pointer" />
+          </span>
+        </div>
       </div>
     </div>
   </div>
 </template>
+<style></style>

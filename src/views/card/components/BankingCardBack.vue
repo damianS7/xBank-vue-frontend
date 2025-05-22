@@ -36,7 +36,7 @@ const props = defineProps<{
     <rect width="400" height="250" rx="20" fill="url(#gradient-fill2)" />
 
     <!-- Franja magnética -->
-    <rect x="0" y="30" width="400" height="40" fill="#222" />
+    <rect x="0" y="30" width="400" height="40" fill="#393b3d" />
 
     <!-- Caja para la firma -->
     <rect x="20" y="120" width="260" height="40" fill="#eee" rx="4" />
