@@ -1,86 +1,51 @@
 import { defineStore } from "pinia";
-import type { BankingAccount } from "../types/BankingAccount";
+import type { BankingCard } from "../types/BankingCard";
 
-export const useAccountStore = defineStore("card", {
+export const useCardStore = defineStore("card", {
   state: () => ({
-    bankingAccounts: [] as BankingAccount[],
+    bankingCards: [] as BankingCard[],
     initialized: false,
   }),
 
   getters: {
-    countAccounts: (state) => {
-      return state.bankingAccounts.length;
+    countCards: (state) => {
+      return state.bankingCards.length;
     },
-    getBankingAccount: (state) => {
+    getBankingCard: (state) => {
       return (id: number) => {
-        return state.bankingAccounts.find((a) => a.id === id);
+        return state.bankingCards.find((a) => a.id === id);
       };
     },
-    getBankingAccounts: (state) => {
-      return state.bankingAccounts;
+    getBankingCards: (state) => {
+      return state.bankingCards;
     },
   },
 
   actions: {
-    async getCustomerBankingAccounts(token: string) {
-      try {
-        const res = await fetch(
-          "http://localhost:8080/api/v1/banking/accounts/me",
-          {
-            method: "GET",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
-
-        if (!res.ok) {
-          throw new Error("Problema al obtener banking accounts");
+    async getCustomerBankingCards(token: string) {
+      const res = await fetch(
+        "http://localhost:8080/api/v1/customers/me/banking/cards",
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
         }
+      );
 
-        const accounts = await res.json();
-        return accounts;
-      } catch (error) {
-        console.error("Error en login:", error);
-        throw error;
+      if (!res.ok) {
+        throw new Error("Problema al obtener banking cards");
       }
-    },
-    async openBankingAccount(type: string, currency: string, token: string) {
-      try {
-        const res = await fetch(
-          "http://localhost:8080/api/v1/banking/accounts/open",
-          {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${token}`,
-            },
-            body: JSON.stringify({
-              accountType: type,
-              accountCurrency: currency,
-            }),
-          }
-        );
 
-        if (!res.ok) {
-          throw new Error("Problema al abrir la cuenta");
-        }
-
-        const account = await res.json();
-        console.log("Cuenta creada:", account);
-        this.addAccount(account);
-        return account;
-      } catch (error) {
-        console.error("Error:", error);
-        throw error;
-      }
+      const cards = await res.json();
+      return cards;
     },
-    setAccounts(accounts: any) {
-      this.bankingAccounts = accounts;
+    setCards(cards: any) {
+      this.bankingCards = cards;
     },
-    addAccount(account: BankingAccount) {
-      this.bankingAccounts.push(account);
+    addCard(card: BankingCard) {
+      this.bankingCards.push(card);
     },
     async initialize() {
       if (this.initialized) {
@@ -89,8 +54,8 @@ export const useAccountStore = defineStore("card", {
 
       const savedToken = localStorage.getItem("token");
       if (savedToken) {
-        const accounts = await this.getCustomerBankingAccounts(savedToken);
-        this.setAccounts(accounts);
+        const cards = await this.getCustomerBankingCards(savedToken);
+        this.setCards(cards);
       }
       this.initialized = true;
     },

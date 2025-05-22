@@ -4,12 +4,14 @@ import Sidebar from "@/layouts/SidebarLayout.vue";
 import Header from "@/components/HeaderBar.vue";
 import { onMounted, onUnmounted, ref } from "vue";
 import { useCustomerStore } from "@/stores/customer";
+import { useCardStore } from "@/stores/card";
 import { useAccountStore } from "@/stores/account";
 import { useAuthStore } from "@/stores/auth";
 import { useRoute, useRouter } from "vue-router";
 const authStore = useAuthStore();
 const accountStore = useAccountStore();
 const customerStore = useCustomerStore();
+const cardStore = useCardStore();
 const router = useRouter();
 let interval: number;
 let initialized = ref(false);
@@ -45,6 +47,7 @@ onMounted(async () => {
   await wait();
   await customerStore.initialize();
   await accountStore.initialize();
+  await cardStore.initialize();
   initialized.value = true;
 });
 

@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import { computed, onMounted, ref } from "vue";
-import { useAccountStore } from "@/stores/account";
+import { useCardStore } from "@/stores/card";
 import BankingCardFront from "@/views/card/components/BankingCardFront.vue";
 import { ChevronRight, ChevronLeft } from "lucide-vue-next";
-const accountStore = useAccountStore();
-const cards = accountStore.getBankingCards;
+const cardStore = useCardStore();
+const cards = cardStore.getBankingCards;
 const currentCardIndex = ref(0);
 const currentCard = computed(() => {
   return cards[currentCardIndex.value];
@@ -18,7 +18,6 @@ function previousCard() {
 }
 
 function nextCard() {
-  console.log("next", currentCardIndex);
   if (currentCardIndex.value >= cards.length - 1) {
     return;
   }

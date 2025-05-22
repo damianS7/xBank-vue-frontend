@@ -2,15 +2,13 @@
 import MessageAlert from "@/components/MessageAlert.vue";
 import { onMounted, ref } from "vue";
 import { useRoute } from "vue-router";
-import { useAccountStore } from "@/stores/account";
-import { useAuthStore } from "@/stores/auth";
+import { useCardStore } from "@/stores/card";
 import BankingCardFront from "@/views/card/components/BankingCardFront.vue";
 import BankingCardBack from "@/views/card/components/BankingCardBack.vue";
 import { MessageType } from "@/types/Message";
 import { ChevronRight, ChevronLeft } from "lucide-vue-next";
 const route = useRoute();
-const accountStore = useAccountStore();
-const authStore = useAuthStore();
+const cardStore = useCardStore();
 const card = ref();
 
 // message to show
@@ -43,7 +41,7 @@ onMounted(() => {
   // account.value = accountStore.getBankingAccount.find(
   //   (a) => a.id === accountId
   // );
-  card.value = accountStore.getBankingCard(cardId);
+  card.value = cardStore.getBankingCard(cardId);
 
   if (!card.value) {
     messageAlert.value.message = "No se encontró la tarjeta.";
