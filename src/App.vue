@@ -29,8 +29,13 @@ nav a.router-link-exact-active {
 .btn {
   @apply font-bold py-2 px-4 rounded text-sm;
 }
+
+.btn-small {
+  @apply font-bold p-1 px-2 rounded text-xs;
+}
+
 .btn-blue {
-  @apply bg-blue-500 text-white;
+  @apply bg-blue-600 text-white;
 }
 .btn-blue:hover {
   @apply bg-blue-700;
