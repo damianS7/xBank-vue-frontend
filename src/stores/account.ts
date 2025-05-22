@@ -42,28 +42,26 @@ export const useAccountStore = defineStore("account", {
 
   actions: {
     async getCustomerBankingAccounts(token: string) {
-      try {
-        const res = await fetch(
-          "http://localhost:8080/api/v1/customers/me/banking/accounts",
-          {
-            method: "GET",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
-
-        if (!res.ok) {
-          throw new Error("Problema al obtener banking accounts");
+      const response = await fetch(
+        "http://localhost:8080/api/v1/customers/me/banking/accounts",
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
         }
+      );
 
-        const accounts = await res.json();
-        return accounts;
-      } catch (error) {
-        console.error("Error en login:", error);
-        throw error;
-      }
+      const accountsJson = await response.json();
+
+      const accounts = accountsJson.map((account: any) => ({
+        ...account,
+        createdAt: new Date(account.createdAt),
+        updatedAt: new Date(account.updatedAt),
+      }));
+
+      return accounts;
     },
     async openBankingAccount(type: string, currency: string, token: string) {
       try {

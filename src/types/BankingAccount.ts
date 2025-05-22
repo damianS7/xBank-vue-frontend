@@ -3,7 +3,7 @@ import { BankingCard } from "@/types/BankingCard";
 
 export type BankingAccountType = "SAVINGS" | "CHECKING";
 export type BankingAccountCurrency = "USD" | "EUR";
-export type BankingAccountStatus = "ACTIVE" | "INACTIVE" | "CLOSED";
+export type BankingAccountStatus = "OPEN" | "CLOSED" | "SUSPENDED";
 
 export interface BankingAccount {
   id: number;
@@ -16,6 +16,6 @@ export interface BankingAccount {
   accountType: BankingAccountType;
   accountCurrency: BankingAccountCurrency;
   accountStatus: BankingAccountStatus;
-  createdAt: string; // o Date si haces parsing
-  updatedAt: string;
+  createdAt: Date;
+  updatedAt: Date;
 }
