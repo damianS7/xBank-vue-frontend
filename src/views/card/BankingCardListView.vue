@@ -37,14 +37,14 @@ onMounted(() => {
       </router-link>
     </div>
 
-    <div class="flex items-center mt-4 text-white bg-stone-300 p-1 rounded">
-      <span class="mx-2">
-        <ChevronLeft class="cursor-pointer" @click="previousCard" />
-      </span>
+    <div class="flex items-center mt-4 p-0 text-white bg-blue-500 rounded-lg">
+      <button class="btn cursor-pointer" @click="previousCard">
+        <ChevronLeft />
+      </button>
       <span> {{ currentCardIndex + 1 }} / {{ cards.length }} </span>
-      <span class="mx-2">
-        <ChevronRight class="cursor-pointer" @click="nextCard" />
-      </span>
+      <button class="btn cursor-pointer" @click="nextCard">
+        <ChevronRight />
+      </button>
     </div>
   </div>
 </template>
