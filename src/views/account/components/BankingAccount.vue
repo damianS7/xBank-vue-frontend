@@ -1,10 +1,8 @@
 <script setup lang="ts">
 import { defineProps } from "vue";
-import { useCustomerStore } from "@/stores/customer";
 import { useCardStore } from "@/stores/card";
 import { BankingAccount } from "@/types/BankingAccount";
 import { CreditCard } from "lucide-vue-next";
-const customerStore = useCustomerStore();
 const cardStore = useCardStore();
 
 const props = defineProps<{
@@ -19,19 +17,14 @@ const props = defineProps<{
         {{ account.alias || "No alias" }}
       </span>
       <div class="flex gap-2">
-        <span
-          class="bg-blue-200 text-blue-800 text-sm font-bold px-2 py-1 rounded"
-        >
+        <span class="flex pill pill-blue">
           {{ cardStore.countCardsByAccount(account.id) }} <CreditCard />
+          tooltip
         </span>
-        <span
-          class="bg-blue-200 text-blue-800 text-sm font-bold px-2 py-1 rounded"
-        >
+        <span class="pill pill-blue">
           {{ account.accountType }}
         </span>
-        <span
-          class="bg-blue-200 text-blue-800 text-sm font-bold px-2 py-1 rounded"
-        >
+        <span class="pill pill-blue">
           {{ account.accountStatus }}
         </span>
       </div>

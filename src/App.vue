@@ -40,4 +40,16 @@ nav a.router-link-exact-active {
 .btn-blue:hover {
   @apply bg-blue-700;
 }
+
+.pill {
+  @apply font-bold text-sm px-2 py-1 rounded;
+}
+
+.pill-xs {
+  @apply font-bold text-xs px-1 py-0.5 rounded;
+}
+
+.pill-blue {
+  @apply bg-blue-200 text-blue-800;
+}
 </style>
