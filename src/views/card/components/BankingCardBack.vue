@@ -11,8 +11,9 @@ const props = defineProps<{
 <template>
   <svg
     viewBox="0 0 400 250"
-    class="w-full h-auto rounded-xl shadow-lg"
+    class="rounded-xl shadow-lg"
     xmlns="http://www.w3.org/2000/svg"
+    width="400"
   >
     <defs>
       <linearGradient
@@ -48,5 +49,31 @@ const props = defineProps<{
         {{ card.cardCVV }}
       </text>
     </g>
+
+    <!-- PIN -->
+    <g>
+      <text x="320" y="135" font-size="10" fill="#fff">PIN</text>
+      <text x="320" y="150" font-size="12" fill="#fff">
+        {{ card.cardPIN }}
+      </text>
+    </g>
+
+    <text
+      x="20"
+      y="180"
+      font-size="12"
+      fill="#fff"
+      class="word-break break-all"
+    >
+      <tspan>Lorem ipsum dolor sit amet consectetur adipiscing elit.</tspan>
+      <tspan>
+        Quisque faucibus ex sapien vitae pellentesque sem placerat. In id cursus
+        mi pretium tellus duis convallis. Tempus leo eu aenean sed diam urna
+        tempor. Pulvinar vivamus fringilla lacus nec metus bibendum egestas.
+        Iaculis massa nisl malesuada lacinia integer nunc posuere. Ut hendrerit
+        semper vel class aptent taciti sociosqu. Ad litora torquent per conubia
+        nostra inceptos himenaeos.
+      </tspan>
+    </text>
   </svg>
 </template>

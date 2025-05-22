@@ -11,13 +11,12 @@ const props = defineProps<{
 <template>
   <svg
     viewBox="0 0 400 250"
-    class="h-auto rounded-xl shadow-lg"
+    class="rounded-xl shadow-lg"
     xmlns="http://www.w3.org/2000/svg"
     version="1.1"
     xmlns:xlink="http://www.w3.org/1999/xlink"
     xmlns:svgjs="http://svgjs.dev/svgjs"
     width="400"
-    height="250"
   >
     <defs>
       <linearGradient id="gradient-fill" x1="0%" y1="0%" x2="100%" y2="0%">
