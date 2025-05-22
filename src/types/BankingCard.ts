@@ -12,9 +12,9 @@ export interface BankingCard {
   cardNumber: string;
   cardCVV: string;
   cardPIN: string;
-  expiredDate: string;
+  expiredDate: Date;
   cardType: BankingCardType;
   cardStatus: BankingCardStatus;
-  createdAt: string; // o Date si haces parsing
-  updatedAt: string;
+  createdAt: Date;
+  updatedAt: Date;
 }

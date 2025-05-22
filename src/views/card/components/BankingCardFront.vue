@@ -100,7 +100,14 @@ const props = defineProps<{
 
     <g transform="translate(220, 205)" fill="gray">
       <text font-size="12" y="0">Expired date</text>
-      <text font-size="14" y="20">{{ card.expiredDate }}</text>
+      <text font-size="14" y="20">
+        {{
+          card.expiredDate.toLocaleDateString("en-US", {
+            year: "numeric",
+            month: "2-digit",
+          })
+        }}
+      </text>
     </g>
   </svg>
 </template>

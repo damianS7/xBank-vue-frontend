@@ -1,11 +1,11 @@
 <script setup lang="ts">
 import { defineProps } from "vue";
 import { useCustomerStore } from "@/stores/customer";
+import { useCardStore } from "@/stores/card";
 import { BankingAccount } from "@/types/BankingAccount";
 import { CreditCard } from "lucide-vue-next";
 const customerStore = useCustomerStore();
-const createdAt = new Date();
-// createdAt.parse(account.createdAt);
+const cardStore = useCardStore();
 
 const props = defineProps<{
   account: BankingAccount;
@@ -22,7 +22,7 @@ const props = defineProps<{
         <span
           class="bg-blue-200 text-blue-800 text-sm font-bold px-2 py-1 rounded"
         >
-          <!-- {{ useAccountStore.countCards }} <CreditCard /> -->
+          {{ cardStore.countCardsByAccount(account.id) }} <CreditCard />
         </span>
         <span
           class="bg-blue-200 text-blue-800 text-sm font-bold px-2 py-1 rounded"

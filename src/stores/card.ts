@@ -11,6 +11,13 @@ export const useCardStore = defineStore("card", {
     countCards: (state) => {
       return state.bankingCards.length;
     },
+    countCardsByAccount: (state) => {
+      return (accountId: number) => {
+        return state.bankingCards.filter(
+          (card) => card.bankingAccountId === accountId
+        ).length;
+      };
+    },
     getBankingCard: (state) => {
       return (id: number) => {
         return state.bankingCards.find((a) => a.id === id);
@@ -38,8 +45,13 @@ export const useCardStore = defineStore("card", {
         throw new Error("Problema al obtener banking cards");
       }
 
-      const cards = await res.json();
-      return cards;
+      const cardsJson = await res.json();
+      return cardsJson.map((card: any) => ({
+        ...card,
+        expiredDate: new Date(card.expiredDate),
+        createdAt: new Date(card.createdAt),
+        updatedAt: new Date(card.updatedAt),
+      }));
     },
     setCards(cards: any) {
       this.bankingCards = cards;
