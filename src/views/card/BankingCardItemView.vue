@@ -46,20 +46,15 @@ onMounted(() => {
   if (!card.value) {
     messageAlert.value.message = "No se encontró la tarjeta.";
   }
-  card.value.transactions = [
-    {
-      description: "Compra en Amazon",
-      amount: -50,
-    },
-    {
-      description: "Ingreso de nómina",
-      amount: 1500,
-    },
-    {
-      description: "Compra en supermercado",
-      amount: -100,
-    },
-  ];
+
+  // fetch transactions
+  // cardStore.fetchTransactions(cardId).then((response) => {
+  //   if (response.status === 200) {
+  //     card.value.transactions = response.data;
+  //   } else {
+  //     messageAlert.value.message = "Error al cargar las transacciones.";
+  //   }
+  // });
 });
 </script>
 <template>
@@ -100,19 +95,21 @@ onMounted(() => {
       </div>
 
       <div class="flex flex-wrap justify-center gap-1 mt-2">
-        <button @click="setPin" class="btn btn-blue w-full sm:w-auto">
+        <button @click="setPin" class="btn-sm btn-blue w-full sm:w-auto">
           SET PIN
         </button>
         <button
           @click="enableDisableCard"
-          class="btn btn-blue w-full sm:w-auto"
+          class="btn-sm btn-blue w-full sm:w-auto"
         >
           {{ card?.cardStatus === "ENABLED" ? "DISABLE" : "ENABLE" }} CARD
         </button>
-        <button class="btn btn-blue w-full sm:w-auto">
+        <button class="btn-sm btn-blue w-full sm:w-auto">
           ENABLE / DISABLE NFC
         </button>
-        <button class="btn btn-blue w-full sm:w-auto">SET DAILY LIMIT</button>
+        <button class="btn-sm btn-blue w-full sm:w-auto">
+          SET DAILY LIMIT
+        </button>
       </div>
 
       <div
