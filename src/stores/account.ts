@@ -117,8 +117,37 @@ export const useAccountStore = defineStore("account", {
       const data = await response.json();
       return { status: response.status, data };
     },
+    async setAlias(accountId: string, alias: string) {
+      const token = localStorage.getItem("token");
+      const response = await fetch(
+        "http://localhost:8080/api/v1/customers/me/banking/account/" +
+          accountId +
+          "/alias",
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({
+            alias,
+          }),
+        }
+      );
+
+      const data = await response.json();
+      return { status: response.status, data };
+    },
     setAccounts(accounts: any) {
       this.bankingAccounts = accounts;
+    },
+    setAccount(newAccount: any) {
+      const index = this.bankingAccounts.findIndex(
+        (account) => account.id === newAccount.id
+      );
+      if (index !== -1) {
+        this.bankingAccounts[index] = newAccount;
+      }
     },
     addAccount(account: BankingAccount) {
       this.bankingAccounts.push(account);
