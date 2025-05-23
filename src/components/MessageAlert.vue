@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { defineProps, defineEmits, onMounted, onUnmounted, ref } from "vue";
+import { defineProps, defineEmits, onMounted, ref } from "vue";
 import { MessageType } from "@/types/Message";
 const emit = defineEmits(["close"]);
 const visible = ref(true);
