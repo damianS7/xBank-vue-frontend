@@ -91,10 +91,10 @@ const props = defineProps<{
 
     <g transform="translate(30, 160)">
       <text fill="white" font-size="20" letter-spacing="3">
-        {{ card.cardNumber }}
+        {{ card?.cardNumber }}
       </text>
       <text y="20" class="uppercase" fill="white" font-size="14">
-        {{ customerStore.getFullName }}
+        {{ customerStore?.getFullName }}
       </text>
     </g>
 
@@ -102,7 +102,7 @@ const props = defineProps<{
       <text font-size="12" y="0">Expired date</text>
       <text font-size="14" y="20">
         {{
-          card.expiredDate.toLocaleDateString("en-US", {
+          card?.expiredDate.toLocaleDateString("en-US", {
             year: "numeric",
             month: "2-digit",
           })

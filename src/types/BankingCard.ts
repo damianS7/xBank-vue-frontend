@@ -1,10 +1,6 @@
-export type BankingCardType = "DEBIT" | "CREDIT"; // ajusta según tu enum real
-export type BankingCardStatus =
-  | "ENABLED"
-  | "DISABLED"
-  | "SUSPENDED"
-  | "LOCKED"
-  | "BLOCKED";
+export type BankingCardType = "DEBIT" | "CREDIT";
+export type BankingCardStatus = "ENABLED" | "DISABLED";
+export type BankingCardLockStatus = "UNLOCKED" | "LOCKED";
 
 export interface BankingCard {
   id: number;
@@ -15,6 +11,7 @@ export interface BankingCard {
   expiredDate: Date;
   cardType: BankingCardType;
   cardStatus: BankingCardStatus;
+  lockStatus: BankingCardLockStatus;
   createdAt: Date;
   updatedAt: Date;
 }
