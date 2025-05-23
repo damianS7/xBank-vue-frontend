@@ -30,7 +30,8 @@ nav a.router-link-exact-active {
   @apply font-bold py-2 px-4 rounded text-sm;
 }
 
-.btn-small {
+.btn-small,
+.btn-sm {
   @apply font-bold p-1 px-2 rounded text-xs;
 }
 
