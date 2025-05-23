@@ -32,16 +32,16 @@ onMounted(() => {
   <div class="flex flex-col items-center justify-center">
     <div class="flex flex-col items-center">
       <router-link :to="`/card/${currentCard.id}`">
-        <BankingCardFront class="shadow-md" :card="currentCard" />
+        <BankingCardFront class="shadow-md w-full" :card="currentCard" />
       </router-link>
     </div>
 
     <div class="flex items-center mt-4 p-0 text-white bg-blue-500 rounded-lg">
-      <button class="btn cursor-pointer" @click="previousCard">
+      <button class="btn-sm cursor-pointer" @click="previousCard">
         <ChevronLeft />
       </button>
       <span> {{ currentCardIndex + 1 }} / {{ cards.length }} </span>
-      <button class="btn cursor-pointer" @click="nextCard">
+      <button class="btn-sm cursor-pointer" @click="nextCard">
         <ChevronRight />
       </button>
     </div>
