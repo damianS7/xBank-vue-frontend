@@ -10,7 +10,6 @@ import BankingCardItemView from "@/views/card//BankingCardItemView.vue";
 import RegisterView from "@/views/auth/RegisterView.vue";
 import SettingsView from "@/views/SettingsView.vue";
 import ProfileView from "@/views/profile/ProfileView.vue";
-import AboutView from "@/views/AboutView.vue";
 import ResetPasswordView from "@/views/auth/ResetPasswordView.vue";
 import { useAuthStore } from "@/stores/auth";
 
@@ -54,11 +53,6 @@ const routes: Array<RouteRecordRaw> = [
         path: "settings",
         name: "settings",
         component: SettingsView,
-      },
-      {
-        path: "about",
-        name: "about",
-        component: AboutView,
       },
     ],
   },
