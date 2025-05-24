@@ -1,51 +1,112 @@
 <script setup lang="ts">
-import { defineProps } from "vue";
+import { defineProps, ref } from "vue";
 import { useCardStore } from "@/stores/card";
+import { useAccountStore } from "@/stores/account";
 import { BankingAccount } from "@/types/BankingAccount";
 import { CreditCard } from "lucide-vue-next";
+import { SquarePen, Save, SaveOff } from "lucide-vue-next";
 const cardStore = useCardStore();
-
+const accountStore = useAccountStore();
 const props = defineProps<{
   account: BankingAccount;
+  editable?: boolean;
 }>();
+
+const formFields = ref({
+  name: "alias",
+  type: "text",
+  placeholder: "Alias",
+  value: props.account.alias,
+  error: "",
+  isEditing: false,
+  edited: false,
+});
+
+function setAlias() {
+  formFields.value.isEditing = false;
+  console.log("Alias set to: ", formFields.value.value);
+  const updatedAccount = accountStore.setAlias(
+    props.account.id.toString(),
+    formFields.value.value
+  );
+
+  accountStore.setAccount(updatedAccount);
+}
+
+function formatIban(iban: string): string {
+  return iban.replace(/(.{4})/g, "$1 ").trim();
+}
 </script>
 <template>
-  <div class="bg-blue-100 p-4 rounded shadow mt-6">
-    <!-- Primera línea: Alias + etiquetas -->
-    <div class="flex justify-between items-center">
-      <span class="text-sm font-bold text-gray-700">
-        {{ account.alias || "No alias" }}
-      </span>
-      <div class="flex gap-2">
-        <span class="flex pill pill-blue">
-          {{ cardStore.countCardsByAccount(account.id) }} <CreditCard />
-          tooltip
+  <div class="bg-blue-100 p-4 rounded shadow mt-6 w-full">
+    <!-- Alias + Etiquetas -->
+    <div
+      class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2"
+    >
+      <!-- Alias -->
+      <div class="flex items-center gap-2 text-sm font-bold text-gray-700">
+        <div class="flex gap-1" v-if="!formFields.isEditing">
+          {{ account.alias || "No alias" }}
+          <SquarePen
+            @click="formFields.isEditing = true"
+            v-if="editable"
+            class="cursor-pointer"
+          />
+        </div>
+        <div class="flex gap-1" v-else>
+          <input type="text" class="w-auto" v-model="formFields.value" />
+          <Save
+            class="text-green-500 cursor-pointer"
+            @click="
+              () => {
+                formFields.isEditing = false;
+                setAlias();
+              }
+            "
+          />
+          <SaveOff
+            class="text-red-500 cursor-pointer"
+            @click="formFields.isEditing = false"
+          />
+        </div>
+      </div>
+
+      <!-- Etiquetas -->
+      <div class="flex flex-wrap gap-2">
+        <span
+          class="relative flex items-center gap-1 pill pill-blue group cursor-pointer"
+        >
+          {{ cardStore.countCardsByAccount(account.id) }}
+          <CreditCard />
+          <span
+            class="absolute top-full left-1/2 -translate-x-1/2 mt-1 scale-0 group-hover:scale-100 transition-all duration-200 bg-gray-800 text-white text-xs px-2 py-1 rounded shadow z-10 whitespace-nowrap"
+          >
+            Total de tarjetas de esta cuenta
+          </span>
         </span>
-        <span class="pill pill-blue">
-          {{ account.accountType }}
-        </span>
-        <span class="pill pill-blue">
-          {{ account.accountStatus }}
-        </span>
+        <span class="pill pill-blue">{{ account.accountType }}</span>
+        <span class="pill pill-blue">{{ account.accountStatus }}</span>
       </div>
     </div>
 
-    <!-- Segunda línea: Número de cuenta + saldo -->
-    <div class="flex justify-between items-center">
-      <span class="sm:text-lg font-semibold text-gray-800">
-        IBAN {{ account.accountNumber }}
+    <!-- IBAN + saldo -->
+    <div
+      class="flex flex-col sm:flex-row sm:justify-between items-start sm:items-center mt-4"
+    >
+      <span class="text-sm sm:text-base font-semibold text-gray-800 break-all">
+        IBAN {{ formatIban(account.accountNumber) }}
       </span>
       <div class="text-right">
-        <p class="sm:text-xl font-bold text-green-600">
-          {{ account.balance.toLocaleString() }}
-          {{ account.accountCurrency }}
+        <p class="text-lg sm:text-xl font-bold text-green-600">
+          {{ account.balance.toLocaleString() }} {{ account.accountCurrency }}
         </p>
       </div>
     </div>
 
-    <div class="flex justify-end items-center">
+    <!-- Fecha de creación -->
+    <div class="flex justify-end items-center mt-2">
       <span class="text-sm text-gray-800">
-        Created on:
+        Creado el:
         {{
           account.createdAt.toLocaleDateString("en-US", {
             year: "numeric",

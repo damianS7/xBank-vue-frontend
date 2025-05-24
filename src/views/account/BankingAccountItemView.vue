@@ -4,9 +4,12 @@ import { onMounted, ref } from "vue";
 import { useRoute } from "vue-router";
 import { useAccountStore } from "@/stores/account";
 import { useAuthStore } from "@/stores/auth";
+import AliasModal from "@/views/account/components/SetAliasModal.vue";
+import MessageAlert from "@/components/MessageAlert.vue";
 import { SquarePen, ChevronRight, ChevronLeft } from "lucide-vue-next";
 import BankingAccount from "@/views/account/components/BankingAccount.vue";
 import RequestBankingCardModal from "@/views/account/components/RequestBankingCardModal.vue";
+import { set } from "zod";
 // message to show
 const messageAlert = ref({
   message: "",
@@ -20,14 +23,61 @@ const accountStore = useAccountStore();
 const authStore = useAuthStore();
 const account = ref();
 
+// modals to show
 const modals = {
-  bankingCard: {
+  aliasModal: {
     visible: ref(false),
+    onConfirm: (value: string) => {
+      // nothing
+    },
+    onCancel: () => {
+      // nothing
+    },
+  },
+  pinModal: {
+    visible: ref(false),
+    onConfirm: (value: string) => {
+      // nothing
+    },
+    onCancel: () => {
+      // nothing
+    },
+  },
+  transferToModal: {
+    visible: ref(false),
+    onConfirm: (value: string) => {
+      // nothing
+    },
+    onCancel: () => {
+      // nothing
+    },
   },
 };
 
+async function openAliasModal(): Promise<string> {
+  return new Promise((resolve, reject) => {
+    // Abres el modal (puedes usar un ref o store para controlarlo)
+    modals.aliasModal.visible.value = true;
+    // Registras callbacks
+    modals.aliasModal.onConfirm = (alias: string) => {
+      modals.aliasModal.visible.value = false;
+      resolve(alias);
+    };
+
+    modals.aliasModal.onCancel = () => {
+      modals.aliasModal.visible.value = false;
+      resolve("");
+    };
+  });
+}
+
 function transferTo() {
   // ...
+}
+
+async function setAlias(alias: string) {
+  // const alias = await openAliasModal();
+  console.log(alias);
 }
 
 function previousPage() {
@@ -86,9 +136,11 @@ onMounted(() => {
 
     <div class="p-4 rounded bg-blue-50 shadow">
       <div>
-        <h1 class="flex items-center text-2xl font-bold gap-1">
-          <span>Banking account ({{ account.alias }})</span>
-          <SquarePen />
+        <h1
+          class="flex flex-col sm:flex-row items-center text-2xl font-bold gap-1"
+        >
+          <span class="flex items-center">Banking account </span>
+
           <span
             class="text-xs rounded-full px-1"
             :class="{
@@ -99,38 +151,37 @@ onMounted(() => {
             }"
             >{{ account?.accountStatus }}
           </span>
-          <div class="flex flex-wrap gap-1">
+
+          <div class="flex flex-wrap gap-1 w-full">
             <button
               @click="transferTo"
-              class="btn-small btn-blue w-full sm:w-auto"
+              class="btn-small btn-blue sm:w-auto w-full"
             >
               TRANSFER TO
             </button>
             <button
               @click="transferTo"
-              class="btn-small btn-blue w-full sm:w-auto"
+              class="btn-small btn-blue sm:w-auto w-full"
             >
               REQUEST CARD
             </button>
             <button
               @click="transferTo"
-              class="btn-small btn-blue w-full sm:w-auto"
+              class="btn-small btn-blue sm:w-auto w-full"
             >
-              SET ALIAS
-            </button>
-            <button
-              @click="transferTo"
-              class="btn-small btn-blue w-full sm:w-auto"
-            >
-              {{ account?.accountStatus === "OPEN" ? "CLOSE" : "OPEN" }}
-              ACCOUNT
+              {{ account?.accountStatus === "OPEN" ? "CLOSE" : "OPEN" }} ACCOUNT
             </button>
           </div>
         </h1>
       </div>
 
       <div class="">
-        <BankingAccount v-if="account" :account="account" />
+        <BankingAccount
+          v-if="account"
+          :account="account"
+          @edit="setAlias"
+          :editable="true"
+        />
       </div>
 
       <div class="mt-6 p-4 bg-white rounded-xl shadow-md w-full mx-auto">
@@ -173,10 +224,10 @@ onMounted(() => {
   <div v-else>Loading account</div>
 
   <!-- Modal -->
-  <RequestBankingCardModal
+  <!-- <RequestBankingCardModal
     v-if="modals.bankingCard.visible.value"
     :visible="modals.bankingCard.visible.value"
     @submit="requestCard"
     @close="modals.bankingCard.visible.value = false"
-  />
+  /> -->
 </template>
