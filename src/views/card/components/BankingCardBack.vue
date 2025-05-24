@@ -58,22 +58,17 @@ const props = defineProps<{
       </text>
     </g>
 
-    <text
-      x="20"
-      y="180"
-      font-size="12"
-      fill="#fff"
-      class="word-break break-all"
-    >
-      <tspan>Lorem ipsum dolor sit amet consectetur adipiscing elit.</tspan>
-      <tspan>
-        Quisque faucibus ex sapien vitae pellentesque sem placerat. In id cursus
-        mi pretium tellus duis convallis. Tempus leo eu aenean sed diam urna
-        tempor. Pulvinar vivamus fringilla lacus nec metus bibendum egestas.
-        Iaculis massa nisl malesuada lacinia integer nunc posuere. Ut hendrerit
-        semper vel class aptent taciti sociosqu. Ad litora torquent per conubia
-        nostra inceptos himenaeos.
-      </tspan>
-    </text>
+    <g width="400" height="300">
+      <foreignObject x="20" y="170" width="400" height="100">
+        <div
+          xmlns="http://www.w3.org/1999/xhtml"
+          class="text-xs text-white break-words"
+        >
+          Lorem ipsum dolor sit amet consectetur adipiscing elit. Quisque
+          faucibus ex sapien vitae pellentesque sem placerat. In id cursus mi
+          pretium tellus duis convallis.
+        </div>
+      </foreignObject>
+    </g>
   </svg>
 </template>
