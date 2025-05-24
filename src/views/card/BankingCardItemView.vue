@@ -7,8 +7,8 @@ import BankingCardFront from "@/views/card/components/BankingCardFront.vue";
 import BankingCardBack from "@/views/card/components/BankingCardBack.vue";
 import { MessageType } from "@/types/Message";
 import { ChevronRight, ChevronLeft } from "lucide-vue-next";
-import SetPinModal from "./components/SetPinModal.vue";
-import EnableDisableCardModal from "./components/EnableDisableCardModal.vue";
+import BankingCardSetPinModal from "./components/BankingCardSetPinModal.vue";
+import BankingCardLockModal from "./components/BankingCardLockModal.vue";
 import BankingCardDailyLimitModal from "./components/BankingCardDailyLimitModal.vue";
 import LoadingSpinner from "@/components/LoadingSpinner.vue";
 
@@ -37,7 +37,7 @@ const previousPage = () => {
 
 // modals
 const setPinModal = ref();
-const enableDisableCardModal = ref();
+const lockModal = ref();
 const dailyLimitModal = ref();
 
 const cardId = parseInt(route.params.id as string, 10);
@@ -52,10 +52,10 @@ const messageAlert = ref({
   visible: false,
 });
 
-async function enableDisableCard() {
+async function setLock() {
   const cardLocked = card.value?.lockStatus === "LOCKED";
 
-  const userConfirmed = await enableDisableCardModal.value.open();
+  const userConfirmed = await lockModal.value.open();
 
   // if user confirmed, enable/disable the card
   if (userConfirmed) {
@@ -160,9 +160,9 @@ onMounted(async () => {
 });
 </script>
 <template>
-  <SetPinModal ref="setPinModal" />
-  <EnableDisableCardModal
-    ref="enableDisableCardModal"
+  <BankingCardSetPinModal ref="setPinModal" />
+  <BankingCardLockModal
+    ref="lockModal"
     :cardEnabled="card?.cardStatus === 'ENABLED'"
   />
   <BankingCardDailyLimitModal ref="dailyLimitModal" />
@@ -179,7 +179,7 @@ onMounted(async () => {
     <button @click="setPin" class="btn-sm btn-blue w-full sm:w-auto">
       SET PIN
     </button>
-    <button @click="enableDisableCard" class="btn-sm btn-blue w-full sm:w-auto">
+    <button @click="setLock" class="btn-sm btn-blue w-full sm:w-auto">
       {{ card?.lockStatus === "LOCKED" ? "UNLOCK" : "LOCK" }} CARD
     </button>
     <button @click="setDailyLimit" class="btn-sm btn-blue w-full sm:w-auto">
