@@ -14,12 +14,32 @@ const isViewReady = ref(false);
 const route = useRoute();
 const cardStore = useCardStore();
 
+// pagination
+const currentPage = ref(0); // Spring usa 0-indexed
+const pageSize = 5;
+const paginator = ref<any>(null);
+
+const nextPage = () => {
+  if (paginator.value && currentPage.value < paginator.value.totalPages - 1) {
+    currentPage.value++;
+    fetchTransactions();
+  }
+};
+
+const previousPage = () => {
+  if (currentPage.value > 0) {
+    currentPage.value--;
+    fetchTransactions();
+  }
+};
+
 // modals
 const setPinModal = ref();
 const enableDisableCardModal = ref();
 
 const cardId = parseInt(route.params.id as string, 10);
 const card = computed(() => cardStore.getBankingCard(cardId));
+// const cardTransactions = computed(() => cardStore.getCardTransactions(cardId));
 
 // message to show
 const messageAlert = ref({
@@ -91,22 +111,27 @@ async function setPin() {
   });
 }
 
-function previousTransactionPage() {
-  return;
-}
-function nextTransactionPage() {
-  return;
+async function fetchTransactions() {
+  return await cardStore
+    .fetchPageableTransactions(cardId, currentPage.value, pageSize)
+    .then((response) => {
+      if (response.status === 200) {
+        // cardStore.setCardTransactions(cardId, response.transactions);
+        // messageAlert.value.message = "Transacciones cargadas correctamente.";
+        // messageAlert.value.type = MessageType.SUCCESS;
+        paginator.value = response.paginator;
+      } else {
+        messageAlert.value.message = "Error al cargar las transacciones.";
+      }
+    });
 }
 
-onMounted(() => {
-  // fetch transactions
-  // cardStore.fetchTransactions(cardId).then((response) => {
-  //   if (response.status === 200) {
-  //     card.value.transactions = response.data;
-  //   } else {
-  //     messageAlert.value.message = "Error al cargar las transacciones.";
-  //   }
-  // });
+onMounted(async () => {
+  // if transactions are empty fetch them
+  if (card.value?.transactions?.length === 0) {
+    // fetch transactions
+    fetchTransactions();
+  }
 
   isViewReady.value = true;
 });
@@ -172,19 +197,22 @@ onMounted(() => {
       <button class="btn-sm btn-blue w-full sm:w-auto">SET DAILY LIMIT</button>
     </div>
 
-    <div class="mt-6 p-4 bg-white rounded-xl shadow-md w-full max-w-xl mx-auto">
+    <div
+      v-if="paginator?.content?.length > 0"
+      class="mt-6 p-4 bg-white rounded-xl shadow-md w-full max-w-xl mx-auto"
+    >
       <h3 class="text-lg font-semibold text-gray-800 border-b pb-2 mb-4">
         TRANSACCIONES
       </h3>
       <ul class="space-y-2">
         <li
-          v-for="(transaction, index) in card?.transactions"
+          v-for="(transaction, index) in paginator?.content"
           :key="index"
           class="flex justify-between items-center bg-gray-50 hover:bg-gray-100 p-3 rounded-md"
         >
-          <span class="text-sm text-gray-700">{{
-            transaction.description
-          }}</span>
+          <span class="text-sm text-gray-700"
+            >{{ transaction.description }} - {{ transaction.createdAt }}</span
+          >
           <span
             class="text-sm font-medium"
             :class="transaction.amount > 0 ? 'text-green-600' : 'text-red-600'"
@@ -197,11 +225,14 @@ onMounted(() => {
         class="flex items-center justify-end mt-4 text-white bg-stone-300 p-1 rounded"
       >
         <span class="mx-2">
-          <ChevronLeft class="cursor-pointer" />
+          <ChevronLeft @click="previousPage" class="cursor-pointer" />
         </span>
-        <span> 1 / 2 </span>
+        <span>
+          {{ paginator.pageable?.pageNumber + 1 }} /
+          {{ paginator.totalPages }}
+        </span>
         <span class="mx-2">
-          <ChevronRight class="cursor-pointer" />
+          <ChevronRight @click="nextPage" class="cursor-pointer" />
         </span>
       </div>
     </div>

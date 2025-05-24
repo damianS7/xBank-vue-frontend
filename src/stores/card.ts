@@ -56,10 +56,62 @@ export const useCardStore = defineStore("card", {
       const cardsJson = await res.json();
       return cardsJson.map((card: any) => ({
         ...card,
+        transactions: [],
         expiredDate: new Date(card.expiredDate),
         createdAt: new Date(card.createdAt),
         updatedAt: new Date(card.updatedAt),
       }));
+    },
+    async fetchTransactions(cardId: number) {
+      const token = localStorage.getItem("token");
+      const res = await fetch(
+        `http://localhost:8080/api/v1/customers/me/banking/cards/${cardId}/transactions`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      if (!res.ok) {
+        throw new Error("Problema al obtener banking cards");
+      }
+
+      const transactionsJson = await res.json();
+      const transactions = transactionsJson.map((transaction: any) => ({
+        ...transaction,
+        createdAt: new Date(transaction.createdAt),
+        updatedAt: new Date(transaction.updatedAt),
+      }));
+      return { transactions, status: res.status };
+    },
+    async fetchPageableTransactions(
+      cardId: number,
+      page: number,
+      size: number
+    ) {
+      const token = localStorage.getItem("token");
+      const res = await fetch(
+        `http://localhost:8080/api/v1/customers/me/banking/cards/${cardId}/transactions?page=${page}&size=${size}&sort=createdAt,DESC`,
+
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      if (!res.ok) {
+        throw new Error("Problema al obtener banking cards");
+      }
+
+      const paginator = await res.json();
+
+      return { paginator, status: res.status };
     },
     async setCardPin(
       cardId: number,
@@ -137,6 +189,19 @@ export const useCardStore = defineStore("card", {
     },
     addCard(card: BankingCard) {
       this.bankingCards.push(card);
+    },
+    setCardTransactions(cardId: number, transactions: any) {
+      const index = this.bankingCards.findIndex((a) => a.id === cardId);
+      if (index !== -1) {
+        // this.bankingCards.splice(index, 1, transactions);
+        this.bankingCards[index].transactions = transactions;
+      }
+    },
+    removeCard(cardId: number) {
+      const index = this.bankingCards.findIndex((a) => a.id === cardId);
+      if (index !== -1) {
+        this.bankingCards.splice(index, 1);
+      }
     },
     async initialize() {
       if (this.initialized) {

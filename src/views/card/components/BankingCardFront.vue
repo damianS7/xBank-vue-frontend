@@ -7,6 +7,10 @@ const customerStore = useCustomerStore();
 const props = defineProps<{
   card: BankingCard;
 }>();
+
+function formatNumber(number: string): string {
+  return number.replace(/(.{4})/g, "$1 ").trim();
+}
 </script>
 <template>
   <svg
@@ -91,7 +95,7 @@ const props = defineProps<{
 
     <g transform="translate(30, 160)">
       <text fill="white" font-size="20" letter-spacing="3">
-        {{ card?.cardNumber }}
+        {{ formatNumber(card?.cardNumber) }}
       </text>
       <text y="20" class="uppercase" fill="white" font-size="14">
         {{ customerStore?.getFullName }}

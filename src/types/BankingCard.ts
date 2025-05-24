@@ -1,3 +1,5 @@
+import { BankingTransaction } from "./BankingTransaction";
+
 export type BankingCardType = "DEBIT" | "CREDIT";
 export type BankingCardStatus = "ENABLED" | "DISABLED";
 export type BankingCardLockStatus = "UNLOCKED" | "LOCKED";
@@ -12,6 +14,7 @@ export interface BankingCard {
   cardType: BankingCardType;
   cardStatus: BankingCardStatus;
   lockStatus: BankingCardLockStatus;
+  transactions?: BankingTransaction[];
   createdAt: Date;
   updatedAt: Date;
 }
