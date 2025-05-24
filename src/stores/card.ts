@@ -109,9 +109,18 @@ export const useCardStore = defineStore("card", {
         throw new Error("Problema al obtener banking cards");
       }
 
-      const paginator = await res.json();
+      const paginatedTransactions = await res.json();
+      const parsedTransactions = paginatedTransactions.content.map(
+        (transaction: any) => ({
+          ...transaction,
+          createdAt: new Date(transaction.createdAt),
+          updatedAt: new Date(transaction.updatedAt),
+        })
+      );
 
-      return { paginator, status: res.status };
+      // replace content with parsed dates
+      paginatedTransactions.content = parsedTransactions;
+      return { paginator: paginatedTransactions, status: res.status };
     },
     async setCardPin(
       cardId: number,
