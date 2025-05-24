@@ -3,7 +3,7 @@ import { useCustomerStore } from "@/stores/customer";
 import MessageAlert from "@/components/MessageAlert.vue";
 import { onMounted, ref } from "vue";
 import ProfileEditableField from "./components/ProfileEditableField.vue";
-import ProfilePhoto from "./components/ProfilePhoto.vue";
+import ProfilePhoto from "./components/ProfilePhotoUploader.vue";
 import ConfirmPasswordModal from "./components/ConfirmPasswordModal.vue";
 import ConfirmMessageModal from "@/components/ConfirmMessageModal.vue";
 import { useAuthStore } from "@/stores/auth";
@@ -279,6 +279,8 @@ async function updatePhoto(photo: any) {
   );
 
   if (response.status === 200) {
+    const blob = await customerStore.getPhoto(response.data.photoPath);
+    localStorage.setItem("profilePhotoURL", URL.createObjectURL(blob));
     customerStore.setProfile(response.data);
     showMessage("Photo successfully updated.", MessageType.SUCCESS);
   } else {
@@ -345,10 +347,7 @@ onMounted(() => {
     <div class="p-4 rounded bg-blue-50 shadow">
       <h1 class="text-2xl font-bold">User profile</h1>
 
-      <ProfilePhoto
-        :photoPath="customerStore.customer.profile.photoPath"
-        @update="updatePhoto"
-      />
+      <ProfilePhoto @update="updatePhoto" />
       <div
         v-if="customerStore.customer.profile"
         class="grid grid-cols-1 md:grid-cols-2 gap-4 p-4"

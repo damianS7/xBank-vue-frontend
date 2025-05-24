@@ -135,13 +135,16 @@ export const useCustomerStore = defineStore("customer", {
       this.customer.profile = profile;
     },
     async initialize() {
-      // if (this.initialized) {
-      //   return;
-      // }
       const savedToken = localStorage.getItem("token");
       if (savedToken) {
         const customer = await this.getCustomer(savedToken);
         this.setCustomer(customer);
+
+        const profilePhoto = await this.getPhoto(customer.profile.photoPath);
+        localStorage.setItem(
+          "profilePhotoURL",
+          URL.createObjectURL(profilePhoto)
+        );
       }
       this.initialized = true;
     },

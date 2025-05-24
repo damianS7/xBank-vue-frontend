@@ -1,10 +1,21 @@
 <script setup lang="ts">
 import { useCustomerStore } from "@/stores/customer";
+import { Bell } from "lucide-vue-next";
+import ProfilePhoto from "@/components/ProfilePhoto.vue";
 const customerStore = useCustomerStore();
 </script>
 <template>
-  <div class="bg-gray-100 w-full p-2 text-right drop-shadow-sm">
-    Welcome
-    <b class="uppercase">{{ customerStore.customer.profile?.firstName }}</b>
+  <div
+    class="flex justify-end items-center gap-2 bg-gray-100 w-full p-2 shadow"
+  >
+    <span class="">
+      Welcome
+      <b class="uppercase">{{ customerStore.customer.profile?.firstName }}</b>
+    </span>
+
+    <span>
+      <ProfilePhoto class="rounded-full w-6 h-6 bg-gray-300" />
+    </span>
+    <Bell />
   </div>
 </template>
