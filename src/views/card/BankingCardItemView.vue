@@ -160,141 +160,143 @@ onMounted(async () => {
 });
 </script>
 <template>
-  <BankingCardSetPinModal ref="setPinModal" />
-  <BankingCardLockModal
-    ref="lockModal"
-    :cardEnabled="card?.cardStatus === 'ENABLED'"
-  />
-  <BankingCardDailyLimitModal ref="dailyLimitModal" />
-  <MessageAlert
-    v-if="messageAlert.message"
-    class="mb-6"
-    :message="messageAlert.message"
-    :timeout="messageAlert.timeout"
-    :type="messageAlert.type"
-    @close="messageAlert.message = ''"
-  />
+  <div>
+    <BankingCardSetPinModal ref="setPinModal" />
+    <BankingCardLockModal
+      ref="lockModal"
+      :cardEnabled="card?.cardStatus === 'ENABLED'"
+    />
+    <BankingCardDailyLimitModal ref="dailyLimitModal" />
+    <MessageAlert
+      v-if="messageAlert.message"
+      class="mb-6"
+      :message="messageAlert.message"
+      :timeout="messageAlert.timeout"
+      :type="messageAlert.type"
+      @close="messageAlert.message = ''"
+    />
 
-  <div class="flex flex-wrap justify-end gap-1 mb-6">
-    <button @click="setPin" class="btn-sm btn-blue w-full sm:w-auto">
-      SET PIN
-    </button>
-    <button @click="setLock" class="btn-sm btn-blue w-full sm:w-auto">
-      {{ card?.lockStatus === "LOCKED" ? "UNLOCK" : "LOCK" }} CARD
-    </button>
-    <button @click="setDailyLimit" class="btn-sm btn-blue w-full sm:w-auto">
-      SET DAILY LIMIT
-    </button>
-  </div>
-
-  <div v-if="card && isViewReady" class="p-4 rounded bg-blue-50 shadow">
-    <div
-      class="sm:flex gap-1 items-center text-2xl font-bold border-b p-1 mb-1"
-    >
-      <h1>User Card</h1>
-      <div class="flex flex-wrap gap-1 text-sm">
-        <span
-          class="pill-xs"
-          :class="{
-            'text-red-100 bg-red-500': card?.cardStatus === 'DISABLED',
-            'text-green-100 bg-green-500': card?.cardStatus === 'ENABLED',
-          }"
-          >{{ card?.cardStatus }}
-        </span>
-        <span
-          class="pill-xs"
-          :class="{
-            'text-gray-100 bg-gray-500': card?.lockStatus === 'LOCKED',
-            'text-green-100 bg-green-500': card?.lockStatus === 'UNLOCKED',
-          }"
-          >{{ card?.lockStatus }}
-        </span>
-        <span class="pill-xs bg-blue-500 text-blue-100"
-          >{{ card?.dailyLimit ? card?.dailyLimit + " LIMIT" : "NO LIMIT" }}
-        </span>
-      </div>
+    <div class="flex flex-wrap justify-end gap-1 mb-6">
+      <button @click="setPin" class="btn-sm btn-blue w-full sm:w-auto">
+        SET PIN
+      </button>
+      <button @click="setLock" class="btn-sm btn-blue w-full sm:w-auto">
+        {{ card?.lockStatus === "LOCKED" ? "UNLOCK" : "LOCK" }} CARD
+      </button>
+      <button @click="setDailyLimit" class="btn-sm btn-blue w-full sm:w-auto">
+        SET DAILY LIMIT
+      </button>
     </div>
 
-    <div class="flex justify-center my-6">
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-1">
-        <div class="flex jusfity-center">
-          <BankingCardFront v-if="card" :card="card" />
-        </div>
-        <div class="flex jusfity-center">
-          <BankingCardBack v-if="card" :card="card" />
-        </div>
-      </div>
-    </div>
-
-    <div
-      v-if="paginator?.content?.length > 0"
-      class="p-4 bg-white rounded-xl shadow-md w-full"
-    >
-      <h3 class="sm:text-lg font-semibold text-gray-800 border-b pb-2 mb-4">
-        TRANSACTIONS
-      </h3>
-      <ul class="space-y-2">
-        <li
-          v-for="(transaction, index) in paginator?.content"
-          :key="index"
-          class="flex flex-col sm:flex-row sm:justify-between sm:items-start bg-gray-50 hover:bg-gray-100 p-3 rounded-md"
-        >
-          <div class="text-sm text-gray-700 sm:w-1/2">
-            {{ transaction.description }}
-          </div>
-
-          <div class="flex flex-col text-sm font-medium text-right sm:w-1/2">
-            <span
-              :class="
-                transaction.amount > 0 ? 'text-green-600' : 'text-red-600'
-              "
-            >
-              {{ transaction.amount > 0 ? "+" : "" }}{{ transaction.amount }}€
-            </span>
-            <span class="text-xs text-gray-500">
-              {{
-                new Date(transaction.createdAt).toLocaleDateString("en-US", {
-                  year: "numeric",
-                  month: "2-digit",
-                  day: "2-digit",
-                  hour: "2-digit",
-                  minute: "2-digit",
-                })
-              }}
-            </span>
-          </div>
-        </li>
-      </ul>
+    <div v-if="card && isViewReady" class="p-4 rounded bg-blue-100 shadow">
       <div
-        class="flex items-center justify-end text-sm mt-4 text-white bg-stone-300 p-1 rounded"
+        class="sm:flex gap-1 items-center text-2xl font-bold border-b border-gray-300 p-1 mb-1"
       >
-        <span class="mx-2">
-          <ChevronLeft @click="previousPage" class="cursor-pointer" />
-        </span>
-        <span>
-          {{ paginator.pageable?.pageNumber + 1 }} /
-          {{ paginator.totalPages }}
-        </span>
-        <span class="mx-2">
-          <ChevronRight @click="nextPage" class="cursor-pointer" />
-        </span>
+        <h1>User Card</h1>
+        <div class="flex flex-wrap gap-1 text-sm">
+          <span
+            class="pill-xs"
+            :class="{
+              'text-red-100 bg-red-500': card?.cardStatus === 'DISABLED',
+              'text-green-100 bg-green-500': card?.cardStatus === 'ENABLED',
+            }"
+            >{{ card?.cardStatus }}
+          </span>
+          <span
+            class="pill-xs"
+            :class="{
+              'text-gray-100 bg-gray-500': card?.lockStatus === 'LOCKED',
+              'text-green-100 bg-green-500': card?.lockStatus === 'UNLOCKED',
+            }"
+            >{{ card?.lockStatus }}
+          </span>
+          <span class="pill-xs bg-blue-500 text-blue-100"
+            >{{ card?.dailyLimit ? card?.dailyLimit + " LIMIT" : "NO LIMIT" }}
+          </span>
+        </div>
+      </div>
+
+      <div class="flex justify-center my-6">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-1">
+          <div class="flex jusfity-center">
+            <BankingCardFront v-if="card" :card="card" />
+          </div>
+          <div class="flex jusfity-center">
+            <BankingCardBack v-if="card" :card="card" />
+          </div>
+        </div>
+      </div>
+
+      <div class="p-4 bg-white rounded-xl shadow-md w-full">
+        <h3 class="sm:text-lg font-semibold text-gray-800 border-b pb-2 mb-4">
+          TRANSACTIONS
+        </h3>
+        <ul v-if="paginator?.content?.length > 0" class="space-y-2">
+          <li
+            v-for="(transaction, index) in paginator?.content"
+            :key="index"
+            class="flex flex-col sm:flex-row sm:justify-between sm:items-start bg-gray-50 hover:bg-gray-100 p-3 rounded-md"
+          >
+            <div class="text-sm text-gray-700 sm:w-1/2">
+              {{ transaction.description }}
+            </div>
+
+            <div class="flex flex-col text-sm font-medium text-right sm:w-1/2">
+              <span
+                :class="
+                  transaction.amount > 0 ? 'text-green-600' : 'text-red-600'
+                "
+              >
+                {{ transaction.amount > 0 ? "+" : "" }}{{ transaction.amount }}€
+              </span>
+              <span class="text-xs text-gray-500">
+                {{
+                  new Date(transaction.createdAt).toLocaleDateString("en-US", {
+                    year: "numeric",
+                    month: "2-digit",
+                    day: "2-digit",
+                    hour: "2-digit",
+                    minute: "2-digit",
+                  })
+                }}
+              </span>
+            </div>
+          </li>
+        </ul>
+        <div v-else class="text-center text-gray-500">
+          No transactions found.
+        </div>
+        <div
+          class="flex items-center justify-end text-sm mt-4 text-white bg-stone-300 p-1 rounded"
+        >
+          <span class="mx-2">
+            <ChevronLeft @click="previousPage" class="cursor-pointer" />
+          </span>
+          <span v-if="paginator?.pageable.pageNumber">
+            {{ paginator.pageable?.pageNumber + 1 }} /
+            {{ paginator.totalPages }}
+          </span>
+          <span class="mx-2">
+            <ChevronRight @click="nextPage" class="cursor-pointer" />
+          </span>
+        </div>
       </div>
     </div>
-  </div>
-  <div v-else>
-    <LoadingSpinner v-if="!isViewReady" />
-  </div>
+    <div v-else>
+      <LoadingSpinner v-if="!isViewReady" />
+    </div>
 
-  <div
-    v-if="!card && isViewReady"
-    class="flex justify-center items-center p-4 rounded shadow bg-red-50"
-  >
-    <div class="text-center">
-      <h1 class="text-2xl font-bold mb-4">Card not found</h1>
-      <p class="text-red-600">Please check the card ID and try again.</p>
-      <p class="text-red-600">
-        If you think this is a mistake, please contact support.
-      </p>
+    <div
+      v-if="!card && isViewReady"
+      class="flex justify-center items-center p-4 rounded shadow bg-red-50"
+    >
+      <div class="text-center">
+        <h1 class="text-2xl font-bold mb-4">Card not found</h1>
+        <p class="text-red-600">Please check the card ID and try again.</p>
+        <p class="text-red-600">
+          If you think this is a mistake, please contact support.
+        </p>
+      </div>
     </div>
   </div>
 </template>
