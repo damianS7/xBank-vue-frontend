@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import MessageAlert from "@/components/MessageAlert.vue";
 import BankingAccount from "@/views/account/components/BankingAccount.vue";
 import { onMounted, ref } from "vue";
 import { useAccountStore } from "@/stores/account";
@@ -32,12 +33,12 @@ onMounted(() => {
 <template>
   <div>
     <MessageAlert
-      v-if="messageAlert.visible"
-      class="mb-4"
+      v-if="messageAlert.message"
+      class="mb-6"
       :message="messageAlert.message"
       :timeout="messageAlert.timeout"
       :type="messageAlert.type"
-      @close="messageAlert.visible = false"
+      @close="messageAlert.message = ''"
     />
     <!-- Botón para abrir una nueva cuenta -->
 
