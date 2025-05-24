@@ -65,7 +65,7 @@ onUnmounted(() => {
       <Header />
 
       <!-- Contenido scrollable -->
-      <div class="flex-1 overflow-auto bg-gray-50 p-6">
+      <div class="flex-1 overflow-auto p-6">
         <router-view />
       </div>
     </div>
