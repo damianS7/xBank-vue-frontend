@@ -43,11 +43,11 @@ nav a.router-link-exact-active {
 }
 
 .pill {
-  @apply font-bold text-sm px-2 py-1 rounded;
+  @apply font-bold text-sm px-2 py-1 rounded-full;
 }
 
 .pill-xs {
-  @apply font-bold text-xs px-1 py-0.5 rounded;
+  @apply font-bold text-xs px-1.5 py-0.5 rounded-full;
 }
 
 .pill-blue {
