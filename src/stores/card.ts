@@ -145,6 +145,38 @@ export const useCardStore = defineStore("card", {
       };
       return { card, status: response.status };
     },
+    async setDailyLimit(
+      cardId: number,
+      dailyLimit: number
+    ): Promise<BankingCardResponse> {
+      const token = localStorage.getItem("token");
+      const response = await fetch(
+        `http://localhost:8080/api/v1/customers/me/banking/cards/${cardId}/daily-limit`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({ dailyLimit }),
+        }
+      );
+
+      if (!response.ok) {
+        // problem setting limit
+        const errorJson = await response.json();
+        return errorJson;
+      }
+
+      const cardJson = await response.json();
+      const card = {
+        ...cardJson,
+        expiredDate: new Date(cardJson.expiredDate),
+        createdAt: new Date(cardJson.createdAt),
+        updatedAt: new Date(cardJson.updatedAt),
+      };
+      return { card, status: response.status };
+    },
     async setLockStatus(
       cardId: number,
       lockStatus: BankingCardLockStatus

@@ -9,6 +9,7 @@ import { MessageType } from "@/types/Message";
 import { ChevronRight, ChevronLeft } from "lucide-vue-next";
 import SetPinModal from "./components/SetPinModal.vue";
 import EnableDisableCardModal from "./components/EnableDisableCardModal.vue";
+import BankingCardDailyLimitModal from "./components/BankingCardDailyLimitModal.vue";
 import LoadingSpinner from "@/components/LoadingSpinner.vue";
 const isViewReady = ref(false);
 const route = useRoute();
@@ -18,7 +19,7 @@ const cardStore = useCardStore();
 const currentPage = ref(0); // Spring usa 0-indexed
 const pageSize = 5;
 const paginator = ref<any>(null);
-
+// prefetch next transactions so it will be faster
 const nextPage = () => {
   if (paginator.value && currentPage.value < paginator.value.totalPages - 1) {
     currentPage.value++;
@@ -36,6 +37,7 @@ const previousPage = () => {
 // modals
 const setPinModal = ref();
 const enableDisableCardModal = ref();
+const dailyLimitModal = ref();
 
 const cardId = parseInt(route.params.id as string, 10);
 const card = computed(() => cardStore.getBankingCard(cardId));
@@ -111,6 +113,26 @@ async function setPin() {
   });
 }
 
+async function setDailyLimit() {
+  const dailyLimit = await dailyLimitModal.value.open();
+  if (!dailyLimit) {
+    return;
+  }
+
+  cardStore.setDailyLimit(cardId, dailyLimit).then((response) => {
+    if (response.status === 200 && response.card) {
+      messageAlert.value.message = "Daily limit updated successfully.";
+      messageAlert.value.type = MessageType.SUCCESS;
+      cardStore.setCard(response.card);
+      return;
+    }
+
+    messageAlert.value.message =
+      "Problem setting daily limit. " + response.errors?.dailyLimit;
+    messageAlert.value.type = MessageType.ERROR;
+  });
+}
+
 async function fetchTransactions() {
   return await cardStore
     .fetchPageableTransactions(cardId, currentPage.value, pageSize)
@@ -142,6 +164,7 @@ onMounted(async () => {
     ref="enableDisableCardModal"
     :cardEnabled="card?.cardStatus === 'ENABLED'"
   />
+  <BankingCardDailyLimitModal ref="dailyLimitModal" />
   <MessageAlert
     v-if="messageAlert.message"
     class="mb-6"
@@ -155,7 +178,7 @@ onMounted(async () => {
       <h1 class="flex gap-1 items-center text-2xl font-bold">
         <span>User Card</span>
         <span
-          class="text-xs rounded-full px-1"
+          class="pill-xs"
           :class="{
             'text-red-100 bg-red-500': card?.cardStatus === 'DISABLED',
             'text-green-100 bg-green-500': card?.cardStatus === 'ENABLED',
@@ -163,12 +186,15 @@ onMounted(async () => {
           >{{ card?.cardStatus }}
         </span>
         <span
-          class="text-xs rounded-full px-1"
+          class="pill-xs"
           :class="{
             'text-gray-100 bg-gray-500': card?.lockStatus === 'LOCKED',
             'text-green-100 bg-green-500': card?.lockStatus === 'UNLOCKED',
           }"
           >{{ card?.lockStatus }}
+        </span>
+        <span class="pill-xs bg-blue-500 text-blue-100"
+          >{{ card?.dailyLimit ? card?.dailyLimit + " LIMIT" : "NO LIMIT" }}
         </span>
       </h1>
     </div>
@@ -194,7 +220,9 @@ onMounted(async () => {
       >
         {{ card?.lockStatus === "LOCKED" ? "UNLOCK" : "LOCK" }} CARD
       </button>
-      <button class="btn-sm btn-blue w-full sm:w-auto">SET DAILY LIMIT</button>
+      <button @click="setDailyLimit" class="btn-sm btn-blue w-full sm:w-auto">
+        SET DAILY LIMIT
+      </button>
     </div>
 
     <div

@@ -10,6 +10,7 @@ export interface BankingCard {
   cardNumber: string;
   cardCVV: string;
   cardPIN: string;
+  dailyLimit: number;
   expiredDate: Date;
   cardType: BankingCardType;
   cardStatus: BankingCardStatus;
