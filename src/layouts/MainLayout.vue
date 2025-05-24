@@ -13,38 +13,36 @@ const accountStore = useAccountStore();
 const customerStore = useCustomerStore();
 const cardStore = useCardStore();
 const router = useRouter();
+const tokenValidationInterval = 30 * 1000; // 30s
 let interval: number;
 let initialized = ref(false);
-let times = 0;
+
 async function checkIfTokenIsValid() {
   const token = authStore.token;
   const isTokenValid = await authStore.isTokenValid(token);
 
-  console.log("validating token");
   if (!isTokenValid) {
-    console.log("logging out for token is invalid", times);
     initialized.value = false;
     await authStore.logout();
-    await wait();
+    await wait(100);
     router.push("/auth/login");
   }
-  times++;
 }
 
 function sleep(ms: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
-async function wait() {
-  await sleep(1000); // Espera 2 segundos
+async function wait(ms: number) {
+  await sleep(ms); // Espera 2 segundos
 }
 
 onMounted(async () => {
   interval = setInterval(async () => {
     await checkIfTokenIsValid();
-  }, 30 * 1000);
+  }, tokenValidationInterval);
 
-  await wait();
+  await wait(1000);
   await customerStore.initialize();
   await accountStore.initialize();
   await cardStore.initialize();
