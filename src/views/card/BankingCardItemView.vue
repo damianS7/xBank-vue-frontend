@@ -11,6 +11,7 @@ import SetPinModal from "./components/SetPinModal.vue";
 import EnableDisableCardModal from "./components/EnableDisableCardModal.vue";
 import BankingCardDailyLimitModal from "./components/BankingCardDailyLimitModal.vue";
 import LoadingSpinner from "@/components/LoadingSpinner.vue";
+
 const isViewReady = ref(false);
 const route = useRoute();
 const cardStore = useCardStore();
@@ -173,10 +174,25 @@ onMounted(async () => {
     :type="messageAlert.type"
     @close="messageAlert.message = ''"
   />
+
+  <div class="flex flex-wrap justify-end gap-1 mb-6">
+    <button @click="setPin" class="btn-sm btn-blue w-full sm:w-auto">
+      SET PIN
+    </button>
+    <button @click="enableDisableCard" class="btn-sm btn-blue w-full sm:w-auto">
+      {{ card?.lockStatus === "LOCKED" ? "UNLOCK" : "LOCK" }} CARD
+    </button>
+    <button @click="setDailyLimit" class="btn-sm btn-blue w-full sm:w-auto">
+      SET DAILY LIMIT
+    </button>
+  </div>
+
   <div v-if="card && isViewReady" class="p-4 rounded bg-blue-50 shadow">
-    <div>
-      <h1 class="flex gap-1 items-center text-2xl font-bold">
-        <span>User Card</span>
+    <div
+      class="sm:flex gap-1 items-center text-2xl font-bold border-b p-1 mb-1"
+    >
+      <h1>User Card</h1>
+      <div class="flex flex-wrap gap-1 text-sm">
         <span
           class="pill-xs"
           :class="{
@@ -196,10 +212,10 @@ onMounted(async () => {
         <span class="pill-xs bg-blue-500 text-blue-100"
           >{{ card?.dailyLimit ? card?.dailyLimit + " LIMIT" : "NO LIMIT" }}
         </span>
-      </h1>
+      </div>
     </div>
 
-    <div class="flex justify-center">
+    <div class="flex justify-center my-6">
       <div class="grid grid-cols-1 md:grid-cols-2 gap-1">
         <div class="flex jusfity-center">
           <BankingCardFront v-if="card" :card="card" />
@@ -210,47 +226,47 @@ onMounted(async () => {
       </div>
     </div>
 
-    <div class="flex flex-wrap justify-center gap-1 mt-2">
-      <button @click="setPin" class="btn-sm btn-blue w-full sm:w-auto">
-        SET PIN
-      </button>
-      <button
-        @click="enableDisableCard"
-        class="btn-sm btn-blue w-full sm:w-auto"
-      >
-        {{ card?.lockStatus === "LOCKED" ? "UNLOCK" : "LOCK" }} CARD
-      </button>
-      <button @click="setDailyLimit" class="btn-sm btn-blue w-full sm:w-auto">
-        SET DAILY LIMIT
-      </button>
-    </div>
-
     <div
       v-if="paginator?.content?.length > 0"
-      class="mt-6 p-4 bg-white rounded-xl shadow-md w-full max-w-xl mx-auto"
+      class="p-4 bg-white rounded-xl shadow-md w-full"
     >
-      <h3 class="text-lg font-semibold text-gray-800 border-b pb-2 mb-4">
-        TRANSACCIONES
+      <h3 class="sm:text-lg font-semibold text-gray-800 border-b pb-2 mb-4">
+        TRANSACTIONS
       </h3>
       <ul class="space-y-2">
         <li
           v-for="(transaction, index) in paginator?.content"
           :key="index"
-          class="flex justify-between items-center bg-gray-50 hover:bg-gray-100 p-3 rounded-md"
+          class="flex flex-col sm:flex-row sm:justify-between sm:items-start bg-gray-50 hover:bg-gray-100 p-3 rounded-md"
         >
-          <span class="text-sm text-gray-700"
-            >{{ transaction.description }} - {{ transaction.createdAt }}</span
-          >
-          <span
-            class="text-sm font-medium"
-            :class="transaction.amount > 0 ? 'text-green-600' : 'text-red-600'"
-          >
-            {{ transaction.amount > 0 ? "+" : "" }}{{ transaction.amount }}€
-          </span>
+          <div class="text-sm text-gray-700 sm:w-1/2">
+            {{ transaction.description }}
+          </div>
+
+          <div class="flex flex-col text-sm font-medium text-right sm:w-1/2">
+            <span
+              :class="
+                transaction.amount > 0 ? 'text-green-600' : 'text-red-600'
+              "
+            >
+              {{ transaction.amount > 0 ? "+" : "" }}{{ transaction.amount }}€
+            </span>
+            <span class="text-xs text-gray-500">
+              {{
+                new Date(transaction.createdAt).toLocaleDateString("en-US", {
+                  year: "numeric",
+                  month: "2-digit",
+                  day: "2-digit",
+                  hour: "2-digit",
+                  minute: "2-digit",
+                })
+              }}
+            </span>
+          </div>
         </li>
       </ul>
       <div
-        class="flex items-center justify-end mt-4 text-white bg-stone-300 p-1 rounded"
+        class="flex items-center justify-end text-sm mt-4 text-white bg-stone-300 p-1 rounded"
       >
         <span class="mx-2">
           <ChevronLeft @click="previousPage" class="cursor-pointer" />
