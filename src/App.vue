@@ -15,6 +15,16 @@ onMounted(() => {
     "Helvetica Neue", Arial, "Noto Sans", sans-serif;
 }
 
+header,
+nav,
+.main-container {
+  @apply bg-stone-100;
+}
+
+.main-container {
+  @apply p-4 rounded shadow;
+}
+
 #app {
   font-family: Avenir, Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;

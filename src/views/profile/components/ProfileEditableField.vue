@@ -103,7 +103,7 @@ function updatePassword() {
 
   <div
     v-if="formField.type === 'select'"
-    class="p-4 bg-white rounded border shadow-sm"
+    class="bg-white p-4 rounded border shadow-sm"
   >
     <p class="text-sm text-gray-500">{{ formField.placeholder }}</p>
 

@@ -40,19 +40,26 @@ onMounted(() => {
       :type="messageAlert.type"
       @close="messageAlert.message = ''"
     />
-    <!-- Botón para abrir una nueva cuenta -->
 
-    <div class="flex justify-end rounded gap-1">
+    <div class="flex justify-end rounded gap-1 mb-6">
       <button type="button" @click="showModal = true" class="btn btn-blue">
         Open account
       </button>
     </div>
 
-    <!-- Lista de cuentas -->
-    <div v-for="account in accountStore.getBankingAccounts" :key="account.id">
-      <router-link :to="`/account/${account.id}`">
-        <BankingAccount :account="account" />
-      </router-link>
+    <div class="main-container">
+      <section
+        class="sm:flex gap-1 items-center text-2xl font-bold border-b border-gray-300 p-1 mb-1"
+      >
+        <h1>Accounts</h1>
+        <div class="flex flex-wrap gap-1 text-sm"></div>
+      </section>
+
+      <div v-for="account in accountStore.getBankingAccounts" :key="account.id">
+        <router-link :to="`/account/${account.id}`">
+          <BankingAccount :account="account" />
+        </router-link>
+      </div>
     </div>
   </div>
   <!-- Modal -->

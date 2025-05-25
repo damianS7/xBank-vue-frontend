@@ -1,10 +1,35 @@
+<script setup lang="ts">
+import {
+  Landmark as Home,
+  Wallet as Accounts,
+  CreditCard,
+  UserPen as Profile,
+  Settings,
+  LogOut,
+  ReceiptText,
+  ChartCandlestick,
+  Banknote,
+} from "lucide-vue-next";
+import { useRouter } from "vue-router";
+import { useAuthStore } from "@/stores/auth";
+import SidebarLink from "@/components/SidebarLink.vue";
+
+const authStore = useAuthStore();
+const router = useRouter();
+
+function logout() {
+  authStore.logout(); // tu acción en la store
+  router.push("/auth/login"); // redirige al login o donde quieras
+}
+</script>
 <template>
   <nav
-    class="sidebar p-2 group bg-gray-100 w-14 hover:sm:w-64 transition-all duration-300 ease-in-out h-screen flex flex-col drop-shadow space-y-2"
+    class="sidebar p-2 group w-14 hover:sm:w-64 transition-all duration-300 ease-in-out h-screen flex flex-col drop-shadow space-y-2"
   >
     <SidebarLink to="/home" :icon="Home" label="Home" />
     <SidebarLink to="/accounts" :icon="Accounts" label="Accounts" />
     <SidebarLink to="/cards" :icon="CreditCard" label="Cards" />
+    <SidebarLink to="/cards" :icon="ReceiptText" label="Sign Operations" />
     <SidebarLink to="/profile" :icon="Profile" label="Profile" />
     <SidebarLink to="/settings" :icon="Settings" label="Settings" />
     <a href="#" @click.prevent="logout">
@@ -22,30 +47,3 @@
     </a>
   </nav>
 </template>
-<script setup lang="ts">
-import {
-  Landmark as Home,
-  Wallet as Accounts,
-  CreditCard,
-  UserPen as Profile,
-  Settings,
-  LogOut,
-} from "lucide-vue-next";
-import { useRouter } from "vue-router";
-import { useAuthStore } from "@/stores/auth";
-import SidebarLink from "@/components/SidebarLink.vue";
-
-const authStore = useAuthStore();
-const router = useRouter();
-
-function logout() {
-  authStore.logout(); // tu acción en la store
-  router.push("/auth/login"); // redirige al login o donde quieras
-}
-</script>
-
-<!-- Add "scoped" attribute to limit CSS to this component only -->
-<style scoped>
-.sidebar {
-}
-</style>

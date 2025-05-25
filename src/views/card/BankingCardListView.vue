@@ -29,21 +29,30 @@ onMounted(() => {
 });
 </script>
 <template>
-  <div class="flex flex-col items-center justify-center">
-    <div class="flex flex-col items-center">
-      <router-link :to="`/card/${currentCard.id}`">
-        <BankingCardFront class="shadow-md w-full" :card="currentCard" />
-      </router-link>
-    </div>
+  <div class="main-container">
+    <section
+      class="sm:flex gap-1 items-center text-2xl font-bold border-b border-gray-300 p-1 mb-1"
+    >
+      <h1>Cards</h1>
+      <div class="flex flex-wrap gap-1 text-sm"></div>
+    </section>
 
-    <div class="flex items-center mt-4 p-0 text-white bg-blue-500 rounded-lg">
-      <button class="btn-sm cursor-pointer" @click="previousCard">
-        <ChevronLeft />
-      </button>
-      <span> {{ currentCardIndex + 1 }} / {{ cards.length }} </span>
-      <button class="btn-sm cursor-pointer" @click="nextCard">
-        <ChevronRight />
-      </button>
-    </div>
+    <section class="flex flex-col items-center justify-center mt-4">
+      <div class="flex flex-col items-center">
+        <router-link :to="`/card/${currentCard.id}`">
+          <BankingCardFront class="shadow-md w-full" :card="currentCard" />
+        </router-link>
+      </div>
+
+      <div class="flex items-center mt-4 p-0 text-white bg-blue-500 rounded-lg">
+        <button class="btn-sm cursor-pointer" @click="previousCard">
+          <ChevronLeft />
+        </button>
+        <span> {{ currentCardIndex + 1 }} / {{ cards.length }} </span>
+        <button class="btn-sm cursor-pointer" @click="nextCard">
+          <ChevronRight />
+        </button>
+      </div>
+    </section>
   </div>
 </template>

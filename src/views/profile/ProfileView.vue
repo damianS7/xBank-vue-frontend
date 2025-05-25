@@ -344,34 +344,41 @@ onMounted(() => {
       @close="messageAlert.visible = false"
     />
 
-    <div class="p-4 rounded bg-blue-50 shadow">
-      <h1 class="text-2xl font-bold">User profile</h1>
-
-      <ProfilePhoto @update="updatePhoto" />
-      <div
-        v-if="customerStore.customer.profile"
-        class="grid grid-cols-1 md:grid-cols-2 gap-4 p-4"
+    <div class="main-container">
+      <section
+        class="sm:flex gap-1 items-center text-2xl font-bold border-b border-gray-300 p-1 mb-1"
       >
-        <ProfileEditableField
-          v-for="(field, index) in formFields"
-          :key="index"
-          :index="index"
-          :field="field"
-          @update="updateField"
-        />
-      </div>
+        <h1>Profile</h1>
+        <div class="flex flex-wrap gap-1 text-sm"></div>
+      </section>
 
-      <ConfirmPasswordModal
-        v-if="modals.confirmPasswordModal.visible.value"
-        @confirm="modals.confirmPasswordModal.onConfirm"
-        @cancel="modals.confirmPasswordModal.onCancel"
-      />
-      <ConfirmMessageModal
-        v-if="modals.confirmMessageModal.visible.value"
-        :message="modals.confirmMessageModal.message"
-        @confirm="modals.confirmMessageModal.onConfirm"
-        @cancel="modals.confirmMessageModal.onCancel"
-      />
+      <section>
+        <ProfilePhoto @update="updatePhoto" />
+        <div
+          v-if="customerStore.customer.profile"
+          class="grid grid-cols-1 md:grid-cols-2 gap-4 p-4"
+        >
+          <ProfileEditableField
+            v-for="(field, index) in formFields"
+            :key="index"
+            :index="index"
+            :field="field"
+            @update="updateField"
+          />
+        </div>
+      </section>
     </div>
   </div>
+
+  <ConfirmPasswordModal
+    v-if="modals.confirmPasswordModal.visible.value"
+    @confirm="modals.confirmPasswordModal.onConfirm"
+    @cancel="modals.confirmPasswordModal.onCancel"
+  />
+  <ConfirmMessageModal
+    v-if="modals.confirmMessageModal.visible.value"
+    :message="modals.confirmMessageModal.message"
+    @confirm="modals.confirmMessageModal.onConfirm"
+    @cancel="modals.confirmMessageModal.onCancel"
+  />
 </template>

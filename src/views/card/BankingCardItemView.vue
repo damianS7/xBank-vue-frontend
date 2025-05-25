@@ -188,7 +188,7 @@ onMounted(async () => {
       </button>
     </div>
 
-    <div v-if="card && isViewReady" class="p-4 rounded bg-blue-100 shadow">
+    <div v-if="card && isViewReady" class="main-container">
       <div
         class="sm:flex gap-1 items-center text-2xl font-bold border-b border-gray-300 p-1 mb-1"
       >
