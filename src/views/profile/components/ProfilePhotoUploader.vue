@@ -4,10 +4,9 @@ import ProfilePhoto from "@/components/ProfilePhoto.vue";
 import { useCustomerStore } from "@/stores/customer";
 const emit = defineEmits(["update", "close"]);
 const customerStore = useCustomerStore();
-
+const fileInput = ref<HTMLInputElement | null>(null);
 // it shows the file chooser dialog
 function showFileChooserDialog() {
-  const fileInput = ref<HTMLInputElement | null>(null);
   fileInput.value?.click();
 }
 
@@ -33,7 +32,7 @@ function updatePhoto(event: Event) {
       />
       <div
         v-else
-        @click.prevent="showFileChooserDialog"
+        @click="showFileChooserDialog"
         class="w-24 h-24 rounded-full bg-gray-300 flex items-center justify-center text-gray-600 cursor-pointer"
       >
         No Image
