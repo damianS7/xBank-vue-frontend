@@ -21,7 +21,7 @@ export const useCustomerStore = defineStore("customer", {
 
   actions: {
     async getCustomer(token: string) {
-      const res = await fetch("http://localhost:8080/api/v1/customers/me", {
+      const res = await fetch(`${process.env.VUE_APP_API_URL}/customers/me`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
@@ -38,7 +38,7 @@ export const useCustomerStore = defineStore("customer", {
       fieldsToUpdate: Record<string, any>
     ) {
       const response = await fetch(
-        "http://localhost:8080/api/v1/customers/me/profile",
+        `${process.env.VUE_APP_API_URL}/customers/me/profile`,
         {
           method: "PATCH",
           headers: {
@@ -54,7 +54,7 @@ export const useCustomerStore = defineStore("customer", {
     },
     async patchEmail(token: string, currentPassword: string, newEmail: string) {
       const response = await fetch(
-        "http://localhost:8080/api/v1/customers/me/email",
+        `${process.env.VUE_APP_API_URL}/customers/me/email`,
         {
           method: "PATCH",
           headers: {
@@ -74,7 +74,7 @@ export const useCustomerStore = defineStore("customer", {
       newPassword: string
     ) {
       const response = await fetch(
-        "http://localhost:8080/api/v1/auth/customers/password",
+        `${process.env.VUE_APP_API_URL}/auth/customers/password`,
         {
           method: "PATCH",
           headers: {
@@ -93,7 +93,7 @@ export const useCustomerStore = defineStore("customer", {
       const token = authStore.token;
 
       const res = await fetch(
-        "http://localhost:8080/api/v1/customers/me/profile/photo/" + photo,
+        `${process.env.VUE_APP_API_URL}/customers/me/profile/photo/${photo}`,
         {
           method: "GET",
           headers: {
@@ -112,7 +112,7 @@ export const useCustomerStore = defineStore("customer", {
       formData.append("currentPassword", currentPassword); // otro campo necesario
 
       const response = await fetch(
-        "http://localhost:8080/api/v1/customers/me/profile/photo",
+        `${process.env.VUE_APP_API_URL}/customers/me/profile/photo`,
         {
           method: "POST",
           headers: {
@@ -140,11 +140,13 @@ export const useCustomerStore = defineStore("customer", {
         const customer = await this.getCustomer(savedToken);
         this.setCustomer(customer);
 
-        const profilePhoto = await this.getPhoto(customer.profile.photoPath);
-        localStorage.setItem(
-          "profilePhotoURL",
-          URL.createObjectURL(profilePhoto)
-        );
+        if (customer.profile.photoPath) {
+          const profilePhoto = await this.getPhoto(customer.profile.photoPath);
+          localStorage.setItem(
+            "profilePhotoURL",
+            URL.createObjectURL(profilePhoto)
+          );
+        }
       }
       this.initialized = true;
     },

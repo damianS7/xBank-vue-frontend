@@ -20,7 +20,7 @@ export const useAuthStore = defineStore("auth", {
   actions: {
     async login(email: string, password: string) {
       try {
-        const res = await fetch("http://localhost:8080/api/v1/auth/login", {
+        const res = await fetch(`${process.env.VUE_APP_API_URL}/auth/login`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -47,7 +47,7 @@ export const useAuthStore = defineStore("auth", {
     },
     async register(fields: Customer) {
       const response = await fetch(
-        "http://localhost:8080/api/v1/auth/register",
+        `${process.env.VUE_APP_API_URL}/auth/register`,
         {
           method: "POST",
           headers: {
@@ -62,7 +62,7 @@ export const useAuthStore = defineStore("auth", {
     },
     async isTokenValid(token: string) {
       const response = await fetch(
-        "http://localhost:8080/api/v1/auth/token/validate",
+        `${process.env.VUE_APP_API_URL}/auth/token/validate`,
         {
           method: "GET",
           headers: {

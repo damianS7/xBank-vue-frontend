@@ -43,7 +43,7 @@ export const useAccountStore = defineStore("account", {
   actions: {
     async getCustomerBankingAccounts(token: string) {
       const response = await fetch(
-        "http://localhost:8080/api/v1/customers/me/banking/accounts",
+        `${process.env.VUE_APP_API_URL}/customers/me/banking/accounts`,
         {
           method: "GET",
           headers: {
@@ -66,7 +66,7 @@ export const useAccountStore = defineStore("account", {
     async openBankingAccount(type: string, currency: string, token: string) {
       try {
         const res = await fetch(
-          "http://localhost:8080/api/v1/customers/me/banking/accounts/open",
+          `${process.env.VUE_APP_API_URL}/customers/me/banking/accounts/open`,
           {
             method: "POST",
             headers: {
@@ -99,7 +99,7 @@ export const useAccountStore = defineStore("account", {
       cardType: string
     ) {
       const response = await fetch(
-        "http://localhost:8080/api/v1/customers/me/banking/account/" +
+        `${process.env.VUE_APP_API_URL}/customers/me/banking/account/` +
           accountId +
           "/cards",
         {
@@ -120,7 +120,7 @@ export const useAccountStore = defineStore("account", {
     async setAlias(accountId: string, alias: string) {
       const token = localStorage.getItem("token");
       const response = await fetch(
-        "http://localhost:8080/api/v1/customers/me/banking/account/" +
+        `${process.env.VUE_APP_API_URL}/customers/me/banking/account/` +
           accountId +
           "/alias",
         {

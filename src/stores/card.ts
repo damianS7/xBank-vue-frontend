@@ -39,7 +39,7 @@ export const useCardStore = defineStore("card", {
     async getCustomerBankingCards() {
       const token = localStorage.getItem("token");
       const res = await fetch(
-        "http://localhost:8080/api/v1/customers/me/banking/cards",
+        `${process.env.VUE_APP_API_URL}/customers/me/banking/cards`,
         {
           method: "GET",
           headers: {
@@ -65,7 +65,7 @@ export const useCardStore = defineStore("card", {
     async fetchTransactions(cardId: number) {
       const token = localStorage.getItem("token");
       const res = await fetch(
-        `http://localhost:8080/api/v1/customers/me/banking/cards/${cardId}/transactions`,
+        `${process.env.VUE_APP_API_URL}/customers/me/banking/cards/${cardId}/transactions`,
         {
           method: "GET",
           headers: {
@@ -94,7 +94,7 @@ export const useCardStore = defineStore("card", {
     ) {
       const token = localStorage.getItem("token");
       const res = await fetch(
-        `http://localhost:8080/api/v1/customers/me/banking/cards/${cardId}/transactions?page=${page}&size=${size}&sort=createdAt,DESC`,
+        `${process.env.VUE_APP_API_URL}/customers/me/banking/cards/${cardId}/transactions?page=${page}&size=${size}&sort=createdAt,DESC`,
 
         {
           method: "GET",
@@ -128,7 +128,7 @@ export const useCardStore = defineStore("card", {
     ): Promise<BankingCardResponse> {
       const token = localStorage.getItem("token");
       const response = await fetch(
-        `http://localhost:8080/api/v1/customers/me/banking/cards/${cardId}/pin`,
+        `${process.env.VUE_APP_API_URL}/customers/me/banking/cards/${cardId}/pin`,
         {
           method: "PUT",
           headers: {
@@ -160,7 +160,7 @@ export const useCardStore = defineStore("card", {
     ): Promise<BankingCardResponse> {
       const token = localStorage.getItem("token");
       const response = await fetch(
-        `http://localhost:8080/api/v1/customers/me/banking/cards/${cardId}/daily-limit`,
+        `${process.env.VUE_APP_API_URL}/customers/me/banking/cards/${cardId}/daily-limit`,
         {
           method: "PUT",
           headers: {
@@ -192,7 +192,7 @@ export const useCardStore = defineStore("card", {
     ): Promise<BankingCardResponse> {
       const token = localStorage.getItem("token");
       const response = await fetch(
-        `http://localhost:8080/api/v1/customers/me/banking/cards/${cardId}/locking`,
+        `${process.env.VUE_APP_API_URL}/customers/me/banking/cards/${cardId}/locking`,
         {
           method: "PUT",
           headers: {

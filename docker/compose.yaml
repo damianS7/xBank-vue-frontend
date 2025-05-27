@@ -1,0 +1,11 @@
+name: xbank
+services:
+  frontend:
+    container_name: frontend
+    build:
+      context: ../
+      dockerfile: ./docker/Dockerfile
+    ports:
+      - "8081:80"
+    environment:
+      - NODE_ENV=production
