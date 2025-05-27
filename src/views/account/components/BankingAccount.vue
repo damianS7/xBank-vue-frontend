@@ -46,7 +46,7 @@ function formatIban(iban: string): string {
       <!-- Alias -->
       <div class="flex items-center gap-2 text-sm font-bold text-gray-700">
         <div class="flex gap-1" v-if="!formFields.isEditing">
-          {{ account.alias || "No alias" }}
+          {{ account.alias || "ALIAS" }}
           <SquarePen
             @click="formFields.isEditing = true"
             v-if="editable"
@@ -81,7 +81,7 @@ function formatIban(iban: string): string {
           <span
             class="absolute top-full left-1/2 -translate-x-1/2 mt-1 scale-0 group-hover:scale-100 transition-all duration-200 bg-gray-800 text-white text-xs px-2 py-1 rounded shadow z-10 whitespace-nowrap"
           >
-            Total de tarjetas de esta cuenta
+            Total cards for this account
           </span>
         </span>
         <span class="pill pill-blue">{{ account.accountType }}</span>
@@ -89,7 +89,6 @@ function formatIban(iban: string): string {
       </div>
     </div>
 
-    <!-- IBAN + saldo -->
     <div
       class="flex flex-col sm:flex-row sm:justify-between items-start sm:items-center mt-4"
     >
@@ -105,12 +104,15 @@ function formatIban(iban: string): string {
 
     <!-- Fecha de creación -->
     <div class="flex justify-end items-center mt-2">
-      <span class="text-sm text-gray-800">
-        Creado el:
+      <span class="text-sm text-gray-500">
+        Created at
         {{
           account.createdAt.toLocaleDateString("en-US", {
             year: "numeric",
             month: "2-digit",
+            day: "2-digit",
+            hour: "2-digit",
+            minute: "2-digit",
           })
         }}
       </span>

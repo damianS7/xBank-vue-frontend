@@ -18,12 +18,29 @@ const messageAlert = ref({
 const accountStore = useAccountStore();
 const authStore = useAuthStore();
 
-const showModal = ref(false);
+const modals = {
+  openAccount: ref(),
+};
 
 // function to handle the submission of the open account modal
-function submitOpenAccount(data: { type: string; currency: string }) {
-  showModal.value = false;
-  accountStore.openBankingAccount(data.type, data.currency, authStore.token);
+async function openAccount() {
+  const accountData = await modals.openAccount.value.open();
+
+  // if modal is cancelled, accountData will be undefined
+  if (!accountData) {
+    return;
+  }
+
+  accountStore
+    .openBankingAccount(accountData.type, accountData.currency)
+    .then((account) => {
+      accountStore.addAccount(account);
+    })
+    .catch((error) => {
+      messageAlert.value.message = error.message || "Failed to open account.";
+      messageAlert.value.type = MessageType.ERROR;
+      messageAlert.value.visible = true;
+    });
 }
 
 onMounted(() => {
@@ -32,6 +49,7 @@ onMounted(() => {
 </script>
 <template>
   <div>
+    <OpenAccountModal :ref="modals.openAccount" />
     <MessageAlert
       v-if="messageAlert.message"
       class="mb-6"
@@ -42,7 +60,7 @@ onMounted(() => {
     />
 
     <div class="flex justify-end rounded gap-1 mb-6">
-      <button type="button" @click="showModal = true" class="btn btn-blue">
+      <button type="button" @click="openAccount" class="btn btn-blue">
         Open account
       </button>
     </div>
@@ -62,12 +80,4 @@ onMounted(() => {
       </div>
     </div>
   </div>
-
-  <!-- Modal -->
-  <OpenAccountModal
-    v-if="showModal"
-    :visible="showModal"
-    @submit="submitOpenAccount"
-    @close="showModal = false"
-  />
 </template>

@@ -1,6 +1,11 @@
 import { defineStore } from "pinia";
-import type { BankingAccount } from "../types/BankingAccount";
-import type { BankingCard } from "../types/BankingCard";
+import type { BankingAccount } from "@/types/BankingAccount";
+import type { BankingCard } from "@/types/BankingCard";
+
+interface GenericErrorResponse {
+  message: string;
+  status: number;
+}
 
 export const useAccountStore = defineStore("account", {
   state: () => ({
@@ -63,9 +68,13 @@ export const useAccountStore = defineStore("account", {
 
       return accounts;
     },
-    async openBankingAccount(type: string, currency: string, token: string) {
+    async openBankingAccount(
+      type: string,
+      currency: string
+    ): Promise<BankingAccount> {
       try {
-        const res = await fetch(
+        const token = localStorage.getItem("token");
+        const response = await fetch(
           `${process.env.VUE_APP_API_URL}/customers/me/banking/accounts/open`,
           {
             method: "POST",
@@ -80,17 +89,20 @@ export const useAccountStore = defineStore("account", {
           }
         );
 
-        if (!res.ok) {
-          throw new Error("Problema al abrir la cuenta");
+        // if response is not 200, throw an error
+        if (!response.ok) {
+          throw new Error("Failed to open account");
         }
 
-        const account = await res.json();
-        console.log("Cuenta creada:", account);
-        this.addAccount(account);
-        return account;
-      } catch (error) {
-        console.error("Error:", error);
-        throw error;
+        const jsonAccount = await response.json();
+
+        return jsonAccount.map((account: any) => ({
+          ...account,
+          createdAt: new Date(account.createdAt),
+          updatedAt: new Date(account.updatedAt),
+        })) as BankingAccount;
+      } catch (error: unknown) {
+        throw new Error("Failed to open account");
       }
     },
     async requestBankingCard(
