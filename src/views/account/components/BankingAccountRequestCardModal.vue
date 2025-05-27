@@ -35,13 +35,13 @@ function submit() {
             @click="emit('close')"
             class="bg-gray-300 rounded px-4 py-2"
           >
-            Close
+            Cancel
           </button>
           <button
             type="submit"
             class="bg-blue-600 text-white rounded px-4 py-2 hover:bg-blue-700"
           >
-            Accept
+            Confirm
           </button>
         </div>
       </form>
