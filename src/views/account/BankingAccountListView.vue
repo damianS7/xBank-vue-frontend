@@ -5,7 +5,7 @@ import { onMounted, ref } from "vue";
 import { useAccountStore } from "@/stores/account";
 import { useAuthStore } from "@/stores/auth";
 import { MessageType } from "@/types/Message";
-import OpenAccountModal from "@/views/account/components/OpenAccountModal.vue";
+import OpenAccountModal from "@/views/account/components/BankingAccountOpenModal.vue";
 
 // message to show
 const messageAlert = ref({
@@ -62,6 +62,7 @@ onMounted(() => {
       </div>
     </div>
   </div>
+
   <!-- Modal -->
   <OpenAccountModal
     v-if="showModal"

@@ -4,11 +4,10 @@ import { onMounted, ref } from "vue";
 import { useRoute } from "vue-router";
 import { useAccountStore } from "@/stores/account";
 import { useAuthStore } from "@/stores/auth";
-import AliasModal from "@/views/account/components/SetAliasModal.vue";
 import MessageAlert from "@/components/MessageAlert.vue";
-import { SquarePen, ChevronRight, ChevronLeft } from "lucide-vue-next";
+import { ChevronRight, ChevronLeft } from "lucide-vue-next";
 import BankingAccount from "@/views/account/components/BankingAccount.vue";
-import RequestBankingCardModal from "@/views/account/components/RequestBankingCardModal.vue";
+import RequestCardModal from "@/views/account/components/BankingAccountRequestCardModal.vue";
 import { set } from "zod";
 // message to show
 const messageAlert = ref({
@@ -186,7 +185,7 @@ onMounted(() => {
 
       <div class="mt-6 p-4 bg-white rounded-xl shadow-md w-full mx-auto">
         <h3 class="text-lg font-semibold text-gray-800 border-b pb-2 mb-4">
-          TRANSACCIONES
+          TRANSACTIONS
         </h3>
         <ul class="space-y-2">
           <li
@@ -223,7 +222,6 @@ onMounted(() => {
   </div>
   <div v-else>Loading account</div>
 
-  <!-- Modal -->
   <!-- <RequestBankingCardModal
     v-if="modals.bankingCard.visible.value"
     :visible="modals.bankingCard.visible.value"
