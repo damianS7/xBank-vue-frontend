@@ -176,8 +176,41 @@ export const useAccountStore = defineStore("account", {
         throw new Error("Failed to close account");
       }
     },
-    async openExistingBankingAccount() {
-      return;
+    async openExistingBankingAccount(
+      accountId: string,
+      password: string
+    ): Promise<BankingAccount> {
+      try {
+        const token = localStorage.getItem("token");
+        const response = await fetch(
+          `${process.env.VUE_APP_API_URL}/customers/me/banking/account/${accountId}/open`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+            body: JSON.stringify({
+              password,
+            }),
+          }
+        );
+
+        // if response is not 200, throw an error
+        if (!response.ok) {
+          throw new Error("Failed to re-open account");
+        }
+
+        const account = await response.json();
+
+        return {
+          ...account,
+          createdAt: new Date(account.createdAt),
+          updatedAt: new Date(account.updatedAt),
+        } as BankingAccount;
+      } catch (error: unknown) {
+        throw new Error("Failed to re-open account");
+      }
     },
     async requestBankingCard(
       accountId: string,

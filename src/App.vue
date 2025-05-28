@@ -53,8 +53,17 @@ nav a.router-link-exact-active {
 .btn-blue {
   @apply bg-blue-600 text-white;
 }
+
 .btn-blue:hover {
   @apply bg-blue-700;
+}
+
+.btn-red {
+  @apply bg-red-600 text-white;
+}
+
+.btn-red:hover {
+  @apply bg-red-700;
 }
 
 .pill {

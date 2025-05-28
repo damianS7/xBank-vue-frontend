@@ -73,6 +73,35 @@ async function requestCard() {
     });
 }
 
+function toggleOpenCloseAccount() {
+  if (account.value.accountStatus === "OPEN") {
+    closeAccount();
+    return;
+  }
+
+  openAccount();
+}
+
+async function openAccount(): Promise<void> {
+  const password = await modals.confirmPassword.value.open();
+
+  if (!password) {
+    return;
+  }
+  await accountStore
+    .openExistingBankingAccount(accountId.toString(), password)
+    .then((account) => {
+      messageAlert.value.message = "Account re-opened successfully.";
+      messageAlert.value.type = MessageType.SUCCESS;
+      // TODO no reactive
+      accountStore.setAccount(account);
+    })
+    .catch((error) => {
+      messageAlert.value.message = error.message || "Error re-opening account.";
+      messageAlert.value.type = MessageType.ERROR;
+    });
+}
+
 async function closeAccount(): Promise<void> {
   const password = await modals.confirmPassword.value.open();
 
@@ -113,7 +142,11 @@ onMounted(() => {
     <div class="flex flex-col sm:flex-row sm:justify-end gap-1 mb-6">
       <button @click="transferTo" class="btn-sm btn-blue">TRANSFER TO</button>
       <button @click="requestCard" class="btn-sm btn-blue">REQUEST CARD</button>
-      <button @click="closeAccount" class="btn-sm btn-blue">
+      <button
+        @click="toggleOpenCloseAccount"
+        class="btn-sm"
+        :class="account?.accountStatus === 'OPEN' ? 'btn-red' : 'btn-blue'"
+      >
         {{ account?.accountStatus === "OPEN" ? "CLOSE" : "OPEN" }} ACCOUNT
       </button>
     </div>
