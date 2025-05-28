@@ -1,19 +1,37 @@
 <script setup lang="ts">
-import { ref, defineEmits } from "vue";
+import { ref, defineExpose } from "vue";
 import { BankingCardType } from "@/types/BankingCard";
+const visible = ref(false);
 const cardTypes: BankingCardType[] = ["CREDIT", "DEBIT"];
-const emit = defineEmits(["submit", "close"]);
 const newCard = ref({
   type: "DEBIT",
 });
+let _resolve: (value: string) => void;
+
+// open modal
+function open(): Promise<string> {
+  visible.value = true;
+
+  return new Promise((resolve) => {
+    _resolve = resolve;
+  });
+}
 
 function submit() {
-  emit("submit", newCard.value.type);
+  visible.value = false;
+  _resolve(newCard.value.type);
 }
+
+function cancel() {
+  visible.value = false;
+  _resolve("");
+}
+defineExpose({ open });
 </script>
 
 <template>
   <div
+    v-if="visible"
     class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
   >
     <div class="bg-white p-6 rounded shadow-md w-full max-w-md">
@@ -32,7 +50,7 @@ function submit() {
         <div class="flex justify-end gap-2">
           <button
             type="button"
-            @click="emit('close')"
+            @click="cancel"
             class="bg-gray-300 rounded px-4 py-2"
           >
             Cancel
