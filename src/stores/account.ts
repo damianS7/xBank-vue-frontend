@@ -1,13 +1,13 @@
 import { defineStore } from "pinia";
 import type { BankingAccount } from "@/types/BankingAccount";
 import type { BankingCard } from "@/types/BankingCard";
+import type { BankingTransaction } from "@/types/BankingTransaction";
 
 export const useAccountStore = defineStore("account", {
   state: () => ({
     bankingAccounts: [] as BankingAccount[],
     initialized: false,
   }),
-
   getters: {
     countAccounts: (state) => {
       return state.bankingAccounts.length;
@@ -27,11 +27,6 @@ export const useAccountStore = defineStore("account", {
         return state.bankingAccounts.find((a) => a.id === id);
       };
     },
-    getBankingCard() {
-      return (id: number) => {
-        return this.getBankingCards.find((card) => card.id === id);
-      };
-    },
     getBankingAccounts: (state) => {
       return state.bankingAccounts;
     },
@@ -39,9 +34,8 @@ export const useAccountStore = defineStore("account", {
       return state.bankingAccounts.flatMap((account) => account.bankingCards);
     },
   },
-
   actions: {
-    async getCustomerBankingAccounts(): Promise<BankingAccount[]> {
+    async fetchAccounts(): Promise<BankingAccount[]> {
       try {
         const token = localStorage.getItem("token");
         const response = await fetch(
@@ -57,7 +51,7 @@ export const useAccountStore = defineStore("account", {
 
         // if response is not 200, throw an error
         if (!response.ok) {
-          throw new Error("Failed to open account");
+          throw new Error("Failed to fetch accounts");
         }
 
         const accounts = await response.json();
@@ -68,44 +62,48 @@ export const useAccountStore = defineStore("account", {
           updatedAt: new Date(account.updatedAt),
         })) as BankingAccount[];
       } catch (error: unknown) {
-        throw new Error("Failed to open account");
+        throw new Error("Failed to fetch accounts");
       }
     },
-    async fetchPageableTransactions(
+    async fetchTransactions(
       accountId: number,
       page: number,
       size: number
-    ) {
-      const token = localStorage.getItem("token");
-      const res = await fetch(
-        `${process.env.VUE_APP_API_URL}/customers/me/banking/accounts/${accountId}/transactions?page=${page}&size=${size}&sort=createdAt,DESC`,
-        {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
+    ): Promise<BankingTransaction[]> {
+      try {
+        const token = localStorage.getItem("token");
+        const response = await fetch(
+          `${process.env.VUE_APP_API_URL}/customers/me/banking/accounts/${accountId}/transactions?page=${page}&size=${size}&sort=createdAt,DESC`,
+          {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+
+        if (!response.ok) {
+          throw new Error("Failed to fetch transactions");
         }
-      );
 
-      if (!res.ok) {
-        throw new Error("Failed to fetch transactions");
+        const paginatedTransactions = await response.json();
+        const parsedTransactions = paginatedTransactions.content.map(
+          (transaction: any) => ({
+            ...transaction,
+            createdAt: new Date(transaction.createdAt),
+            updatedAt: new Date(transaction.updatedAt),
+          })
+        );
+
+        // replace content with parsed dates
+        paginatedTransactions.content = parsedTransactions;
+        return paginatedTransactions;
+      } catch (error: any) {
+        throw new Error(error.message || "Failed to fetch transactions");
       }
-
-      const paginatedTransactions = await res.json();
-      const parsedTransactions = paginatedTransactions.content.map(
-        (transaction: any) => ({
-          ...transaction,
-          createdAt: new Date(transaction.createdAt),
-          updatedAt: new Date(transaction.updatedAt),
-        })
-      );
-
-      // replace content with parsed dates
-      paginatedTransactions.content = parsedTransactions;
-      return { paginator: paginatedTransactions, status: res.status };
     },
-    async createBankingAccount(
+    async openBankingAccount(
       type: string,
       currency: string
     ): Promise<BankingAccount> {
@@ -142,7 +140,7 @@ export const useAccountStore = defineStore("account", {
         throw new Error("Failed to open account");
       }
     },
-    async toggleBankingAccountStatus(
+    async closeBankingAccount(
       accountId: string,
       password: string
     ): Promise<BankingAccount> {
@@ -178,7 +176,10 @@ export const useAccountStore = defineStore("account", {
         throw new Error("Failed to close account");
       }
     },
-    async createAndLinkBankingCard(
+    async openExistingBankingAccount() {
+      return;
+    },
+    async requestBankingCard(
       accountId: string,
       cardType: string
     ): Promise<BankingCard> {
@@ -217,7 +218,10 @@ export const useAccountStore = defineStore("account", {
         throw new Error("Failed to request card");
       }
     },
-    async setAlias(accountId: string, alias: string): Promise<BankingAccount> {
+    async setBankingAccountAlias(
+      accountId: string,
+      alias: string
+    ): Promise<BankingAccount> {
       try {
         const token = localStorage.getItem("token");
         const response = await fetch(
@@ -274,15 +278,25 @@ export const useAccountStore = defineStore("account", {
       account?.bankingCards.push(card);
     },
     async initialize() {
+      // if store its already initialized
       if (this.initialized) {
+        // do nothing
         return;
       }
 
-      const savedToken = localStorage.getItem("token");
-      if (savedToken) {
-        const accounts = await this.getCustomerBankingAccounts(savedToken);
+      // get the stored token
+      const storedToken = localStorage.getItem("token");
+
+      // if the token exists
+      if (storedToken) {
+        // get the accounts
+        const accounts = await this.fetchAccounts();
+
+        // add the accounts array to the store
         this.setAccounts(accounts);
       }
+
+      // store initialized
       this.initialized = true;
     },
   },
