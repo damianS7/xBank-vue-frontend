@@ -42,7 +42,6 @@ onMounted(async () => {
     await checkIfTokenIsValid();
   }, tokenValidationInterval);
 
-  await wait(1000);
   await customerStore.initialize();
   await accountStore.initialize();
   await cardStore.initialize();

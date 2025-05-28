@@ -1,12 +1,10 @@
 <script setup lang="ts">
-import { defineProps, ref } from "vue";
+import { defineProps, defineEmits, ref } from "vue";
 import { useCardStore } from "@/stores/card";
-import { useAccountStore } from "@/stores/account";
 import { BankingAccount } from "@/types/BankingAccount";
-import { CreditCard } from "lucide-vue-next";
-import { SquarePen, Save, SaveOff } from "lucide-vue-next";
+import { CreditCard, SquarePen, Save, SaveOff } from "lucide-vue-next";
+const emit = defineEmits(["update"]);
 const cardStore = useCardStore();
-const accountStore = useAccountStore();
 const props = defineProps<{
   account: BankingAccount;
   editable?: boolean;
@@ -22,14 +20,9 @@ const formFields = ref({
   edited: false,
 });
 
-function setAlias() {
+function saveAlias() {
   formFields.value.isEditing = false;
-  const updatedAccount = accountStore.setBankingAccountAlias(
-    props.account.id.toString(),
-    formFields.value.value
-  );
-
-  accountStore.setAccount(updatedAccount);
+  emit("update", formFields.value.value);
 }
 
 function formatIban(iban: string): string {
@@ -45,7 +38,6 @@ function formatIban(iban: string): string {
         IBAN {{ formatIban(account.accountNumber) }}
       </span>
 
-      <!-- Etiquetas -->
       <div class="flex flex-wrap gap-1">
         <span
           class="relative flex items-center gap-1 pill pill-blue group cursor-pointer"
@@ -77,14 +69,14 @@ function formatIban(iban: string): string {
               class="cursor-pointer"
             />
           </div>
-          <div class="flex gap-1" v-else>
-            <input type="text" class="w-auto" v-model="formFields.value" />
+          <div class="flex gap-1 items-center" v-else>
+            <input type="text" class="w-auto p-1" v-model="formFields.value" />
             <Save
               class="text-green-500 cursor-pointer"
               @click="
                 () => {
                   formFields.isEditing = false;
-                  setAlias();
+                  saveAlias();
                 }
               "
             />
@@ -102,7 +94,6 @@ function formatIban(iban: string): string {
       </div>
     </div>
 
-    <!-- Fecha de creación -->
     <div class="flex justify-end items-center mt-2">
       <span class="text-sm text-gray-500">
         Created at

@@ -218,7 +218,7 @@ export const useAccountStore = defineStore("account", {
         throw new Error("Failed to request card");
       }
     },
-    async setBankingAccountAlias(
+    async updateBankingAccountAlias(
       accountId: string,
       alias: string
     ): Promise<BankingAccount> {
@@ -260,12 +260,14 @@ export const useAccountStore = defineStore("account", {
     setAccounts(accounts: any) {
       this.bankingAccounts = accounts;
     },
-    setAccount(newAccount: any) {
+    setAccount(account: any) {
       const index = this.bankingAccounts.findIndex(
-        (account) => account.id === newAccount.id
+        (account) => account.id === account.id
       );
+
       if (index !== -1) {
-        this.bankingAccounts[index] = newAccount;
+        // this.bankingAccounts[index] = account;
+        this.bankingAccounts.splice(index, 1, account);
       }
     },
     addAccount(account: BankingAccount) {

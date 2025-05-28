@@ -1,10 +1,9 @@
 <script setup lang="ts">
 import { MessageType } from "@/types/Message";
-import { onMounted, ref } from "vue";
+import { onMounted, ref, computed } from "vue";
 import { useRoute } from "vue-router";
 import { useAccountStore } from "@/stores/account";
 import { useCardStore } from "@/stores/card";
-import { useAuthStore } from "@/stores/auth";
 import MessageAlert from "@/components/MessageAlert.vue";
 import BankingAccountTransactions from "@/views/account/components/BankingAccountTransactions.vue";
 import BankingAccount from "@/views/account/components/BankingAccount.vue";
@@ -13,7 +12,10 @@ import ConfirmPasswordModal from "@/components/ConfirmPasswordModal.vue";
 import BankingAccountCards from "@/views/account/components/BankingAccountCards.vue";
 import { set } from "zod";
 const route = useRoute();
+const accountStore = useAccountStore();
+const cardStore = useCardStore();
 const accountId = parseInt(route.params.id as string, 10);
+const account = computed(() => accountStore.getBankingAccount(accountId));
 
 // message to show
 const messageAlert = ref({
@@ -22,11 +24,6 @@ const messageAlert = ref({
   timeout: 12,
   visible: false,
 });
-
-const accountStore = useAccountStore();
-const cardStore = useCardStore(); // Assuming cardStore is also part of accountStore
-const authStore = useAuthStore();
-const account = ref();
 
 // modals to show
 const modals = {
@@ -48,9 +45,9 @@ async function setAlias(alias: string) {
   }
 
   await accountStore
-    .setAlias(accountId.toString(), alias)
-    .then((account) => {
-      accountStore.setAccount(account);
+    .updateBankingAccountAlias(accountId.toString(), alias)
+    .then((newAccount) => {
+      accountStore.setAccount(newAccount);
     })
     .catch((error) => {
       messageAlert.value.message = error.message || "Error modifying alias.";
@@ -97,7 +94,6 @@ async function closeAccount(): Promise<void> {
 }
 
 onMounted(() => {
-  account.value = accountStore.getBankingAccount(accountId);
   // isViewReady.value = true;
 });
 </script>
@@ -146,7 +142,7 @@ onMounted(() => {
         <BankingAccount
           v-if="account"
           :account="account"
-          @edit="setAlias"
+          @update="setAlias"
           :editable="true"
         />
       </div>
