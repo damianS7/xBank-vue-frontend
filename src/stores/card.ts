@@ -27,11 +27,18 @@ export const useCardStore = defineStore("card", {
     },
     getBankingCard: (state) => {
       return (id: number) => {
-        return state.bankingCards.find((a) => a.id === id);
+        return state.bankingCards.find((card) => card.id === id);
       };
     },
     getBankingCards: (state) => {
       return state.bankingCards;
+    },
+    getBankingCardsByAccountId: (state) => {
+      return (accountId: number) => {
+        return state.bankingCards.filter(
+          (card) => card.bankingAccountId === accountId
+        );
+      };
     },
   },
 

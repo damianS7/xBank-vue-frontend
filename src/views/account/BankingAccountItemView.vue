@@ -3,12 +3,18 @@ import { MessageType } from "@/types/Message";
 import { onMounted, ref } from "vue";
 import { useRoute } from "vue-router";
 import { useAccountStore } from "@/stores/account";
+import { useCardStore } from "@/stores/card";
 import { useAuthStore } from "@/stores/auth";
 import MessageAlert from "@/components/MessageAlert.vue";
-import { ChevronRight, ChevronLeft } from "lucide-vue-next";
+import BankingAccountTransactions from "@/views/account/components/BankingAccountTransactions.vue";
 import BankingAccount from "@/views/account/components/BankingAccount.vue";
-import RequestCardModal from "@/views/account/components/BankingAccountRequestCardModal.vue";
+import RequestBankingCardModal from "@/views/account/components/BankingAccountRequestCardModal.vue";
+import ConfirmPasswordModal from "@/components/ConfirmPasswordModal.vue";
+import BankingAccountCards from "@/views/account/components/BankingAccountCards.vue";
 import { set } from "zod";
+const route = useRoute();
+const accountId = parseInt(route.params.id as string, 10);
+
 // message to show
 const messageAlert = ref({
   message: "",
@@ -17,128 +23,111 @@ const messageAlert = ref({
   visible: false,
 });
 
-const route = useRoute();
 const accountStore = useAccountStore();
+const cardStore = useCardStore(); // Assuming cardStore is also part of accountStore
 const authStore = useAuthStore();
 const account = ref();
 
 // modals to show
 const modals = {
-  aliasModal: {
-    visible: ref(false),
-    onConfirm: (value: string) => {
-      // nothing
-    },
-    onCancel: () => {
-      // nothing
-    },
-  },
-  pinModal: {
-    visible: ref(false),
-    onConfirm: (value: string) => {
-      // nothing
-    },
-    onCancel: () => {
-      // nothing
-    },
-  },
-  transferToModal: {
-    visible: ref(false),
-    onConfirm: (value: string) => {
-      // nothing
-    },
-    onCancel: () => {
-      // nothing
-    },
-  },
+  requestCard: ref(),
+  transfer: ref(),
+  confirmPassword: ref(),
 };
-
-async function openAliasModal(): Promise<string> {
-  return new Promise((resolve, reject) => {
-    // Abres el modal (puedes usar un ref o store para controlarlo)
-    modals.aliasModal.visible.value = true;
-    // Registras callbacks
-    modals.aliasModal.onConfirm = (alias: string) => {
-      modals.aliasModal.visible.value = false;
-      resolve(alias);
-    };
-
-    modals.aliasModal.onCancel = () => {
-      modals.aliasModal.visible.value = false;
-      resolve("");
-    };
-  });
-}
 
 function transferTo() {
   // ...
 }
 
+// Set alias for the banking account
 async function setAlias(alias: string) {
-  // const alias = await openAliasModal();
-  console.log(alias);
-}
-
-function previousPage() {
-  // ...
-}
-function nextPage() {
-  // ...
-}
-
-async function requestCard(cardType: string) {
-  // hide modal
-  modals.bankingCard.visible.value = false;
-
-  // account id from url
-  const accountId = parseInt(route.params.id[0]);
-
-  // token
-  const token = authStore.token;
-
-  // petition
-  const response = await accountStore.requestBankingCard(
-    token,
-    accountId.toString(),
-    cardType
-  );
-
-  if (response.status !== 201 && response.data.error) {
-    messageAlert.value.message = response.data.message;
+  if (alias.length < 5) {
+    messageAlert.value.message = "Alias must be at least 5 characters long.";
+    messageAlert.value.type = MessageType.ERROR;
     return;
   }
 
-  accountStore.addCard(accountId, response.data);
+  await accountStore
+    .setAlias(accountId.toString(), alias)
+    .then((account) => {
+      accountStore.setAccount(account);
+    })
+    .catch((error) => {
+      messageAlert.value.message = error.message || "Error modifying alias.";
+      messageAlert.value.type = MessageType.ERROR;
+    });
+}
+
+// Request a new banking card
+async function requestCard() {
+  const cardType = await modals.requestCard.value.open();
+  if (!cardType) {
+    return;
+  }
+
+  await accountStore
+    .requestBankingCard(accountId.toString(), cardType)
+    .then((card) => {
+      cardStore.addCard(card);
+    })
+    .catch((error) => {
+      messageAlert.value.message = error.message || "Error requesting card.";
+      messageAlert.value.type = MessageType.ERROR;
+    });
+}
+
+async function closeAccount(): Promise<void> {
+  const password = await modals.confirmPassword.value.open();
+
+  if (!password) {
+    return;
+  }
+  await accountStore
+    .closeBankingAccount(accountId.toString(), password)
+    .then((account) => {
+      messageAlert.value.message = "Account closed successfully.";
+      messageAlert.value.type = MessageType.SUCCESS;
+      // TODO no reactive
+      accountStore.setAccount(account);
+    })
+    .catch((error) => {
+      messageAlert.value.message = error.message || "Error closing account.";
+      messageAlert.value.type = MessageType.ERROR;
+    });
 }
 
 onMounted(() => {
-  const accountId = parseInt(route.params.id as string, 10);
-  // account.value = accountStore.getBankingAccount.find(
-  //   (a) => a.id === accountId
-  // );
   account.value = accountStore.getBankingAccount(accountId);
-  if (!account.value) {
-    messageAlert.value.message = "No se encontró la cuenta bancaria.";
-  }
+  // isViewReady.value = true;
 });
 </script>
 <template>
   <div v-if="account">
+    <RequestBankingCardModal :ref="modals.requestCard" />
+    <ConfirmPasswordModal :ref="modals.confirmPassword" />
     <MessageAlert
-      v-if="messageAlert.visible"
-      class="mb-4"
+      v-if="messageAlert.message"
+      class="mb-6"
       :message="messageAlert.message"
       :timeout="messageAlert.timeout"
       :type="messageAlert.type"
-      @close="messageAlert.visible = false"
+      @close="messageAlert.message = ''"
     />
 
-    <div class="p-4 rounded bg-blue-50 shadow">
+    <div class="flex flex-col sm:flex-row sm:justify-end gap-1 mb-6">
+      <button @click="transferTo" class="btn-sm btn-blue">TRANSFER TO</button>
+      <button @click="requestCard" class="btn-sm btn-blue">REQUEST CARD</button>
+      <button @click="closeAccount" class="btn-sm btn-blue">
+        {{ account?.accountStatus === "OPEN" ? "CLOSE" : "OPEN" }} ACCOUNT
+      </button>
+    </div>
+
+    <div class="main-container">
       <div>
         <h1
           class="flex flex-col sm:flex-row items-center text-2xl font-bold gap-1"
         >
-          <span class="flex items-center">Banking account </span>
+          <span class="flex items-center">Banking account</span>
 
           <span
             class="text-xs rounded-full px-1"
@@ -150,31 +139,10 @@ onMounted(() => {
             }"
             >{{ account?.accountStatus }}
           </span>
-
-          <div class="flex flex-wrap gap-1 w-full">
-            <button
-              @click="transferTo"
-              class="btn-small btn-blue sm:w-auto w-full"
-            >
-              TRANSFER TO
-            </button>
-            <button
-              @click="transferTo"
-              class="btn-small btn-blue sm:w-auto w-full"
-            >
-              REQUEST CARD
-            </button>
-            <button
-              @click="transferTo"
-              class="btn-small btn-blue sm:w-auto w-full"
-            >
-              {{ account?.accountStatus === "OPEN" ? "CLOSE" : "OPEN" }} ACCOUNT
-            </button>
-          </div>
         </h1>
       </div>
 
-      <div class="">
+      <div>
         <BankingAccount
           v-if="account"
           :account="account"
@@ -183,49 +151,14 @@ onMounted(() => {
         />
       </div>
 
-      <div class="mt-6 p-4 bg-white rounded-xl shadow-md w-full mx-auto">
-        <h3 class="text-lg font-semibold text-gray-800 border-b pb-2 mb-4">
-          TRANSACTIONS
-        </h3>
-        <ul class="space-y-2">
-          <li
-            v-for="(transaction, index) in account?.bankingAccountTransactions"
-            :key="index"
-            class="flex justify-between items-center bg-gray-50 hover:bg-gray-100 p-3 rounded-md"
-          >
-            <span class="text-sm text-gray-700">{{
-              transaction.description
-            }}</span>
-            <span
-              class="text-sm font-medium"
-              :class="
-                transaction.amount > 0 ? 'text-green-600' : 'text-red-600'
-              "
-            >
-              {{ transaction.amount > 0 ? "+" : "" }}{{ transaction.amount }}€
-            </span>
-          </li>
-        </ul>
-        <div
-          class="flex justify-end items-center mt-4 p-0 text-white bg-blue-500 rounded-lg"
-        >
-          <button class="btn cursor-pointer" @click="previousPage">
-            <ChevronLeft />
-          </button>
-          <span> 1/2 </span>
-          <button class="btn cursor-pointer" @click="nextPage">
-            <ChevronRight />
-          </button>
-        </div>
+      <div class="my-6">
+        <BankingAccountCards :accountId="account.id" />
+      </div>
+
+      <div>
+        <BankingAccountTransactions :accountId="account.id" />
       </div>
     </div>
   </div>
   <div v-else>Loading account</div>
-
-  <!-- <RequestBankingCardModal
-    v-if="modals.bankingCard.visible.value"
-    :visible="modals.bankingCard.visible.value"
-    @submit="requestCard"
-    @close="modals.bankingCard.visible.value = false"
-  /> -->
 </template>
