@@ -24,8 +24,7 @@ const formFields = ref({
 
 function setAlias() {
   formFields.value.isEditing = false;
-  console.log("Alias set to: ", formFields.value.value);
-  const updatedAccount = accountStore.setAlias(
+  const updatedAccount = accountStore.setBankingAccountAlias(
     props.account.id.toString(),
     formFields.value.value
   );
@@ -39,40 +38,15 @@ function formatIban(iban: string): string {
 </script>
 <template>
   <div class="bg-blue-100 p-4 rounded shadow mt-6 w-full">
-    <!-- Alias + Etiquetas -->
     <div
       class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2"
     >
-      <!-- Alias -->
-      <div class="flex items-center gap-2 text-sm font-bold text-gray-700">
-        <div class="flex gap-1" v-if="!formFields.isEditing">
-          {{ account.alias || "ALIAS" }}
-          <SquarePen
-            @click="formFields.isEditing = true"
-            v-if="editable"
-            class="cursor-pointer"
-          />
-        </div>
-        <div class="flex gap-1" v-else>
-          <input type="text" class="w-auto" v-model="formFields.value" />
-          <Save
-            class="text-green-500 cursor-pointer"
-            @click="
-              () => {
-                formFields.isEditing = false;
-                setAlias();
-              }
-            "
-          />
-          <SaveOff
-            class="text-red-500 cursor-pointer"
-            @click="formFields.isEditing = false"
-          />
-        </div>
-      </div>
+      <span class="text-sm sm:text-base font-semibold text-gray-800 break-all">
+        IBAN {{ formatIban(account.accountNumber) }}
+      </span>
 
       <!-- Etiquetas -->
-      <div class="flex flex-wrap gap-2">
+      <div class="flex flex-wrap gap-1">
         <span
           class="relative flex items-center gap-1 pill pill-blue group cursor-pointer"
         >
@@ -92,9 +66,35 @@ function formatIban(iban: string): string {
     <div
       class="flex flex-col sm:flex-row sm:justify-between items-start sm:items-center mt-4"
     >
-      <span class="text-sm sm:text-base font-semibold text-gray-800 break-all">
-        IBAN {{ formatIban(account.accountNumber) }}
-      </span>
+      <!-- Alias -->
+      <div class="flex items-center gap-2 text-sm font-bold text-gray-700">
+        <div>
+          <div v-if="!formFields.isEditing" class="flex gap-1">
+            {{ account.alias || "" }}
+            <SquarePen
+              @click="formFields.isEditing = true"
+              v-if="editable"
+              class="cursor-pointer"
+            />
+          </div>
+          <div class="flex gap-1" v-else>
+            <input type="text" class="w-auto" v-model="formFields.value" />
+            <Save
+              class="text-green-500 cursor-pointer"
+              @click="
+                () => {
+                  formFields.isEditing = false;
+                  setAlias();
+                }
+              "
+            />
+            <SaveOff
+              class="text-red-500 cursor-pointer"
+              @click="formFields.isEditing = false"
+            />
+          </div>
+        </div>
+      </div>
       <div class="text-right">
         <p class="text-lg sm:text-xl font-bold text-green-600">
           {{ account.balance.toLocaleString() }} {{ account.accountCurrency }}

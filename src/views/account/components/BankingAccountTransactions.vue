@@ -1,0 +1,115 @@
+<script setup lang="ts">
+import { MessageType } from "@/types/Message";
+import { onMounted, ref } from "vue";
+import { defineProps } from "vue";
+import { useAccountStore } from "@/stores/account";
+import { BankingTransaction } from "@/types/BankingTransaction";
+import { ChevronRight, ChevronLeft } from "lucide-vue-next";
+const accountStore = useAccountStore();
+const props = defineProps({
+  accountId: {
+    type: Number,
+    required: true,
+  },
+});
+
+// pagination
+const currentPage = ref(0); // Spring usa 0-indexed
+const pageSize = 5;
+const paginator = ref<any>(null);
+
+function previousPage() {
+  if (currentPage.value > 0) {
+    currentPage.value--;
+    fetchTransactions();
+  }
+}
+function nextPage() {
+  if (paginator.value?.hasNext) {
+    currentPage.value++;
+    fetchTransactions();
+  }
+}
+
+async function fetchTransactions() {
+  return await accountStore
+    .fetchTransactions(props.accountId, currentPage.value, pageSize)
+    .then((paginatedTransactions) => {
+      paginator.value = paginatedTransactions;
+    })
+    .catch((error) => {
+      console.log(error);
+    });
+}
+
+onMounted(() => {
+  if (!props.accountId) {
+    return;
+  }
+
+  // if transactions are empty fetch them
+  // if (account.value?.transactions?.length === 0) {
+  //   // fetch transactions
+
+  // }
+  fetchTransactions();
+  // isViewReady.value = true;
+});
+</script>
+<template>
+  <div v-if="paginator">
+    <div class="p-4 bg-white rounded-xl shadow-md w-full">
+      <h3 class="sm:text-lg font-semibold text-gray-800 border-b pb-2 mb-4">
+        Transactions
+      </h3>
+      <ul v-if="paginator?.content?.length > 0" class="space-y-2">
+        <li
+          v-for="(transaction, index) in paginator?.content"
+          :key="index"
+          class="flex flex-col sm:flex-row sm:justify-between sm:items-start bg-gray-50 hover:bg-gray-100 p-3 rounded-md"
+        >
+          <div class="text-sm text-gray-700 sm:w-1/2">
+            {{ transaction.description }}
+          </div>
+
+          <div class="flex flex-col text-sm font-medium text-right sm:w-1/2">
+            <span
+              :class="
+                transaction.amount > 0 ? 'text-green-600' : 'text-red-600'
+              "
+            >
+              {{ transaction.amount > 0 ? "+" : "" }}{{ transaction.amount }}€
+            </span>
+            <span class="text-xs text-gray-500">
+              {{
+                new Date(transaction.createdAt).toLocaleDateString("en-US", {
+                  year: "numeric",
+                  month: "2-digit",
+                  day: "2-digit",
+                  hour: "2-digit",
+                  minute: "2-digit",
+                })
+              }}
+            </span>
+          </div>
+        </li>
+      </ul>
+      <div v-else class="text-center text-gray-500">No transactions found.</div>
+      <div
+        class="flex items-center justify-end text-sm mt-4 text-white bg-stone-300 p-1 rounded"
+      >
+        <span class="mx-2">
+          <ChevronLeft @click="previousPage" class="cursor-pointer" />
+        </span>
+        <span v-if="paginator?.pageable.pageNumber">
+          {{ paginator.pageable?.pageNumber + 1 }} /
+          {{ paginator.totalPages }}
+        </span>
+        <span class="mx-2">
+          <ChevronRight @click="nextPage" class="cursor-pointer" />
+        </span>
+      </div>
+    </div>
+  </div>
+  <div v-else>Loading transactions</div>
+</template>
