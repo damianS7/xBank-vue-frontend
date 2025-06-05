@@ -4,19 +4,18 @@ import MessageAlert from "@/components/MessageAlert.vue";
 import { onMounted, ref } from "vue";
 import ProfileEditableField from "./components/ProfileEditableField.vue";
 import ProfilePhoto from "./components/ProfilePhotoUploader.vue";
-import ConfirmPasswordModal from "./components/ConfirmPasswordModal.vue";
+import ConfirmPasswordModal from "@/components/ConfirmPasswordModal.vue";
 import ConfirmMessageModal from "@/components/ConfirmMessageModal.vue";
-import { useAuthStore } from "@/stores/auth";
 import { GenderType } from "@/types/Profile";
 import { MessageType } from "@/types/Message";
 const customerStore = useCustomerStore();
-const authStore = useAuthStore();
 const customer = customerStore.getLoggedCustomer;
 const genderTypes: GenderType[] = ["MALE", "FEMALE"];
 const genderOptions = genderTypes.map((value) => ({
   value,
   label: value.charAt(0) + value.slice(1).toLowerCase(),
 }));
+// TODO add zod validation
 // message to show
 const messageAlert = ref({
   message: "",
@@ -25,26 +24,12 @@ const messageAlert = ref({
   visible: false,
 });
 
+// modals to show
 const modals = {
-  confirmPasswordModal: {
-    visible: ref(false),
-    onConfirm: (value: string) => {
-      // nothing
-    },
-    onCancel: () => {
-      // nothing
-    },
-  },
-  confirmMessageModal: {
-    visible: ref(false),
-    message: "",
-    onConfirm: (value: string) => {
-      // nothing
-    },
-    onCancel: () => {
-      // nothing
-    },
-  },
+  requestCard: ref(),
+  transfer: ref(),
+  confirmPassword: ref(),
+  confirmMessage: ref(),
 };
 
 // updatable fields to be displayed
@@ -152,42 +137,6 @@ const formFields = ref([
   },
 ]);
 
-async function openConfirmPasswordModal(): Promise<string> {
-  return new Promise((resolve, reject) => {
-    // Abres el modal (puedes usar un ref o store para controlarlo)
-    modals.confirmPasswordModal.visible.value = true;
-    // Registras callbacks
-    modals.confirmPasswordModal.onConfirm = (password: string) => {
-      modals.confirmPasswordModal.visible.value = false;
-      resolve(password);
-    };
-
-    modals.confirmPasswordModal.onCancel = () => {
-      modals.confirmPasswordModal.visible.value = false;
-      resolve("");
-    };
-  });
-}
-
-async function openConfirmMessageModal(message: string): Promise<string> {
-  console.log("weee");
-  modals.confirmMessageModal.message = message;
-  return new Promise((resolve, reject) => {
-    // Abres el modal (puedes usar un ref o store para controlarlo)
-    modals.confirmMessageModal.visible.value = true;
-    // Registras callbacks
-    modals.confirmMessageModal.onConfirm = () => {
-      modals.confirmMessageModal.visible.value = false;
-      resolve("");
-    };
-
-    modals.confirmMessageModal.onCancel = () => {
-      modals.confirmMessageModal.visible.value = false;
-      resolve("");
-    };
-  });
-}
-
 // update a single field
 async function updateField(
   index: number,
@@ -195,7 +144,7 @@ async function updateField(
 ) {
   // updating email requires a different method
   if (field.name == "email") {
-    updateEmail(index, field);
+    updateEmail(index, field.value);
     return;
   }
 
@@ -206,7 +155,7 @@ async function updateField(
   }
 
   // wait for the user to input his password
-  const currentPassword = await openConfirmPasswordModal();
+  const currentPassword = await modals.confirmPassword.value.open();
 
   // nothing to update
   if (field.value.length == 0 || currentPassword.length == 0) {
@@ -214,27 +163,26 @@ async function updateField(
   }
 
   // request for update
-  const response = await customerStore.patchProfile(
-    authStore.token,
-    currentPassword,
-    { [field.name]: field.value }
-  );
-
-  if (response.status === 200) {
-    customerStore.setProfile(response.data);
-  } else {
-    showMessage(response.data.message, MessageType.ERROR);
-  }
-
-  formFields.value[index].value = field.value;
-  showMessage("Field successfully updated.", MessageType.SUCCESS);
+  await customerStore
+    .patchProfile(currentPassword, {
+      [field.name]: field.value,
+    })
+    .then((profile) => {
+      customerStore.setProfile(profile);
+      formFields.value[index].value = field.value;
+      showMessage("Field successfully updated.", MessageType.SUCCESS);
+    })
+    .catch((error) => {
+      messageAlert.value.message = error.message || "Error updating field.";
+      messageAlert.value.type = MessageType.ERROR;
+      showMessage(error.data.message, MessageType.ERROR);
+    });
 }
 
 // change the password
 async function updatePassword(index: number, newPassword: string) {
   // wait for the user to input his password
-  const currentPassword = await openConfirmPasswordModal();
-  console.log(currentPassword);
+  const currentPassword = await modals.confirmPassword.value.open();
 
   // nothing to update
   if (currentPassword.length == 0 || newPassword.length == 0) {
@@ -242,84 +190,68 @@ async function updatePassword(index: number, newPassword: string) {
   }
 
   // request for update
-  const response = await customerStore.changePassword(
-    authStore.token,
-    currentPassword,
-    newPassword
-  );
-
-  if (response.status !== 200) {
-    console.log(response);
-    if (response.data.errors) {
-      showMessage(response.data.errors?.newPassword, MessageType.ERROR);
-    } else {
-      showMessage(response.data.message, MessageType.ERROR);
-    }
-    return;
-  }
-
-  formFields.value[index].value = currentPassword;
-  showMessage("Password successfully updated.", MessageType.SUCCESS);
+  await customerStore
+    .changePassword(currentPassword, newPassword)
+    .then(() => {
+      showMessage("Password successfully updated.", MessageType.SUCCESS);
+    })
+    .catch((error) => {
+      messageAlert.value.message = error.message || "Error updating password.";
+      messageAlert.value.type = MessageType.ERROR;
+      showMessage(error.data.message, MessageType.ERROR);
+    });
 }
 
 // update profile photo
 async function updatePhoto(photo: any) {
   // wait for the user to input his password
-  const currentPassword = await openConfirmPasswordModal();
+  const password = await modals.confirmPassword.value.open();
 
-  if (currentPassword.length == 0) {
+  // if password is not set
+  if (password.length == 0) {
     return;
   }
 
-  // request for update
-  const response = await customerStore.uploadPhoto(
-    authStore.token,
-    currentPassword,
-    photo
-  );
-
-  if (response.status === 200) {
-    const blob = await customerStore.getPhoto(response.data.photoPath);
-    localStorage.setItem("profilePhotoURL", URL.createObjectURL(blob));
-    customerStore.setProfile(response.data);
-    showMessage("Photo successfully updated.", MessageType.SUCCESS);
-  } else {
-    showMessage(response.data.message, MessageType.ERROR);
-  }
+  await customerStore
+    .uploadPhoto(password, photo)
+    .then((blob) => {
+      localStorage.setItem("profilePhotoURL", URL.createObjectURL(blob));
+      customerStore.setPhoto(blob);
+      showMessage("Photo successfully updated.", MessageType.SUCCESS);
+    })
+    .catch((error) => {
+      messageAlert.value.message = error.message || "Error uplading image.";
+      messageAlert.value.type = MessageType.ERROR;
+    });
 }
 
 // upade email field
-async function updateEmail(
-  index: number,
-  field: { name: string; value: string }
-) {
-  await openConfirmMessageModal(
-    "Session will be close after you change your email."
+async function updateEmail(index: number, newEmail: string) {
+  await modals.confirmMessage.value.open(
+    "Session will be closed after you change your email."
   );
 
   // wait for the user to input his password
-  const currentPassword = await openConfirmPasswordModal();
+  const currentPassword = await modals.confirmPassword.value.open();
 
   // nothing to update
-  if (field.value.length == 0 || currentPassword.length == 0) {
+  if (newEmail.length == 0 || currentPassword.length == 0) {
     return;
   }
 
   // request for update
-  const response = await customerStore.patchEmail(
-    authStore.token,
-    currentPassword,
-    field.value
-  );
-
-  if (response.status === 200) {
-    customerStore.setEmail(response.data.email);
-  } else {
-    showMessage(response.data.message, MessageType.ERROR);
-  }
-
-  formFields.value[index].value = field.value;
-  showMessage("Field successfully updated.", MessageType.SUCCESS);
+  await customerStore
+    .patchEmail(currentPassword, newEmail)
+    .then((customer) => {
+      customerStore.setEmail(customer.email);
+      formFields.value[index].value = newEmail;
+      showMessage("Field successfully updated.", MessageType.SUCCESS);
+    })
+    .catch((error) => {
+      messageAlert.value.message = error.message || "Error updating email.";
+      messageAlert.value.type = MessageType.ERROR;
+      showMessage(error.data.message, MessageType.ERROR);
+    });
 }
 
 // it shows a message
@@ -335,6 +267,8 @@ onMounted(() => {
 </script>
 <template>
   <div>
+    <ConfirmPasswordModal :ref="modals.confirmPassword" />
+    <ConfirmMessageModal :ref="modals.confirmMessage" />
     <MessageAlert
       v-if="messageAlert.visible"
       class="mb-4"
@@ -369,16 +303,4 @@ onMounted(() => {
       </section>
     </div>
   </div>
-
-  <ConfirmPasswordModal
-    v-if="modals.confirmPasswordModal.visible.value"
-    @confirm="modals.confirmPasswordModal.onConfirm"
-    @cancel="modals.confirmPasswordModal.onCancel"
-  />
-  <ConfirmMessageModal
-    v-if="modals.confirmMessageModal.visible.value"
-    :message="modals.confirmMessageModal.message"
-    @confirm="modals.confirmMessageModal.onConfirm"
-    @cancel="modals.confirmMessageModal.onCancel"
-  />
 </template>

@@ -4,7 +4,9 @@ import { useCustomerStore } from "@/stores/customer";
 const customerStore = useCustomerStore();
 
 onMounted(() => {
-  reloadProfileImg();
+  if (customerStore.customer.profile?.photoPath) {
+    reloadProfileImg();
+  }
 });
 
 const profileImgURL = ref("");
@@ -19,6 +21,7 @@ watch(
 
 // updates the photoUrl
 function reloadProfileImg() {
+  console.log("reloading photo");
   const profilePhotoURL = localStorage.getItem("profilePhotoURL");
   if (profilePhotoURL) {
     profileImgURL.value = profilePhotoURL;
@@ -26,5 +29,6 @@ function reloadProfileImg() {
 }
 </script>
 <template>
-  <img v-if="profileImgURL" :src="profileImgURL" />
+  <img v-if="customerStore.customer.profile?.photoPath" :src="profileImgURL" />
+  <div v-else></div>
 </template>

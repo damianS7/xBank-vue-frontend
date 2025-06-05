@@ -1,6 +1,6 @@
 import { defineStore } from "pinia";
 import type { Customer } from "@/types/Customer";
-import { useAuthStore } from "@/stores/auth";
+import { Profile } from "@/types/Profile";
 
 export const useCustomerStore = defineStore("customer", {
   state: () => ({
@@ -20,110 +20,172 @@ export const useCustomerStore = defineStore("customer", {
   },
 
   actions: {
-    async getCustomer(token: string) {
-      const res = await fetch(`${process.env.VUE_APP_API_URL}/customers/me`, {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-      });
+    async getCustomer(): Promise<Customer> {
+      try {
+        const token = localStorage.getItem("token");
+        const response = await fetch(
+          `${process.env.VUE_APP_API_URL}/customers/me`,
+          {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
 
-      const data = await res.json();
-      return data;
+        // if response is not 200, throw an error
+        if (response.status !== 200) {
+          const jsonResponse = await response.json();
+          throw new Error("Failed to fetch customer. " + jsonResponse.message);
+        }
+
+        return (await response.json()) as Customer;
+      } catch (error: unknown) {
+        // handle errors
+        throw new Error("Failed to fetch customer.");
+      }
     },
     async patchProfile(
-      token: string,
       currentPassword: string,
       fieldsToUpdate: Record<string, any>
-    ) {
-      const response = await fetch(
-        `${process.env.VUE_APP_API_URL}/customers/me/profile`,
-        {
-          method: "PATCH",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify({ currentPassword, fieldsToUpdate }),
-        }
-      );
+    ): Promise<Profile> {
+      try {
+        const token = localStorage.getItem("token");
+        const response = await fetch(
+          `${process.env.VUE_APP_API_URL}/customers/me/profile`,
+          {
+            method: "PATCH",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+            body: JSON.stringify({ currentPassword, fieldsToUpdate }),
+          }
+        );
 
-      const data = await response.json();
-      return { status: response.status, data };
-    },
-    async patchEmail(token: string, currentPassword: string, newEmail: string) {
-      const response = await fetch(
-        `${process.env.VUE_APP_API_URL}/customers/me/email`,
-        {
-          method: "PATCH",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify({ currentPassword, newEmail }),
+        // if response is not 200, throw an error
+        if (response.status !== 200) {
+          const jsonResponse = await response.json();
+          throw new Error("Failed to updated profile. " + jsonResponse.message);
         }
-      );
 
-      const data = await response.json();
-      return { status: response.status, data };
+        return (await response.json()) as Profile;
+      } catch (error: unknown) {
+        // handle errors
+        throw new Error("Failed to update profile.");
+      }
     },
-    async changePassword(
-      token: string,
+    async patchEmail(
       currentPassword: string,
-      newPassword: string
-    ) {
-      const response = await fetch(
-        `${process.env.VUE_APP_API_URL}/auth/customers/password`,
-        {
-          method: "PATCH",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify({ currentPassword, newPassword }),
-        }
-      );
+      newEmail: string
+    ): Promise<Customer> {
+      try {
+        const token = localStorage.getItem("token");
+        const response = await fetch(
+          `${process.env.VUE_APP_API_URL}/customers/me/email`,
+          {
+            method: "PATCH",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+            body: JSON.stringify({ currentPassword, newEmail }),
+          }
+        );
 
-      const data = await response.json();
-      return { status: response.status, data };
+        // if response is not 200, throw an error
+        if (response.status !== 200) {
+          const jsonResponse = await response.json();
+          throw new Error("Failed to update email. " + jsonResponse.message);
+        }
+
+        return (await response.json()) as Customer;
+      } catch (error: unknown) {
+        // handle errors
+        throw new Error("Failed to update email.");
+      }
     },
-    async getPhoto(photo: string) {
-      const authStore = useAuthStore();
-      const token = authStore.token;
+    async changePassword(currentPassword: string, newPassword: string) {
+      try {
+        const token = localStorage.getItem("token");
+        const response = await fetch(
+          `${process.env.VUE_APP_API_URL}/auth/customers/password`,
+          {
+            method: "PATCH",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+            body: JSON.stringify({ currentPassword, newPassword }),
+          }
+        );
 
-      const res = await fetch(
-        `${process.env.VUE_APP_API_URL}/customers/me/profile/photo/${photo}`,
-        {
-          method: "GET",
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
+        // if response is not 200, throw an error
+        if (response.status !== 200) {
+          const jsonResponse = await response.json();
+          throw new Error("Failed to change password. " + jsonResponse.message);
         }
-      );
-
-      const data = await res.blob();
-
-      return data;
+      } catch (error: unknown) {
+        // handle errors
+        throw new Error("Failed to change password.");
+      }
     },
-    async uploadPhoto(token: string, currentPassword: string, file: any) {
-      const formData = new FormData();
-      formData.append("file", file);
-      formData.append("currentPassword", currentPassword); // otro campo necesario
+    async getPhoto(photo: string): Promise<Blob> {
+      try {
+        const token = localStorage.getItem("token");
 
-      const response = await fetch(
-        `${process.env.VUE_APP_API_URL}/customers/me/profile/photo`,
-        {
-          method: "POST",
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-          body: formData,
+        const response = await fetch(
+          `${process.env.VUE_APP_API_URL}/customers/me/profile/photo/${photo}`,
+          {
+            method: "GET",
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+
+        // if response is not 200, throw an error
+        if (response.status !== 200) {
+          const jsonResponse = await response.json();
+          throw new Error("Failed to get photo. " + jsonResponse.message);
         }
-      );
 
-      const data = await response.json();
-      return { status: response.status, data };
+        return (await response.blob()) as Blob;
+      } catch (error: unknown) {
+        // handle errors
+        throw new Error("Failed to get photo");
+      }
+    },
+    async uploadPhoto(currentPassword: string, file: any): Promise<Blob> {
+      try {
+        const token = localStorage.getItem("token");
+        const formData = new FormData();
+        formData.append("file", file);
+        formData.append("currentPassword", currentPassword); // otro campo necesario
+
+        const response = await fetch(
+          `${process.env.VUE_APP_API_URL}/customers/me/profile/photo`,
+          {
+            method: "POST",
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+            body: formData,
+          }
+        );
+
+        // if response is not 201, throw an error
+        if (response.status !== 201) {
+          const jsonResponse = await response.json();
+          throw new Error("Failed to upload photo. " + jsonResponse.message);
+        }
+
+        return (await response.blob()) as Blob;
+      } catch (error: unknown) {
+        // handle errors
+        throw new Error("Failed to upload photo");
+      }
     },
     async setCustomer(customer: any) {
       this.customer = customer;
@@ -134,10 +196,13 @@ export const useCustomerStore = defineStore("customer", {
     async setProfile(profile: any) {
       this.customer.profile = profile;
     },
+    async setPhoto(image: any) {
+      this.customer.profile.photoPath = ".";
+    },
     async initialize() {
       const savedToken = localStorage.getItem("token");
       if (savedToken) {
-        const customer = await this.getCustomer(savedToken);
+        const customer = await this.getCustomer();
         this.setCustomer(customer);
 
         if (customer.profile.photoPath) {
