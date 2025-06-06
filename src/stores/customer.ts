@@ -131,12 +131,12 @@ export const useCustomerStore = defineStore("customer", {
         throw new Error("Failed to change password.");
       }
     },
-    async getPhoto(photo: string): Promise<Blob> {
+    async getPhoto(filename: string): Promise<Blob> {
       try {
         const token = localStorage.getItem("token");
 
         const response = await fetch(
-          `${process.env.VUE_APP_API_URL}/customers/me/profile/photo/${photo}`,
+          `${process.env.VUE_APP_API_URL}/customers/me/profile/photo/${filename}`,
           {
             method: "GET",
             headers: {
@@ -147,14 +147,17 @@ export const useCustomerStore = defineStore("customer", {
 
         // if response is not 200, throw an error
         if (response.status !== 200) {
-          const jsonResponse = await response.json();
-          throw new Error("Failed to get photo. " + jsonResponse.message);
+          const json = await response.json();
+          throw new Error(json?.message || "Failed to get photo.");
         }
 
         return (await response.blob()) as Blob;
       } catch (error: unknown) {
-        // handle errors
-        throw new Error("Failed to get photo");
+        if (error instanceof Error) {
+          throw new Error(error.message);
+        } else {
+          throw new Error("Failed to get photo. Unknown error.");
+        }
       }
     },
     async uploadPhoto(currentPassword: string, file: any): Promise<Blob> {
@@ -200,19 +203,34 @@ export const useCustomerStore = defineStore("customer", {
       this.customer.profile.photoPath = ".";
     },
     async initialize() {
-      const savedToken = localStorage.getItem("token");
-      if (savedToken) {
-        const customer = await this.getCustomer();
-        this.setCustomer(customer);
+      const token = localStorage.getItem("token");
+      if (!token) {
+        return;
+      }
 
-        if (customer.profile.photoPath) {
-          const profilePhoto = await this.getPhoto(customer.profile.photoPath);
+      await this.getCustomer()
+        .then((customer) => {
+          this.setCustomer(customer);
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+
+      if (!this.customer?.profile?.photoPath) {
+        return;
+      }
+
+      await this.getPhoto(this.customer.profile.photoPath)
+        .then((filename) => {
           localStorage.setItem(
             "profilePhotoURL",
-            URL.createObjectURL(profilePhoto)
+            URL.createObjectURL(filename)
           );
-        }
-      }
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+
       this.initialized = true;
     },
   },

@@ -2,14 +2,13 @@
 import { ref, onMounted, watch } from "vue";
 import { useCustomerStore } from "@/stores/customer";
 const customerStore = useCustomerStore();
+const profileImgURL = ref("");
 
 onMounted(() => {
   if (customerStore.customer.profile?.photoPath) {
     reloadProfileImg();
   }
 });
-
-const profileImgURL = ref("");
 
 watch(
   () => customerStore.customer.profile?.photoPath,
@@ -21,7 +20,6 @@ watch(
 
 // updates the photoUrl
 function reloadProfileImg() {
-  console.log("reloading photo");
   const profilePhotoURL = localStorage.getItem("profilePhotoURL");
   if (profilePhotoURL) {
     profileImgURL.value = profilePhotoURL;
@@ -29,6 +27,6 @@ function reloadProfileImg() {
 }
 </script>
 <template>
-  <img v-if="customerStore.customer.profile?.photoPath" :src="profileImgURL" />
-  <div v-else></div>
+  <img v-if="profileImgURL" :src="profileImgURL" />
+  <div v-else class="bg-gray-300"></div>
 </template>
