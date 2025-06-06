@@ -1,42 +1,54 @@
 <script setup lang="ts">
-import { defineProps, defineEmits, onMounted, ref } from "vue";
+import { defineExpose, onMounted, ref } from "vue";
 import { MessageType } from "@/types/Message";
-const emit = defineEmits(["close"]);
-const visible = ref(true);
+// alert properties
+const alert = ref({
+  message: "",
+  type: MessageType.ERROR,
+  timeout: 10,
+  visible: false,
+});
 
-const props = defineProps<{
-  message: string;
-  type: MessageType;
-  timeout: number;
-}>();
-
-onMounted(() => {
+function show(message: string, type: MessageType, timeout?: number) {
+  alert.value.type = type;
+  alert.value.timeout = timeout ?? alert.value.timeout;
+  alert.value.message = message;
+  alert.value.visible = true;
   setTimeout(() => {
-    visible.value = false;
+    alert.value.visible = false;
 
     setTimeout(() => {
-      emit("close");
+      hideAlert();
     }, 500);
-  }, props.timeout * 1000);
-});
+  }, alert.value.timeout * 1000);
+}
+
+function hideAlert() {
+  alert.value.message = "";
+}
+
+defineExpose({ show });
 </script>
 <template>
   <div
-    class="flex items-center border px-4 py-3 rounded relative transition-opacity duration-500"
+    v-if="alert.message"
+    class="mb-6 flex items-center border px-4 py-3 rounded relative transition-opacity duration-500"
     :class="[
-      type === MessageType.INFO && 'bg-blue-100 border-blue-400 text-blue-700',
-      type === MessageType.ERROR && 'bg-red-100 border-red-400 text-red-700',
-      type === MessageType.SUCCESS &&
+      alert.type === MessageType.INFO &&
+        'bg-blue-100 border-blue-400 text-blue-700',
+      alert.type === MessageType.ERROR &&
+        'bg-red-100 border-red-400 text-red-700',
+      alert.type === MessageType.SUCCESS &&
         'bg-green-100 border-green-400 text-green-700',
-      visible ? 'opacity-100' : 'opacity-0',
+      alert.visible ? 'opacity-100' : 'opacity-0',
     ]"
     role="alert"
   >
-    <span class="block sm:inline ml-2">{{ message }}</span>
+    <span class="block sm:inline ml-2">{{ alert.message }}</span>
     <button
       type="button"
       class="absolute top-0 bottom-0 right-0 px-4 py-3"
-      @click="emit('close')"
+      @click="hideAlert()"
     >
       <svg class="fill-current h-6 w-6 text-red-500" viewBox="0 0 20 20">
         <title>Close</title>
