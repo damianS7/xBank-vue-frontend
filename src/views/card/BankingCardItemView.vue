@@ -31,7 +31,6 @@ const modals = {
 
 const cardId = parseInt(route.params.id as string, 10);
 const card = computed(() => cardStore.getBankingCard(cardId));
-// const cardTransactions = computed(() => cardStore.getCardTransactions(cardId));
 
 async function setLock() {
   const userConfirmed = await modals.lockModal.value.open();
@@ -46,6 +45,7 @@ async function setLock() {
 
   const newCardLockStatus =
     card.value?.lockStatus === "LOCKED" ? "UNLOCKED" : "LOCKED";
+
   await cardStore
     .setLockStatus(cardId, newCardLockStatus, password)
     .then((card) => {
@@ -106,6 +106,10 @@ async function setDailyLimit() {
       alert.value.showMessage("Daily limit updated.", MessageType.SUCCESS);
     })
     .catch((error) => {
+      if (error instanceof FieldException) {
+        alert.value.showException(error);
+        return;
+      }
       alert.value.showMessage(error.message, MessageType.ERROR);
     });
 }

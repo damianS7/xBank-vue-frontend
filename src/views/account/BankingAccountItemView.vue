@@ -11,19 +11,15 @@ import ConfirmPasswordModal from "@/components/modal/ConfirmPasswordModal.vue";
 import TransferModal from "@/views/account/components/BankingAccountTransferModal.vue";
 import BankingAccountCards from "@/views/account/components/BankingAccountCards.vue";
 import BankingTransactions from "@/components/BankingTransactions.vue";
+import { FieldException } from "@/exceptions/FieldException";
 const route = useRoute();
 const accountStore = useAccountStore();
 const cardStore = useCardStore();
 const accountId = parseInt(route.params.id as string, 10);
 const account = computed(() => accountStore.getBankingAccount(accountId));
-
-// message to show
-const messageAlert = ref({
-  message: "",
-  type: MessageType.ERROR,
-  timeout: 12,
-  visible: false,
-});
+// TODO implement watch to update everything and transfer
+// alert
+const alert = ref();
 
 // modals to show
 const modals = {
@@ -56,24 +52,31 @@ async function transferTo() {
     )
     .then((transaction) => {
       accountStore.addTransaction(transaction);
+      alert.value.show("Transfered funds.", MessageType.SUCCESS);
     })
     .catch((error) => {
-      messageAlert.value.message = error.message || "Failed to transfer.";
-      messageAlert.value.type = MessageType.ERROR;
+      if (error instanceof FieldException) {
+        alert.value.showException(error);
+        return;
+      }
+      alert.value.showMessage(error.message, MessageType.ERROR);
     });
 }
 
 // Set alias for the banking account
 async function setAlias(alias: string) {
   if (alias.length < 5) {
-    messageAlert.value.message = "Alias must be at least 5 characters long.";
-    messageAlert.value.type = MessageType.ERROR;
+    alert.value.show(
+      "Alias must be at least 5 characters long.",
+      MessageType.ERROR
+    );
     return;
   }
 
   const password = await modals.confirmPassword.value.open();
 
   if (!password) {
+    alert.value.show("Invalid password format.", MessageType.ERROR);
     return;
   }
 
@@ -83,8 +86,11 @@ async function setAlias(alias: string) {
       accountStore.setAccount(newAccount);
     })
     .catch((error) => {
-      messageAlert.value.message = error.message || "Error modifying alias.";
-      messageAlert.value.type = MessageType.ERROR;
+      if (error instanceof FieldException) {
+        alert.value.showException(error);
+        return;
+      }
+      alert.value.showMessage(error.message, MessageType.ERROR);
     });
 }
 
@@ -101,13 +107,16 @@ async function requestCard() {
       cardStore.addCard(card);
     })
     .catch((error) => {
-      messageAlert.value.message = error.message || "Error requesting card.";
-      messageAlert.value.type = MessageType.ERROR;
+      if (error instanceof FieldException) {
+        alert.value.showException(error);
+        return;
+      }
+      alert.value.showMessage(error.message, MessageType.ERROR);
     });
 }
 
 function toggleOpenCloseAccount() {
-  if (account.value.accountStatus === "OPEN") {
+  if (account.value?.accountStatus === "OPEN") {
     closeAccount();
     return;
   }
@@ -124,14 +133,16 @@ async function openAccount(): Promise<void> {
   await accountStore
     .openExistingBankingAccount(accountId.toString(), password)
     .then((account) => {
-      messageAlert.value.message = "Account re-opened successfully.";
-      messageAlert.value.type = MessageType.SUCCESS;
+      alert.value.show("Account re-opened.", MessageType.SUCCESS);
       // TODO no reactive
       accountStore.setAccount(account);
     })
     .catch((error) => {
-      messageAlert.value.message = error.message || "Error re-opening account.";
-      messageAlert.value.type = MessageType.ERROR;
+      if (error instanceof FieldException) {
+        alert.value.showException(error);
+        return;
+      }
+      alert.value.showMessage(error.message, MessageType.ERROR);
     });
 }
 
@@ -144,14 +155,16 @@ async function closeAccount(): Promise<void> {
   await accountStore
     .closeBankingAccount(accountId.toString(), password)
     .then((account) => {
-      messageAlert.value.message = "Account closed successfully.";
-      messageAlert.value.type = MessageType.SUCCESS;
+      alert.value.show("Account closed.", MessageType.SUCCESS);
       // TODO no reactive
       accountStore.setAccount(account);
     })
     .catch((error) => {
-      messageAlert.value.message = error.message || "Error closing account.";
-      messageAlert.value.type = MessageType.ERROR;
+      if (error instanceof FieldException) {
+        alert.value.showException(error);
+        return;
+      }
+      alert.value.showMessage(error.message, MessageType.ERROR);
     });
 }
 
@@ -164,14 +177,7 @@ onMounted(() => {
     <RequestBankingCardModal :ref="modals.requestCard" />
     <TransferModal :ref="modals.transfer" />
     <ConfirmPasswordModal :ref="modals.confirmPassword" />
-    <MessageAlert
-      v-if="messageAlert.message"
-      class="mb-6"
-      :message="messageAlert.message"
-      :timeout="messageAlert.timeout"
-      :type="messageAlert.type"
-      @close="messageAlert.message = ''"
-    />
+    <MessageAlert ref="alert" />
 
     <div class="flex flex-col sm:flex-row sm:justify-end gap-1 mb-6">
       <button @click="transferTo" class="btn-sm btn-blue">TRANSFER TO</button>
