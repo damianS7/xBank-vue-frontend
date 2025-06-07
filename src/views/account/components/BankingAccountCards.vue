@@ -68,7 +68,7 @@ onMounted(() => {
           <li v-for="(card, index) in cards" :key="index">
             <router-link
               :to="`/card/${card.id}`"
-              class="flex justify-between items-center bg-gray-50 hover:bg-gray-100 rounded-md p-3"
+              class="flex justify-between items-center bg-blue-50 hover:bg-blue-100 rounded-md p-3"
             >
               <!-- Número de tarjeta a la izquierda -->
               <div class="font-medium text-gray-700">

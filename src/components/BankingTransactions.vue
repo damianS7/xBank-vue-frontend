@@ -76,7 +76,7 @@ onMounted(() => {
         <li
           v-for="(transaction, index) in paginator?.content"
           :key="index"
-          class="flex flex-col sm:flex-row sm:justify-between sm:items-start bg-gray-50 hover:bg-gray-100 p-3 rounded-md"
+          class="flex flex-col sm:flex-row sm:justify-between sm:items-start bg-blue-50 hover:bg-blue-100 p-3 rounded-md"
         >
           <div class="text-sm text-gray-700 sm:w-1/2">
             {{ transaction.description }}
@@ -106,16 +106,16 @@ onMounted(() => {
       </ul>
       <div v-else class="text-center text-gray-500">No transactions found.</div>
       <div
-        class="flex items-center justify-end text-sm mt-4 text-white bg-stone-300 p-1 rounded"
+        class="flex items-center justify-end text-sm mt-4 text-white bg-blue-600 p-1 rounded"
       >
-        <button class="mx-2">
+        <button class="mx-2 rounded-md">
           <ChevronLeft @click="previousPage" class="cursor-pointer" />
         </button>
         <span v-if="paginator.pageable">
           {{ paginator.pageable?.pageNumber + 1 }} /
           {{ paginator.totalPages }}
         </span>
-        <button class="mx-2">
+        <button class="mx-2 rounded-md">
           <ChevronRight @click="nextPage" class="cursor-pointer" />
         </button>
       </div>
