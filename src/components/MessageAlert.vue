@@ -1,9 +1,11 @@
 <script setup lang="ts">
-import { defineExpose, onMounted, ref } from "vue";
+import { defineExpose, ref } from "vue";
 import { MessageType } from "@/types/Message";
+import { FieldException } from "@/exceptions/FieldException";
 // alert properties
 const alert = ref({
   message: "",
+  errors: {},
   type: MessageType.ERROR,
   timeout: 10,
   visible: false,
@@ -23,11 +25,17 @@ function show(message: string, type: MessageType, timeout?: number) {
   }, alert.value.timeout * 1000);
 }
 
-function hideAlert() {
-  alert.value.message = "";
+function showException(exception: FieldException, timeout?: number) {
+  alert.value.errors = exception.errors;
+  show(exception.message, MessageType.ERROR, timeout);
 }
 
-defineExpose({ show });
+function hideAlert() {
+  alert.value.message = "";
+  alert.value.errors = {};
+}
+
+defineExpose({ show, showException });
 </script>
 <template>
   <div
@@ -44,7 +52,15 @@ defineExpose({ show });
     ]"
     role="alert"
   >
-    <span class="block sm:inline ml-2">{{ alert.message }}</span>
+    <span class="block sm:inline ml-2">
+      <p>{{ alert.message }}</p>
+      <ul v-if="alert.errors" class="list-disc ml-8">
+        <li v-for="(error, field) in alert.errors" :key="field">
+          <b>{{ field.toUpperCase() }}</b
+          >: {{ error }}
+        </li>
+      </ul>
+    </span>
     <button
       type="button"
       class="absolute top-0 bottom-0 right-0 px-4 py-3"

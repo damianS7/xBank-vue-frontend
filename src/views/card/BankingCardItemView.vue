@@ -1,18 +1,18 @@
 <script setup lang="ts">
 import MessageAlert from "@/components/MessageAlert.vue";
-import { onMounted, ref, computed, reactive } from "vue";
+import { onMounted, ref, computed } from "vue";
 import { useRoute } from "vue-router";
 import { useCardStore } from "@/stores/card";
 import BankingCardFront from "@/views/card/components/BankingCardFront.vue";
 import BankingCardBack from "@/views/card/components/BankingCardBack.vue";
 import { MessageType } from "@/types/Message";
-import { ChevronRight, ChevronLeft } from "lucide-vue-next";
 import BankingCardSetPinModal from "@/views/card/components/BankingCardSetPinModal.vue";
 import BankingCardLockModal from "@/views/card/components/BankingCardLockModal.vue";
 import BankingCardDailyLimitModal from "@/views/card/components/BankingCardDailyLimitModal.vue";
 import LoadingSpinner from "@/components/LoadingSpinner.vue";
 import ConfirmPasswordModal from "@/components/modal/ConfirmPasswordModal.vue";
 import BankingTransactions from "@/components/BankingTransactions.vue";
+import { FieldException } from "@/exceptions/FieldException";
 
 const isViewReady = ref(false);
 const route = useRoute();
@@ -50,6 +50,10 @@ async function setLock() {
       alert.value.show("Card lock status updated.", MessageType.SUCCESS);
     })
     .catch((error) => {
+      if (error instanceof FieldException) {
+        alert.value.showException(error);
+        return;
+      }
       alert.value.show(error.message, MessageType.ERROR);
     });
 }
@@ -69,6 +73,10 @@ async function setPin() {
       alert.value.show("PIN updated.", MessageType.SUCCESS);
     })
     .catch((error) => {
+      if (error instanceof FieldException) {
+        alert.value.showException(error);
+        return;
+      }
       alert.value.show(error.message, MessageType.ERROR);
     });
 }
