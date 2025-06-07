@@ -1,20 +1,23 @@
 <script setup lang="ts">
-import { defineProps, defineEmits, ref } from "vue";
+import { defineProps, defineEmits, ref, computed } from "vue";
 import { useCardStore } from "@/stores/card";
-import { BankingAccount } from "@/types/BankingAccount";
 import { CreditCard, SquarePen, Save, SaveOff } from "lucide-vue-next";
+import { useAccountStore } from "@/stores/account";
 const emit = defineEmits(["update"]);
 const cardStore = useCardStore();
+const accountStore = useAccountStore();
 const props = defineProps<{
-  account: BankingAccount;
+  id: number;
   editable?: boolean;
 }>();
+
+const account = computed(() => accountStore.getBankingAccount(props.id));
 
 const formFields = ref({
   name: "alias",
   type: "text",
   placeholder: "Alias",
-  value: props.account.alias,
+  value: account.value?.alias,
   error: "",
   isEditing: false,
   edited: false,
@@ -30,7 +33,7 @@ function formatIban(iban: string): string {
 }
 </script>
 <template>
-  <div class="bg-blue-100 p-4 rounded shadow mt-6 w-full">
+  <div v-if="account" class="bg-blue-100 p-4 rounded shadow mt-6 w-full">
     <div
       class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2"
     >
