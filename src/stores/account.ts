@@ -300,6 +300,12 @@ export const useAccountStore = defineStore("account", {
         this.bankingAccounts.splice(index, 1, account);
       }
     },
+    setBalance(accountId: number, balance: number) {
+      const account = this.bankingAccounts.find((acc) => acc.id === accountId);
+      if (account) {
+        account.balance = balance;
+      }
+    },
     addAccount(account: BankingAccount) {
       console.log(account);
       // this.bankingAccounts.push(account);

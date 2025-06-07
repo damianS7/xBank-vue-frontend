@@ -52,6 +52,7 @@ async function transferTo() {
     )
     .then((transaction) => {
       alert.value.showMessage("Transfered funds.", MessageType.SUCCESS);
+      accountStore.setBalance(accountId, transaction.accountBalance);
       accountStore.addTransaction(transaction);
     })
     .catch((error) => {
