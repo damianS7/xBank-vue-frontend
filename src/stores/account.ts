@@ -14,7 +14,7 @@ export const useAccountStore = defineStore("account", {
     },
     countCards: (state) => {
       return state.bankingAccounts.reduce((total, account) => {
-        return total + (account.bankingCards?.length || 0);
+        return total + (account.accountCards?.length || 0);
       }, 0);
     },
     totalBalance: (state) => {
@@ -31,7 +31,7 @@ export const useAccountStore = defineStore("account", {
       return state.bankingAccounts;
     },
     getBankingCards: (state) => {
-      return state.bankingAccounts.flatMap((account) => account.bankingCards);
+      return state.bankingAccounts.flatMap((account) => account.accountCards);
     },
   },
   actions: {
@@ -50,8 +50,9 @@ export const useAccountStore = defineStore("account", {
         );
 
         // if response is not 200, throw an error
-        if (!response.ok) {
-          throw new Error("Failed to fetch accounts");
+        if (response.status !== 200) {
+          const error = await response.json();
+          throw new Error(error.message || "Failed to fetch accounts");
         }
 
         const accounts = await response.json();
@@ -62,6 +63,9 @@ export const useAccountStore = defineStore("account", {
           updatedAt: new Date(account.updatedAt),
         })) as BankingAccount[];
       } catch (error: unknown) {
+        if (error instanceof Error) {
+          throw new Error(error.message);
+        }
         throw new Error("Failed to fetch accounts");
       }
     },
@@ -83,8 +87,9 @@ export const useAccountStore = defineStore("account", {
           }
         );
 
-        if (!response.ok) {
-          throw new Error("Failed to fetch transactions");
+        if (response.status !== 200) {
+          const error = await response.json();
+          throw new Error(error.message || "Failed to tetch transactions");
         }
 
         const paginatedTransactions = await response.json();
@@ -99,8 +104,11 @@ export const useAccountStore = defineStore("account", {
         // replace content with parsed dates
         paginatedTransactions.content = parsedTransactions;
         return paginatedTransactions;
-      } catch (error: any) {
-        throw new Error(error.message || "Failed to fetch transactions");
+      } catch (error: unknown) {
+        if (error instanceof Error) {
+          throw new Error(error.message);
+        }
+        throw new Error("Failed to fetch transactions");
       }
     },
     async requestBankingAccount(
@@ -125,8 +133,9 @@ export const useAccountStore = defineStore("account", {
         );
 
         // if response is not 200, throw an error
-        if (!response.ok) {
-          throw new Error("Failed to open account");
+        if (response.status !== 200) {
+          const error = await response.json();
+          throw new Error(error.message || "Failed to open account");
         }
 
         const account = await response.json();
@@ -137,6 +146,9 @@ export const useAccountStore = defineStore("account", {
           updatedAt: new Date(account.updatedAt),
         } as BankingAccount;
       } catch (error: unknown) {
+        if (error instanceof Error) {
+          throw new Error(error.message);
+        }
         throw new Error("Failed to open account");
       }
     },
@@ -161,8 +173,9 @@ export const useAccountStore = defineStore("account", {
         );
 
         // if response is not 200, throw an error
-        if (!response.ok) {
-          throw new Error("Failed to close account");
+        if (response.status !== 200) {
+          const error = await response.json();
+          throw new Error(error.message || "Failed to close account");
         }
 
         const account = await response.json();
@@ -173,6 +186,9 @@ export const useAccountStore = defineStore("account", {
           updatedAt: new Date(account.updatedAt),
         } as BankingAccount;
       } catch (error: unknown) {
+        if (error instanceof Error) {
+          throw new Error(error.message);
+        }
         throw new Error("Failed to close account");
       }
     },
@@ -197,8 +213,9 @@ export const useAccountStore = defineStore("account", {
         );
 
         // if response is not 200, throw an error
-        if (!response.ok) {
-          throw new Error("Failed to re-open account");
+        if (response.status !== 200) {
+          const error = await response.json();
+          throw new Error(error.message || "Failed to re-open account");
         }
 
         const account = await response.json();
@@ -209,6 +226,9 @@ export const useAccountStore = defineStore("account", {
           updatedAt: new Date(account.updatedAt),
         } as BankingAccount;
       } catch (error: unknown) {
+        if (error instanceof Error) {
+          throw new Error(error.message);
+        }
         throw new Error("Failed to re-open account");
       }
     },
@@ -234,9 +254,10 @@ export const useAccountStore = defineStore("account", {
           }
         );
 
-        // if response is not 200, throw an error
+        // if response is not 201, throw an error
         if (response.status !== 201) {
-          throw new Error("Failed to request card");
+          const error = await response.json();
+          throw new Error(error.message || "Failed to request card");
         }
 
         const card = await response.json();
@@ -247,7 +268,9 @@ export const useAccountStore = defineStore("account", {
           updatedAt: new Date(card.updatedAt),
         } as BankingCard;
       } catch (error: unknown) {
-        // handle errors
+        if (error instanceof Error) {
+          throw new Error(error.message);
+        }
         throw new Error("Failed to request card");
       }
     },
@@ -277,7 +300,8 @@ export const useAccountStore = defineStore("account", {
 
         // if response is not 200, throw an error
         if (response.status !== 200) {
-          throw new Error("Failed to set an alias");
+          const error = await response.json();
+          throw new Error(error.message || "Failed to set an alias");
         }
 
         const account = await response.json();
@@ -288,7 +312,9 @@ export const useAccountStore = defineStore("account", {
           updatedAt: new Date(account.updatedAt),
         } as BankingAccount;
       } catch (error: unknown) {
-        // handle errors
+        if (error instanceof Error) {
+          throw new Error(error.message);
+        }
         throw new Error("Failed to set an alias");
       }
     },
@@ -322,7 +348,8 @@ export const useAccountStore = defineStore("account", {
 
         // if response is not 201, throw an error
         if (response.status !== 201) {
-          throw new Error("Failed to transfer");
+          const error = await response.json();
+          throw new Error(error.message || "Failed to create transaction.");
         }
 
         const transaction = await response.json();
@@ -333,8 +360,11 @@ export const useAccountStore = defineStore("account", {
           updatedAt: new Date(transaction.updatedAt),
         } as BankingTransaction;
       } catch (error: unknown) {
-        // handle errors
-        throw new Error("Failed to transfer");
+        if (error instanceof Error) {
+          throw new Error(error.message);
+        }
+
+        throw new Error("Failed to create transaction.");
       }
     },
     setAccounts(accounts: any) {
@@ -354,7 +384,6 @@ export const useAccountStore = defineStore("account", {
       this.bankingAccounts.push(account);
     },
     addTransaction(transaction: BankingTransaction) {
-      // TODO push not working
       const account = this.getBankingAccount(transaction.bankingAccountId);
       account?.accountTransactions.push(transaction);
     },
@@ -362,7 +391,7 @@ export const useAccountStore = defineStore("account", {
       const account = this.bankingAccounts.find(
         (account) => account.id === accountId
       );
-      account?.bankingCards.push(card);
+      account?.accountCards.push(card);
     },
     async initialize() {
       // if store its already initialized
