@@ -2,6 +2,7 @@
 import { onMounted, PropType, ref } from "vue";
 import { defineProps } from "vue";
 import { ChevronRight, ChevronLeft } from "lucide-vue-next";
+// TODO implement cached transactions so we dont have to call the endpoint all the time
 const props = defineProps({
   id: {
     type: Number,
@@ -16,6 +17,7 @@ const props = defineProps({
 });
 
 // pagination
+const cachedPagination = [{ pageable: { pageNumber: -1 } }];
 const currentPage = ref(0); // Spring usa 0-indexed
 const pageSize = 4;
 const paginator = ref<any>(null);
@@ -34,10 +36,23 @@ function nextPage() {
 }
 
 async function fetchTransactions() {
+  // check if the page its already fetched
+  const pagination = cachedPagination.find(
+    (pag) => pag.pageable.pageNumber === currentPage.value
+  );
+
+  // if its fetched we assign to the paginator and prevents to fetch from endpoint
+  if (pagination) {
+    paginator.value = pagination;
+    return;
+  }
+
   return await props
     .fetch(props.id, currentPage.value, pageSize)
     .then((paginatedTransactions: any) => {
+      console.log(paginatedTransactions);
       paginator.value = paginatedTransactions;
+      cachedPagination.push(paginatedTransactions);
     })
     .catch((error: any) => {
       console.error(error.message);
