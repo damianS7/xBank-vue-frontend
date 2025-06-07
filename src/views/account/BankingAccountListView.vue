@@ -3,7 +3,6 @@ import MessageAlert from "@/components/MessageAlert.vue";
 import BankingAccount from "@/views/account/components/BankingAccount.vue";
 import { onMounted, ref } from "vue";
 import { useAccountStore } from "@/stores/account";
-import { useAuthStore } from "@/stores/auth";
 import { MessageType } from "@/types/Message";
 import OpenAccountModal from "@/views/account/components/BankingAccountOpenModal.vue";
 
@@ -16,7 +15,6 @@ const messageAlert = ref({
 });
 
 const accountStore = useAccountStore();
-const authStore = useAuthStore();
 
 const modals = {
   openAccount: ref(),
@@ -32,7 +30,7 @@ async function openAccount() {
   }
 
   accountStore
-    .openBankingAccount(accountData.type, accountData.currency)
+    .requestBankingAccount(accountData.type, accountData.currency)
     .then((account) => {
       accountStore.addAccount(account);
     })

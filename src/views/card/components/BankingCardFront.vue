@@ -8,7 +8,7 @@ const props = defineProps<{
   card: BankingCard;
 }>();
 
-function formatNumber(number: string): string {
+function formatCardNumber(number: string): string {
   return number.replace(/(.{4})/g, "$1 ").trim();
 }
 </script>
@@ -68,7 +68,7 @@ function formatNumber(number: string): string {
 
     <g transform="translate(30, 160)">
       <text fill="white" font-size="20" letter-spacing="3">
-        {{ formatNumber(card?.cardNumber) }}
+        {{ formatCardNumber(card?.cardNumber) }}
       </text>
       <text y="20" class="uppercase" fill="white" font-size="14">
         {{ customerStore?.getFullName }}

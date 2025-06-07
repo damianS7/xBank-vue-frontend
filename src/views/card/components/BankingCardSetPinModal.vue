@@ -33,7 +33,6 @@ function cancel() {
 
 defineExpose({ open });
 </script>
-
 <template>
   <div
     v-if="visible"
