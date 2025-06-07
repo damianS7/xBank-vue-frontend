@@ -34,35 +34,41 @@ const card = computed(() => cardStore.getBankingCard(cardId));
 // const cardTransactions = computed(() => cardStore.getCardTransactions(cardId));
 
 async function setLock() {
-  const newCardLockStatus =
-    card.value?.lockStatus === "LOCKED" ? "UNLOCKED" : "LOCKED";
-  const password = await modals.confirmPassword.value.open();
   const userConfirmed = await modals.lockModal.value.open();
-
   if (!userConfirmed) {
     return;
   }
 
+  const password = await modals.confirmPassword.value.open();
+  if (!password) {
+    return;
+  }
+
+  const newCardLockStatus =
+    card.value?.lockStatus === "LOCKED" ? "UNLOCKED" : "LOCKED";
   await cardStore
     .setLockStatus(cardId, newCardLockStatus, password)
     .then((card) => {
       cardStore.setCard(card);
-      alert.value.show("Card lock status updated.", MessageType.SUCCESS);
+      alert.value.showMessage("Card lock status updated.", MessageType.SUCCESS);
     })
     .catch((error) => {
       if (error instanceof FieldException) {
         alert.value.showException(error);
         return;
       }
-      alert.value.show(error.message, MessageType.ERROR);
+      alert.value.showMessage(error.message, MessageType.ERROR);
     });
 }
 
 async function setPin() {
   const pin = await modals.setPinModal.value.open();
-  const password = await modals.confirmPassword.value.open();
+  if (!pin) {
+    return;
+  }
 
-  if (!pin || !password) {
+  const password = await modals.confirmPassword.value.open();
+  if (!password) {
     return;
   }
 
@@ -70,22 +76,26 @@ async function setPin() {
     .setCardPin(cardId, pin, password)
     .then((card) => {
       cardStore.setCard(card);
-      alert.value.show("PIN updated.", MessageType.SUCCESS);
+      alert.value.showMessage("PIN updated.", MessageType.SUCCESS);
     })
     .catch((error) => {
       if (error instanceof FieldException) {
         alert.value.showException(error);
         return;
       }
-      alert.value.show(error.message, MessageType.ERROR);
+      alert.value.showMessage(error.message, MessageType.ERROR);
     });
 }
 
 async function setDailyLimit() {
   const dailyLimit = await modals.dailyLimitModal.value.open();
-  const password = await modals.confirmPassword.value.open();
 
-  if (!dailyLimit || !password) {
+  if (!dailyLimit) {
+    return;
+  }
+
+  const password = await modals.confirmPassword.value.open();
+  if (!password) {
     return;
   }
 
@@ -93,10 +103,10 @@ async function setDailyLimit() {
     .setDailyLimit(cardId, dailyLimit, password)
     .then((card) => {
       cardStore.setCard(card);
-      alert.value.show("Daily limit updated.", MessageType.SUCCESS);
+      alert.value.showMessage("Daily limit updated.", MessageType.SUCCESS);
     })
     .catch((error) => {
-      alert.value.show(error.message, MessageType.ERROR);
+      alert.value.showMessage(error.message, MessageType.ERROR);
     });
 }
 

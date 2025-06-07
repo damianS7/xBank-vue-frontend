@@ -25,6 +25,11 @@ function show(message: string, type: MessageType, timeout?: number) {
   }, alert.value.timeout * 1000);
 }
 
+function showMessage(message: string, type: MessageType, timeout?: number) {
+  alert.value.errors = {};
+  show(message, type, timeout);
+}
+
 function showException(exception: FieldException, timeout?: number) {
   alert.value.errors = exception.errors;
   show(exception.message, MessageType.ERROR, timeout);
@@ -35,7 +40,7 @@ function hideAlert() {
   alert.value.errors = {};
 }
 
-defineExpose({ show, showException });
+defineExpose({ showMessage, showException });
 </script>
 <template>
   <div
