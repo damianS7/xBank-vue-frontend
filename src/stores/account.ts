@@ -133,7 +133,7 @@ export const useAccountStore = defineStore("account", {
         );
 
         // if response is not 200, throw an error
-        if (response.status !== 200) {
+        if (response.status !== 201) {
           const error = await response.json();
           throw new Error(error.message || "Failed to open account");
         }
@@ -381,7 +381,9 @@ export const useAccountStore = defineStore("account", {
       }
     },
     addAccount(account: BankingAccount) {
-      this.bankingAccounts.push(account);
+      console.log(account);
+      // this.bankingAccounts.push(account);
+      this.bankingAccounts = [...this.bankingAccounts, account];
     },
     addTransaction(transaction: BankingTransaction) {
       const account = this.getBankingAccount(transaction.bankingAccountId);
