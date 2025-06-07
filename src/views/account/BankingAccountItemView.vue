@@ -5,12 +5,12 @@ import { useRoute } from "vue-router";
 import { useAccountStore } from "@/stores/account";
 import { useCardStore } from "@/stores/card";
 import MessageAlert from "@/components/MessageAlert.vue";
-import BankingAccountTransactions from "@/views/account/components/BankingAccountTransactions.vue";
 import BankingAccount from "@/views/account/components/BankingAccount.vue";
 import RequestBankingCardModal from "@/views/account/components/BankingAccountRequestCardModal.vue";
-import ConfirmPasswordModal from "@/components/ConfirmPasswordModal.vue";
+import ConfirmPasswordModal from "@/components/modal/ConfirmPasswordModal.vue";
+import TransferModal from "@/views/account/components/BankingAccountTransferModal.vue";
 import BankingAccountCards from "@/views/account/components/BankingAccountCards.vue";
-import { set } from "zod";
+import BankingTransactions from "@/components/BankingTransactions.vue";
 const route = useRoute();
 const accountStore = useAccountStore();
 const cardStore = useCardStore();
@@ -32,8 +32,35 @@ const modals = {
   confirmPassword: ref(),
 };
 
-function transferTo() {
-  // ...
+async function transferTo() {
+  const transferData = await modals.transfer.value.open();
+
+  if (!transferData) {
+    return;
+  }
+
+  const password = await modals.confirmPassword.value.open();
+
+  if (!password) {
+    return;
+  }
+
+  await accountStore
+    .createBankingTransaction(
+      accountId.toString(),
+      transferData.accountNumber,
+      transferData.amount,
+      transferData.concept,
+      "TRANSFER_TO",
+      password
+    )
+    .then((transaction) => {
+      accountStore.addTransaction(transaction);
+    })
+    .catch((error) => {
+      messageAlert.value.message = error.message || "Failed to transfer.";
+      messageAlert.value.type = MessageType.ERROR;
+    });
 }
 
 // Set alias for the banking account
@@ -44,8 +71,14 @@ async function setAlias(alias: string) {
     return;
   }
 
+  const password = await modals.confirmPassword.value.open();
+
+  if (!password) {
+    return;
+  }
+
   await accountStore
-    .updateBankingAccountAlias(accountId.toString(), alias)
+    .updateBankingAccountAlias(accountId.toString(), alias, password)
     .then((newAccount) => {
       accountStore.setAccount(newAccount);
     })
@@ -129,6 +162,7 @@ onMounted(() => {
 <template>
   <div v-if="account">
     <RequestBankingCardModal :ref="modals.requestCard" />
+    <TransferModal :ref="modals.transfer" />
     <ConfirmPasswordModal :ref="modals.confirmPassword" />
     <MessageAlert
       v-if="messageAlert.message"
@@ -185,7 +219,12 @@ onMounted(() => {
       </div>
 
       <div>
-        <BankingAccountTransactions :accountId="account.id" />
+        <BankingTransactions
+          :id="account.id"
+          :fetch="
+            (id: number, page: number, size: number) => accountStore.fetchTransactions(id, page, size)
+          "
+        />
       </div>
     </div>
   </div>

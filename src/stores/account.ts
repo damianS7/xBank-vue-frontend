@@ -24,7 +24,7 @@ export const useAccountStore = defineStore("account", {
     },
     getBankingAccount: (state) => {
       return (id: number) => {
-        return state.bankingAccounts.find((a) => a.id === id);
+        return state.bankingAccounts.find((account) => account.id === id);
       };
     },
     getBankingAccounts: (state) => {
@@ -103,14 +103,14 @@ export const useAccountStore = defineStore("account", {
         throw new Error(error.message || "Failed to fetch transactions");
       }
     },
-    async openBankingAccount(
+    async requestBankingAccount(
       type: string,
       currency: string
     ): Promise<BankingAccount> {
       try {
         const token = localStorage.getItem("token");
         const response = await fetch(
-          `${process.env.VUE_APP_API_URL}/customers/me/banking/accounts/open`,
+          `${process.env.VUE_APP_API_URL}/customers/me/banking/accounts/request`,
           {
             method: "POST",
             headers: {
@@ -147,9 +147,9 @@ export const useAccountStore = defineStore("account", {
       try {
         const token = localStorage.getItem("token");
         const response = await fetch(
-          `${process.env.VUE_APP_API_URL}/customers/me/banking/account/${accountId}/close`,
+          `${process.env.VUE_APP_API_URL}/customers/me/banking/accounts/${accountId}/close`,
           {
-            method: "POST",
+            method: "PATCH",
             headers: {
               "Content-Type": "application/json",
               Authorization: `Bearer ${token}`,
@@ -183,9 +183,9 @@ export const useAccountStore = defineStore("account", {
       try {
         const token = localStorage.getItem("token");
         const response = await fetch(
-          `${process.env.VUE_APP_API_URL}/customers/me/banking/account/${accountId}/open`,
+          `${process.env.VUE_APP_API_URL}/customers/me/banking/accounts/${accountId}/open`,
           {
-            method: "POST",
+            method: "PATCH",
             headers: {
               "Content-Type": "application/json",
               Authorization: `Bearer ${token}`,
@@ -219,9 +219,9 @@ export const useAccountStore = defineStore("account", {
       try {
         const token = localStorage.getItem("token");
         const response = await fetch(
-          `${process.env.VUE_APP_API_URL}/customers/me/banking/account/` +
+          `${process.env.VUE_APP_API_URL}/customers/me/banking/accounts/` +
             accountId +
-            "/card/request",
+            "/cards/request",
           {
             method: "POST",
             headers: {
@@ -253,22 +253,24 @@ export const useAccountStore = defineStore("account", {
     },
     async updateBankingAccountAlias(
       accountId: string,
-      alias: string
+      alias: string,
+      password: string
     ): Promise<BankingAccount> {
       try {
         const token = localStorage.getItem("token");
         const response = await fetch(
-          `${process.env.VUE_APP_API_URL}/customers/me/banking/account/` +
+          `${process.env.VUE_APP_API_URL}/customers/me/banking/accounts/` +
             accountId +
             "/alias",
           {
-            method: "PUT",
+            method: "PATCH",
             headers: {
               "Content-Type": "application/json",
               Authorization: `Bearer ${token}`,
             },
             body: JSON.stringify({
               alias,
+              password,
             }),
           }
         );
@@ -290,6 +292,51 @@ export const useAccountStore = defineStore("account", {
         throw new Error("Failed to set an alias");
       }
     },
+    async createBankingTransaction(
+      fromBankingAccountId: string,
+      toBankingAccountNumber: string,
+      amount: string,
+      description: string,
+      transactionType: string,
+      password: string
+    ): Promise<BankingTransaction> {
+      try {
+        const token = localStorage.getItem("token");
+        const response = await fetch(
+          `${process.env.VUE_APP_API_URL}/customers/me/banking/accounts/${fromBankingAccountId}/transactions`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+            body: JSON.stringify({
+              toBankingAccountNumber,
+              transactionType,
+              description,
+              amount,
+              password,
+            }),
+          }
+        );
+
+        // if response is not 201, throw an error
+        if (response.status !== 201) {
+          throw new Error("Failed to transfer");
+        }
+
+        const transaction = await response.json();
+
+        return {
+          ...transaction,
+          createdAt: new Date(transaction.createdAt),
+          updatedAt: new Date(transaction.updatedAt),
+        } as BankingTransaction;
+      } catch (error: unknown) {
+        // handle errors
+        throw new Error("Failed to transfer");
+      }
+    },
     setAccounts(accounts: any) {
       this.bankingAccounts = accounts;
     },
@@ -305,6 +352,11 @@ export const useAccountStore = defineStore("account", {
     },
     addAccount(account: BankingAccount) {
       this.bankingAccounts.push(account);
+    },
+    addTransaction(transaction: BankingTransaction) {
+      // TODO push not working
+      const account = this.getBankingAccount(transaction.bankingAccountId);
+      account?.accountTransactions.push(transaction);
     },
     addCard(accountId: number, card: BankingCard) {
       const account = this.bankingAccounts.find(

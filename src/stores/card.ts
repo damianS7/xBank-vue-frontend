@@ -1,5 +1,6 @@
 import { defineStore } from "pinia";
 import type { BankingCard, BankingCardLockStatus } from "../types/BankingCard";
+import { BankingTransaction } from "@/types/BankingTransaction";
 
 type BankingCardResponse = {
   card?: BankingCard;
@@ -69,30 +70,45 @@ export const useCardStore = defineStore("card", {
         updatedAt: new Date(card.updatedAt),
       }));
     },
-    async fetchTransactions(cardId: number) {
-      const token = localStorage.getItem("token");
-      const res = await fetch(
-        `${process.env.VUE_APP_API_URL}/customers/me/banking/cards/${cardId}/transactions`,
-        {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
+    async fetchTransactions(
+      id: number,
+      page: number,
+      size: number
+    ): Promise<BankingTransaction[]> {
+      try {
+        const token = localStorage.getItem("token");
+        const response = await fetch(
+          `${process.env.VUE_APP_API_URL}/customers/me/banking/cards/${id}/transactions?page=${page}&size=${size}&sort=createdAt,DESC`,
+          {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+
+        // if response is not 200, throw an error
+        if (response.status !== 200) {
+          const json = await response.json();
+          throw new Error(json?.message || "Failed to fetch transactions.");
         }
-      );
 
-      if (!res.ok) {
-        throw new Error("Problema al obtener banking cards");
+        const paginatedTransactions = await response.json();
+        const parsedTransactions = paginatedTransactions.content.map(
+          (transaction: any) => ({
+            ...transaction,
+            createdAt: new Date(transaction.createdAt),
+            updatedAt: new Date(transaction.updatedAt),
+          })
+        );
+
+        // replace content with parsed dates
+        paginatedTransactions.content = parsedTransactions;
+        return paginatedTransactions;
+      } catch (error: any) {
+        throw new Error(error.message || "Failed to fetch transactions");
       }
-
-      const transactionsJson = await res.json();
-      const transactions = transactionsJson.map((transaction: any) => ({
-        ...transaction,
-        createdAt: new Date(transaction.createdAt),
-        updatedAt: new Date(transaction.updatedAt),
-      }));
-      return { transactions, status: res.status };
     },
     async fetchPageableTransactions(
       cardId: number,
@@ -131,99 +147,119 @@ export const useCardStore = defineStore("card", {
     },
     async setCardPin(
       cardId: number,
-      pin: string
-    ): Promise<BankingCardResponse> {
-      const token = localStorage.getItem("token");
-      const response = await fetch(
-        `${process.env.VUE_APP_API_URL}/customers/me/banking/cards/${cardId}/pin`,
-        {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify({ pin }),
+      pin: string,
+      password: string
+    ): Promise<BankingCard> {
+      try {
+        const token = localStorage.getItem("token");
+        const response = await fetch(
+          `${process.env.VUE_APP_API_URL}/customers/me/banking/cards/${cardId}/pin`,
+          {
+            method: "PATCH",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+            body: JSON.stringify({ pin, password }),
+          }
+        );
+
+        if (!response.ok) {
+          // problem setting pin
+          const error = await response.json();
+          throw new Error("Error updating pin. " + error.message);
         }
-      );
 
-      if (!response.ok) {
-        // problem setting pin
-        const errorJson = await response.json();
-        return errorJson;
+        const cardJson = await response.json();
+        const card = {
+          ...cardJson,
+          expiredDate: new Date(cardJson.expiredDate),
+          createdAt: new Date(cardJson.createdAt),
+          updatedAt: new Date(cardJson.updatedAt),
+        };
+
+        return card as BankingCard;
+      } catch (error: unknown) {
+        throw new Error("Error updating ping.");
       }
-
-      const cardJson = await response.json();
-      const card = {
-        ...cardJson,
-        expiredDate: new Date(cardJson.expiredDate),
-        createdAt: new Date(cardJson.createdAt),
-        updatedAt: new Date(cardJson.updatedAt),
-      };
-      return { card, status: response.status };
     },
     async setDailyLimit(
       cardId: number,
-      dailyLimit: number
-    ): Promise<BankingCardResponse> {
-      const token = localStorage.getItem("token");
-      const response = await fetch(
-        `${process.env.VUE_APP_API_URL}/customers/me/banking/cards/${cardId}/daily-limit`,
-        {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify({ dailyLimit }),
+      dailyLimit: number,
+      password: string
+    ): Promise<BankingCard> {
+      try {
+        const token = localStorage.getItem("token");
+        const response = await fetch(
+          `${process.env.VUE_APP_API_URL}/customers/me/banking/cards/${cardId}/daily-limit`,
+          {
+            method: "PATCH",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+            body: JSON.stringify({ dailyLimit, password }),
+          }
+        );
+
+        if (!response.ok) {
+          // problem setting pin
+          const error = await response.json();
+          throw new Error("Failed updating card daily limit. " + error.message);
         }
-      );
 
-      if (!response.ok) {
-        // problem setting limit
-        const errorJson = await response.json();
-        return errorJson;
+        const cardJson = await response.json();
+        const card = {
+          ...cardJson,
+          expiredDate: new Date(cardJson.expiredDate),
+          createdAt: new Date(cardJson.createdAt),
+          updatedAt: new Date(cardJson.updatedAt),
+        };
+        return card as BankingCard;
+      } catch (error: unknown) {
+        if (error instanceof Error) {
+          throw new Error(error.message);
+        } else {
+          throw new Error("Failed updating card daily limit. Unknown error.");
+        }
       }
-
-      const cardJson = await response.json();
-      const card = {
-        ...cardJson,
-        expiredDate: new Date(cardJson.expiredDate),
-        createdAt: new Date(cardJson.createdAt),
-        updatedAt: new Date(cardJson.updatedAt),
-      };
-      return { card, status: response.status };
     },
     async setLockStatus(
       cardId: number,
-      lockStatus: BankingCardLockStatus
-    ): Promise<BankingCardResponse> {
-      const token = localStorage.getItem("token");
-      const response = await fetch(
-        `${process.env.VUE_APP_API_URL}/customers/me/banking/cards/${cardId}/locking`,
-        {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify({ lockStatus }),
+      lockStatus: BankingCardLockStatus,
+      password: string
+    ): Promise<BankingCard> {
+      try {
+        const token = localStorage.getItem("token");
+        const response = await fetch(
+          `${process.env.VUE_APP_API_URL}/customers/me/banking/cards/${cardId}/lock-status`,
+          {
+            method: "PATCH",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+            body: JSON.stringify({ lockStatus, password }),
+          }
+        );
+
+        if (!response.ok) {
+          // problem setting pin
+          const errorJson = await response.json();
+          throw new Error("Error setting lock on card." + errorJson);
         }
-      );
 
-      if (!response.ok) {
-        // problem setting pin
-        const errorJson = await response.json();
-        return errorJson;
+        const cardJson = await response.json();
+        const card = {
+          ...cardJson,
+          expiredDate: new Date(cardJson.expiredDate),
+          createdAt: new Date(cardJson.createdAt),
+          updatedAt: new Date(cardJson.updatedAt),
+        };
+        return card as BankingCard;
+      } catch (error: unknown) {
+        throw new Error("Error setting lock on card.");
       }
-
-      const cardJson = await response.json();
-      const card = {
-        ...cardJson,
-        expiredDate: new Date(cardJson.expiredDate),
-        createdAt: new Date(cardJson.createdAt),
-        updatedAt: new Date(cardJson.updatedAt),
-      };
-      return { card, status: response.status };
     },
     setCards(cards: any) {
       this.bankingCards = cards;

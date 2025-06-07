@@ -1,21 +1,23 @@
 <script setup lang="ts">
-import { MessageType } from "@/types/Message";
-import { onMounted, ref } from "vue";
+import { onMounted, PropType, ref } from "vue";
 import { defineProps } from "vue";
-import { useAccountStore } from "@/stores/account";
-import { BankingTransaction } from "@/types/BankingTransaction";
 import { ChevronRight, ChevronLeft } from "lucide-vue-next";
-const accountStore = useAccountStore();
 const props = defineProps({
-  accountId: {
+  id: {
     type: Number,
+    required: true,
+  },
+  fetch: {
+    type: Function as PropType<
+      (id: number, page: number, size: number) => Promise<any>
+    >,
     required: true,
   },
 });
 
 // pagination
 const currentPage = ref(0); // Spring usa 0-indexed
-const pageSize = 5;
+const pageSize = 4;
 const paginator = ref<any>(null);
 
 function previousPage() {
@@ -25,33 +27,27 @@ function previousPage() {
   }
 }
 function nextPage() {
-  if (paginator.value?.hasNext) {
+  if (currentPage.value < paginator.value?.totalPages) {
     currentPage.value++;
     fetchTransactions();
   }
 }
 
 async function fetchTransactions() {
-  return await accountStore
-    .fetchTransactions(props.accountId, currentPage.value, pageSize)
-    .then((paginatedTransactions) => {
+  return await props
+    .fetch(props.id, currentPage.value, pageSize)
+    .then((paginatedTransactions: any) => {
       paginator.value = paginatedTransactions;
     })
-    .catch((error) => {
-      console.log(error);
+    .catch((error: any) => {
+      console.error(error.message);
     });
 }
 
 onMounted(() => {
-  if (!props.accountId) {
+  if (!props.id) {
     return;
   }
-
-  // if transactions are empty fetch them
-  // if (account.value?.transactions?.length === 0) {
-  //   // fetch transactions
-
-  // }
   fetchTransactions();
   // isViewReady.value = true;
 });
@@ -101,7 +97,7 @@ onMounted(() => {
         <span class="mx-2">
           <ChevronLeft @click="previousPage" class="cursor-pointer" />
         </span>
-        <span v-if="paginator?.pageable.pageNumber">
+        <span v-if="paginator.pageable">
           {{ paginator.pageable?.pageNumber + 1 }} /
           {{ paginator.totalPages }}
         </span>
