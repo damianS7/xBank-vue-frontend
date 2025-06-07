@@ -40,14 +40,15 @@ defineExpose({ open });
     class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
   >
     <div class="bg-white p-6 rounded shadow-md w-full max-w-md">
-      <h2 class="text-xl font-semibold mb-4">{{ props.cardEnabled }} CARD</h2>
+      <h2 class="text-xl font-semibold mb-4">Locking card</h2>
 
       <form @submit.prevent="submit">
         <div class="mb-4">
           <p>
-            You are about to {{ props.cardEnabled ? "enable" : "disable" }} the
-            card. Confirm.
+            You are about to
+            <b>{{ props.cardEnabled ? "enable" : "disable" }}</b> this card.
           </p>
+          <p>Are you sure?</p>
         </div>
 
         <div class="flex justify-end gap-2">
