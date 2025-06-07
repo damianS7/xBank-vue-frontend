@@ -51,8 +51,8 @@ async function transferTo() {
       password
     )
     .then((transaction) => {
+      alert.value.showMessage("Transfered funds.", MessageType.SUCCESS);
       accountStore.addTransaction(transaction);
-      alert.value.show("Transfered funds.", MessageType.SUCCESS);
     })
     .catch((error) => {
       if (error instanceof FieldException) {
@@ -66,7 +66,7 @@ async function transferTo() {
 // Set alias for the banking account
 async function setAlias(alias: string) {
   if (alias.length < 5) {
-    alert.value.show(
+    alert.value.showMessage(
       "Alias must be at least 5 characters long.",
       MessageType.ERROR
     );
@@ -76,7 +76,7 @@ async function setAlias(alias: string) {
   const password = await modals.confirmPassword.value.open();
 
   if (!password) {
-    alert.value.show("Invalid password format.", MessageType.ERROR);
+    alert.value.showMessage("Invalid password format.", MessageType.ERROR);
     return;
   }
 
@@ -133,7 +133,7 @@ async function openAccount(): Promise<void> {
   await accountStore
     .openExistingBankingAccount(accountId.toString(), password)
     .then((account) => {
-      alert.value.show("Account re-opened.", MessageType.SUCCESS);
+      alert.value.showMessage("Account re-opened.", MessageType.SUCCESS);
       // TODO no reactive
       accountStore.setAccount(account);
     })
@@ -155,7 +155,7 @@ async function closeAccount(): Promise<void> {
   await accountStore
     .closeBankingAccount(accountId.toString(), password)
     .then((account) => {
-      alert.value.show("Account closed.", MessageType.SUCCESS);
+      alert.value.showMessage("Account closed.", MessageType.SUCCESS);
       // TODO no reactive
       accountStore.setAccount(account);
     })
@@ -214,7 +214,7 @@ onMounted(() => {
       <div>
         <BankingAccount
           v-if="account"
-          :account="account"
+          :id="account.id"
           @update="setAlias"
           :editable="true"
         />
