@@ -19,14 +19,12 @@ let initialized = ref(false);
 
 async function checkIfTokenIsValid() {
   const token = authStore.token;
-  const isTokenValid = await authStore.isTokenValid(token);
-
-  if (!isTokenValid) {
+  await authStore.isTokenValid(token).catch(async () => {
     initialized.value = false;
     await authStore.logout();
     await wait(100);
     router.push("/auth/login");
-  }
+  });
 }
 
 function sleep(ms: number): Promise<void> {

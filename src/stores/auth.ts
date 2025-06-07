@@ -20,62 +20,85 @@ export const useAuthStore = defineStore("auth", {
   actions: {
     async login(email: string, password: string) {
       try {
-        const res = await fetch(`${process.env.VUE_APP_API_URL}/auth/login`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ email, password }),
-        });
+        const response = await fetch(
+          `${process.env.VUE_APP_API_URL}/auth/login`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ email, password }),
+          }
+        );
 
-        if (!res.ok) {
-          throw new Error("Credenciales incorrectas");
+        // if response is not 200, throw an error
+        if (response.status !== 200) {
+          const error = await response.json();
+          throw new Error(error.message || "Invalid credentials.");
         }
 
-        const data = await res.json();
-        // this.email = data.customer.email;
+        const data = await response.json();
         this.token = data.token;
-        // se recomienda guardar el token en localStorage tambien en caso de que se pulse f5
         localStorage.setItem("token", this.token);
-
-        // Opcional: obtener el usuario
-        // this.user = await this.fetchUser();
       } catch (error) {
-        console.error("Error en login:", error);
-        throw error;
+        if (error instanceof Error) {
+          throw error;
+        }
+        throw new Error("Login failed.");
       }
     },
     async register(fields: Customer) {
-      const response = await fetch(
-        `${process.env.VUE_APP_API_URL}/auth/register`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(fields),
-        }
-      );
+      try {
+        const response = await fetch(
+          `${process.env.VUE_APP_API_URL}/auth/register`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(fields),
+          }
+        );
 
-      const data = await response.json();
-      return { status: response.status, data };
+        // if response is not 201, throw an error
+        if (response.status !== 201) {
+          const error = await response.json();
+          throw new Error(error.message || "Registration failed.");
+        }
+
+        const data = await response.json();
+        return { status: response.status, data };
+      } catch (error) {
+        if (error instanceof Error) {
+          throw error;
+        }
+        throw new Error("Registration failed.");
+      }
     },
     async isTokenValid(token: string) {
-      const response = await fetch(
-        `${process.env.VUE_APP_API_URL}/auth/token/validate`,
-        {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+      try {
+        const response = await fetch(
+          `${process.env.VUE_APP_API_URL}/auth/token/validate`,
+          {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
 
-      if (response.status == 200) {
-        return true;
+        // if response is not 200, throw an error
+        if (response.status !== 200) {
+          const error = await response.json();
+          throw new Error(error.message || "Token validation failed.");
+        }
+      } catch (error) {
+        if (error instanceof Error) {
+          throw error;
+        }
+        throw new Error("Token validation failed.");
       }
-      return false;
     },
     async logout() {
       this.token = "";
@@ -86,10 +109,11 @@ export const useAuthStore = defineStore("auth", {
       const savedToken = localStorage.getItem("token");
       if (savedToken) {
         this.token = savedToken;
-        if (!(await this.isTokenValid(savedToken))) {
+
+        await this.isTokenValid(savedToken).catch(() => {
           this.logout();
           return;
-        }
+        });
       }
       this.initialized = true;
     },
