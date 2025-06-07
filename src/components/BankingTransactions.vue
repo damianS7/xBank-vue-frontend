@@ -29,7 +29,7 @@ function previousPage() {
   }
 }
 function nextPage() {
-  if (currentPage.value < paginator.value?.totalPages) {
+  if (currentPage.value < paginator.value?.totalPages - 1) {
     currentPage.value++;
     fetchTransactions();
   }
@@ -50,7 +50,6 @@ async function fetchTransactions() {
   return await props
     .fetch(props.id, currentPage.value, pageSize)
     .then((paginatedTransactions: any) => {
-      console.log(paginatedTransactions);
       paginator.value = paginatedTransactions;
       cachedPagination.push(paginatedTransactions);
     })
@@ -109,16 +108,16 @@ onMounted(() => {
       <div
         class="flex items-center justify-end text-sm mt-4 text-white bg-stone-300 p-1 rounded"
       >
-        <span class="mx-2">
+        <button class="mx-2">
           <ChevronLeft @click="previousPage" class="cursor-pointer" />
-        </span>
+        </button>
         <span v-if="paginator.pageable">
           {{ paginator.pageable?.pageNumber + 1 }} /
           {{ paginator.totalPages }}
         </span>
-        <span class="mx-2">
+        <button class="mx-2">
           <ChevronRight @click="nextPage" class="cursor-pointer" />
-        </span>
+        </button>
       </div>
     </div>
   </div>
