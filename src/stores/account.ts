@@ -17,11 +17,6 @@ export const useAccountStore = defineStore("account", {
         return total + (account.accountCards?.length || 0);
       }, 0);
     },
-    totalBalance: (state) => {
-      return state.bankingAccounts.reduce((total, account) => {
-        return total + (account.balance || 0);
-      }, 0);
-    },
     getBankingAccount: (state) => {
       return (id: number) => {
         return state.bankingAccounts.find((account) => account.id === id);

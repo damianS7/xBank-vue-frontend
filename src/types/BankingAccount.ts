@@ -2,7 +2,9 @@ import { BankingTransaction } from "@/types/BankingTransaction";
 import { BankingCard } from "@/types/BankingCard";
 
 export type BankingAccountType = "SAVINGS" | "CHECKING";
-export type BankingAccountCurrency = "USD" | "EUR";
+// export type BankingAccountCurrency = "USD" | "EUR";
+export const BankingAccountCurrencies = ["USD", "EUR"] as const;
+export type BankingAccountCurrency = (typeof BankingAccountCurrencies)[number];
 export type BankingAccountStatus = "OPEN" | "CLOSED" | "SUSPENDED";
 
 export interface BankingAccount {
