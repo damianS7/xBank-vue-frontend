@@ -64,7 +64,7 @@ export const useAccountStore = defineStore("account", {
         })) as BankingAccount[];
       } catch (error: unknown) {
         if (error instanceof Error) {
-          throw new Error(error.message);
+          throw error;
         }
         throw new Error("Failed to fetch accounts");
       }
@@ -147,7 +147,7 @@ export const useAccountStore = defineStore("account", {
         } as BankingAccount;
       } catch (error: unknown) {
         if (error instanceof Error) {
-          throw new Error(error.message);
+          throw error;
         }
         throw new Error("Failed to open account");
       }
@@ -189,7 +189,7 @@ export const useAccountStore = defineStore("account", {
         } as BankingCard;
       } catch (error: unknown) {
         if (error instanceof Error) {
-          throw new Error(error.message);
+          throw error;
         }
         throw new Error("Failed to request card");
       }
@@ -233,7 +233,7 @@ export const useAccountStore = defineStore("account", {
         } as BankingAccount;
       } catch (error: unknown) {
         if (error instanceof Error) {
-          throw new Error(error.message);
+          throw error;
         }
         throw new Error("Failed to set an alias");
       }
@@ -281,7 +281,7 @@ export const useAccountStore = defineStore("account", {
         } as BankingTransaction;
       } catch (error: unknown) {
         if (error instanceof Error) {
-          throw new Error(error.message);
+          throw error;
         }
 
         throw new Error("Failed to create transaction.");
