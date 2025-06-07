@@ -115,59 +115,6 @@ async function requestCard() {
     });
 }
 
-function toggleOpenCloseAccount() {
-  if (account.value?.accountStatus === "OPEN") {
-    closeAccount();
-    return;
-  }
-
-  openAccount();
-}
-
-async function openAccount(): Promise<void> {
-  const password = await modals.confirmPassword.value.open();
-
-  if (!password) {
-    return;
-  }
-  await accountStore
-    .openExistingBankingAccount(accountId.toString(), password)
-    .then((account) => {
-      alert.value.showMessage("Account re-opened.", MessageType.SUCCESS);
-      // TODO no reactive
-      accountStore.setAccount(account);
-    })
-    .catch((error) => {
-      if (error instanceof FieldException) {
-        alert.value.showException(error);
-        return;
-      }
-      alert.value.showMessage(error.message, MessageType.ERROR);
-    });
-}
-
-async function closeAccount(): Promise<void> {
-  const password = await modals.confirmPassword.value.open();
-
-  if (!password) {
-    return;
-  }
-  await accountStore
-    .closeBankingAccount(accountId.toString(), password)
-    .then((account) => {
-      alert.value.showMessage("Account closed.", MessageType.SUCCESS);
-      // TODO no reactive
-      accountStore.setAccount(account);
-    })
-    .catch((error) => {
-      if (error instanceof FieldException) {
-        alert.value.showException(error);
-        return;
-      }
-      alert.value.showMessage(error.message, MessageType.ERROR);
-    });
-}
-
 onMounted(() => {
   // isViewReady.value = true;
 });
@@ -182,13 +129,6 @@ onMounted(() => {
     <div class="flex flex-col sm:flex-row sm:justify-end gap-1 mb-6">
       <button @click="transferTo" class="btn-sm btn-blue">TRANSFER TO</button>
       <button @click="requestCard" class="btn-sm btn-blue">REQUEST CARD</button>
-      <button
-        @click="toggleOpenCloseAccount"
-        class="btn-sm"
-        :class="account?.accountStatus === 'OPEN' ? 'btn-red' : 'btn-blue'"
-      >
-        {{ account?.accountStatus === "OPEN" ? "CLOSE" : "OPEN" }} ACCOUNT
-      </button>
     </div>
 
     <div class="main-container">
