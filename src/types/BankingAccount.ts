@@ -10,7 +10,7 @@ export interface BankingAccount {
   customerId: number;
   alias: string;
   accountTransactions: BankingTransaction[];
-  bankingCards: BankingCard[];
+  accountCards: BankingCard[];
   accountNumber: string;
   balance: number;
   accountType: BankingAccountType;
