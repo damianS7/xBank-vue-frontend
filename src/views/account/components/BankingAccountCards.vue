@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import { onMounted, ref, watch } from "vue";
+import { computed, onMounted, ref, watch } from "vue";
 import { defineProps } from "vue";
 import { useCardStore } from "@/stores/card";
-import { CircleChevronDown } from "lucide-vue-next";
+import { CircleChevronDown, CircleChevronUp } from "lucide-vue-next";
 const cardStore = useCardStore();
 const props = defineProps({
   accountId: {
@@ -10,14 +10,11 @@ const props = defineProps({
     required: true,
   },
 });
-const cards = ref();
-watch(
-  () => cardStore.getBankingCardsByAccountId(props.accountId),
-  (newData, oldData) => {
-    cards.value = newData;
-  },
-  { immediate: true }
+
+const cards = computed(() =>
+  cardStore.getBankingCardsByAccountId(props.accountId)
 );
+
 const showCards = ref(false);
 const toggleCards = () => {
   showCards.value = !showCards.value;
@@ -48,7 +45,13 @@ onMounted(() => {
         <h3 class="text-base sm:text-lg font-semibold text-gray-800">
           Associated cards
         </h3>
-        <button>
+        <button v-if="showCards">
+          <CircleChevronUp
+            class="cursor-pointer text-gray-600 hover:text-gray-800 transition"
+            @click="toggleCards"
+          />
+        </button>
+        <button v-else>
           <CircleChevronDown
             class="cursor-pointer text-gray-600 hover:text-gray-800 transition"
             @click="toggleCards"
