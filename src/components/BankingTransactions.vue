@@ -113,12 +113,13 @@ onMounted(() => {
       </ul>
       <div v-else class="text-center text-gray-500">No transactions found.</div>
       <div
+        v-if="paginator.totalPages > 0"
         class="flex items-center justify-end text-sm mt-4 text-white bg-blue-600 p-1 rounded"
       >
         <button class="mx-2 rounded-md">
           <ChevronLeft @click="previousPage" class="cursor-pointer" />
         </button>
-        <span v-if="paginator.pageable">
+        <span>
           {{ paginator.pageable?.pageNumber + 1 }} /
           {{ paginator.totalPages }}
         </span>
