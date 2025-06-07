@@ -13,10 +13,11 @@ import LoadingSpinner from "@/components/LoadingSpinner.vue";
 import ConfirmPasswordModal from "@/components/modal/ConfirmPasswordModal.vue";
 import BankingTransactions from "@/components/BankingTransactions.vue";
 import { FieldException } from "@/exceptions/FieldException";
-
-const isViewReady = ref(false);
-const route = useRoute();
+import { useAccountStore } from "@/stores/account";
+const accountStore = useAccountStore();
 const cardStore = useCardStore();
+const route = useRoute();
+const isViewReady = ref(false);
 
 // alert
 const alert = ref();
@@ -31,6 +32,11 @@ const modals = {
 
 const cardId = parseInt(route.params.id as string, 10);
 const card = computed(() => cardStore.getBankingCard(cardId));
+const currency = computed(() => {
+  const bankingAccountId = card.value?.bankingAccountId;
+  if (!bankingAccountId) return;
+  return accountStore.getBankingAccount(bankingAccountId)?.accountCurrency;
+});
 
 async function setLock() {
   const userConfirmed = await modals.lockModal.value.open();
@@ -129,64 +135,67 @@ onMounted(async () => {
     <BankingCardDailyLimitModal :ref="modals.dailyLimitModal" />
     <MessageAlert ref="alert" />
 
-    <div class="flex flex-wrap justify-end gap-1 mb-6">
-      <button @click="setPin" class="btn-sm btn-blue w-full sm:w-auto">
-        SET PIN
-      </button>
-      <button @click="setLock" class="btn-sm btn-blue w-full sm:w-auto">
-        {{ card?.lockStatus === "LOCKED" ? "UNLOCK" : "LOCK" }} CARD
-      </button>
-      <button @click="setDailyLimit" class="btn-sm btn-blue w-full sm:w-auto">
-        SET DAILY LIMIT
-      </button>
-    </div>
-
-    <div v-if="card && isViewReady" class="main-container">
-      <div
-        class="sm:flex gap-1 items-center text-2xl font-bold border-b border-gray-300 p-1 mb-1"
-      >
-        <h1>User Card</h1>
-        <div class="flex flex-wrap gap-1 text-sm">
-          <span
-            class="pill-xs"
-            :class="{
-              'text-red-100 bg-red-500': card?.cardStatus === 'DISABLED',
-              'text-green-100 bg-green-500': card?.cardStatus === 'ENABLED',
-            }"
-            >{{ card?.cardStatus }}
-          </span>
-          <span
-            class="pill-xs"
-            :class="{
-              'text-gray-100 bg-gray-500': card?.lockStatus === 'LOCKED',
-              'text-green-100 bg-green-500': card?.lockStatus === 'UNLOCKED',
-            }"
-            >{{ card?.lockStatus }}
-          </span>
-          <span class="pill-xs bg-blue-500 text-blue-100"
-            >{{ card?.dailyLimit ? card?.dailyLimit + " LIMIT" : "NO LIMIT" }}
-          </span>
-        </div>
+    <div v-if="card && isViewReady">
+      <div class="flex flex-wrap justify-end gap-1 mb-6">
+        <button @click="setPin" class="btn-sm btn-blue w-full sm:w-auto">
+          SET PIN
+        </button>
+        <button @click="setLock" class="btn-sm btn-blue w-full sm:w-auto">
+          {{ card?.lockStatus === "LOCKED" ? "UNLOCK" : "LOCK" }} CARD
+        </button>
+        <button @click="setDailyLimit" class="btn-sm btn-blue w-full sm:w-auto">
+          SET DAILY LIMIT
+        </button>
       </div>
 
-      <div class="flex justify-center my-6">
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-1">
-          <div class="flex jusfity-center">
-            <BankingCardFront v-if="card" :card="card" />
-          </div>
-          <div class="flex jusfity-center">
-            <BankingCardBack v-if="card" :card="card" />
+      <div class="main-container">
+        <div
+          class="sm:flex gap-1 items-center text-2xl font-bold border-b border-gray-300 p-1 mb-1"
+        >
+          <h1>User Card</h1>
+          <div class="flex flex-wrap gap-1 text-sm">
+            <span
+              class="pill-xs"
+              :class="{
+                'text-red-100 bg-red-500': card?.cardStatus === 'DISABLED',
+                'text-green-100 bg-green-500': card?.cardStatus === 'ENABLED',
+              }"
+              >{{ card?.cardStatus }}
+            </span>
+            <span
+              class="pill-xs"
+              :class="{
+                'text-gray-100 bg-gray-500': card?.lockStatus === 'LOCKED',
+                'text-green-100 bg-green-500': card?.lockStatus === 'UNLOCKED',
+              }"
+              >{{ card?.lockStatus }}
+            </span>
+            <span class="pill-xs bg-blue-500 text-blue-100"
+              >{{ card?.dailyLimit ? card?.dailyLimit + " LIMIT" : "NO LIMIT" }}
+            </span>
           </div>
         </div>
-      </div>
 
-      <div>
-        <BankingTransactions
-          :id="card.id"
-          :fetch="
-            (id: number, page: number, size: number) => cardStore.fetchTransactions(id, page, size)
-          "
-        />
+        <div class="flex justify-center my-6">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-1">
+            <div class="flex jusfity-center">
+              <BankingCardFront v-if="card" :card="card" />
+            </div>
+            <div class="flex jusfity-center">
+              <BankingCardBack v-if="card" :card="card" />
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <BankingTransactions
+            :id="card.id"
+            :currency="currency"
+            :fetch="
+              (id: number, page: number, size: number) => cardStore.fetchTransactions(id, page, size)
+            "
+          />
+        </div>
       </div>
     </div>
     <div v-else>

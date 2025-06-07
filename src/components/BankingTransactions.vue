@@ -1,13 +1,14 @@
 <script setup lang="ts">
 import { onMounted, PropType, ref } from "vue";
 import { defineProps } from "vue";
-import { ChevronRight, ChevronLeft } from "lucide-vue-next";
+import { ChevronRight, ChevronLeft, Currency } from "lucide-vue-next";
 // TODO implement cached transactions so we dont have to call the endpoint all the time
 const props = defineProps({
   id: {
     type: Number,
     required: true,
   },
+  currency: { type: String, required: true },
   fetch: {
     type: Function as PropType<
       (id: number, page: number, size: number) => Promise<any>
@@ -84,11 +85,17 @@ onMounted(() => {
 
           <div class="flex flex-col text-sm font-medium text-right sm:w-1/2">
             <span
-              :class="
-                transaction.amount > 0 ? 'text-green-600' : 'text-red-600'
+              v-if="
+                ['DEPOSIT', 'TRANSFER_FROM'].includes(
+                  transaction.transactionType
+                )
               "
+              class="text-green-600"
             >
-              {{ transaction.amount > 0 ? "+" : "" }}{{ transaction.amount }}€
+              +{{ transaction.amount }} {{ currency }}
+            </span>
+            <span v-else class="text-red-600">
+              -{{ transaction.amount }} {{ currency }}
             </span>
             <span class="text-xs text-gray-500">
               {{

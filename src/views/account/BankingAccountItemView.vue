@@ -17,7 +17,7 @@ const accountStore = useAccountStore();
 const cardStore = useCardStore();
 const accountId = parseInt(route.params.id as string, 10);
 const account = computed(() => accountStore.getBankingAccount(accountId));
-// TODO implement watch to update everything and transfer
+
 // alert
 const alert = ref();
 
@@ -167,6 +167,7 @@ onMounted(() => {
       <div>
         <BankingTransactions
           :id="account.id"
+          :currency="account.accountCurrency"
           :fetch="
             (id: number, page: number, size: number) => accountStore.fetchTransactions(id, page, size)
           "
