@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onMounted, ref } from "vue";
+import { onMounted, ref, watch } from "vue";
 import { defineProps } from "vue";
 import { useCardStore } from "@/stores/card";
 import { CircleChevronDown } from "lucide-vue-next";
@@ -10,7 +10,14 @@ const props = defineProps({
     required: true,
   },
 });
-const cards = ref(cardStore.getBankingCardsByAccountId(props.accountId));
+const cards = ref();
+watch(
+  () => cardStore.getBankingCardsByAccountId(props.accountId),
+  (newData, oldData) => {
+    cards.value = newData;
+  },
+  { immediate: true }
+);
 const showCards = ref(false);
 const toggleCards = () => {
   showCards.value = !showCards.value;
