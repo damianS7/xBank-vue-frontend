@@ -14,7 +14,9 @@ import ConfirmPasswordModal from "@/components/modal/ConfirmPasswordModal.vue";
 import BankingTransactions from "@/components/BankingTransactions.vue";
 import { FieldException } from "@/exceptions/FieldException";
 import { useAccountStore } from "@/stores/account";
+import { useTransactionStore } from "@/stores/transaction";
 const accountStore = useAccountStore();
+const transactionStore = useTransactionStore();
 const cardStore = useCardStore();
 const route = useRoute();
 const isViewReady = ref(false);
@@ -192,7 +194,7 @@ onMounted(async () => {
             :id="card.id"
             :currency="currency"
             :fetch="
-              (id: number, page: number, size: number) => cardStore.fetchTransactions(id, page, size)
+              (id: number, page: number, size: number) => transactionStore.fetchCardTransactions(id, page, size)
             "
           />
         </div>

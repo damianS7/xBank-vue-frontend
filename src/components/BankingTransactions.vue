@@ -2,7 +2,7 @@
 import { onMounted, PropType, ref } from "vue";
 import { defineProps, defineExpose } from "vue";
 import { ChevronRight, ChevronLeft } from "lucide-vue-next";
-// TODO implement cached transactions so we dont have to call the endpoint all the time
+
 const props = defineProps({
   id: {
     type: Number,

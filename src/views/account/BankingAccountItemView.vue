@@ -12,8 +12,10 @@ import TransferModal from "@/views/account/components/BankingAccountTransferModa
 import BankingAccountCards from "@/views/account/components/BankingAccountCards.vue";
 import BankingTransactions from "@/components/BankingTransactions.vue";
 import { FieldException } from "@/exceptions/FieldException";
+import { useTransactionStore } from "@/stores/transaction";
 const route = useRoute();
 const accountStore = useAccountStore();
+const transactionStore = useTransactionStore();
 const cardStore = useCardStore();
 const accountId = parseInt(route.params.id as string, 10);
 const account = computed(() => accountStore.getBankingAccount(accountId));
@@ -39,7 +41,7 @@ async function transferTo() {
     return;
   }
 
-  await accountStore
+  await transactionStore
     .createBankingTransaction(
       accountId.toString(),
       transferData.accountNumber,
@@ -169,7 +171,7 @@ onMounted(() => {
           :currency="account.accountCurrency"
           ref="transactionRefs"
           :fetch="
-            (id: number, page: number, size: number) => accountStore.fetchTransactions(id, page, size)
+            (id: number, page: number, size: number) => transactionStore.fetchAccountTransactions(id, page, size)
           "
         />
       </div>
