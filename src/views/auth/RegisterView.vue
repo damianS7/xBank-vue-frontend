@@ -1,61 +1,3 @@
-<template>
-  <div class="bg-white p-6 rounded-lg shadow-md">
-    <form
-      :resolver="resolver"
-      @submit.prevent="onFormSubmit"
-      class="flex flex-col gap-4"
-    >
-      <div
-        v-for="(field, index) in formFields"
-        :key="index"
-        class="flex flex-col gap-1"
-      >
-        <input
-          v-if="field.type !== 'select'"
-          v-model="field.value"
-          :name="field.name"
-          :type="field.type"
-          :placeholder="field.placeholder"
-          class="border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
-        />
-        <select
-          v-if="field.type === 'select'"
-          v-model="field.value"
-          :name="field.name"
-          class="border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
-        >
-          <option
-            v-for="option in field.options"
-            :key="option.value"
-            :value="option.value"
-          >
-            {{ option.label }}
-          </option>
-        </select>
-        <span v-if="field?.error" class="text-sm text-red-500">{{
-          field.error[0]
-        }}</span>
-      </div>
-      <div v-if="formStatus.message" class="flex flex-col gap-1">
-        <span
-          :class="[
-            'flex items-center border px-4 py-3 rounded relative',
-            formStatus.status === '201'
-              ? 'text-green-700 bg-green-100'
-              : 'text-red-700 bg-red-100',
-          ]"
-          >{{ formStatus.message }}</span
-        >
-      </div>
-      <button
-        type="submit"
-        class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded"
-      >
-        Register
-      </button>
-    </form>
-  </div>
-</template>
 <script setup lang="ts">
 import { ref } from "vue";
 import { z } from "zod";
@@ -167,25 +109,23 @@ const formFields = ref([
 ]);
 
 const resolver = z.object({
-  email: z.string().email("Email inválido"),
-  password: z.string().min(6, "La contraseña debe tener al menos 6 caracteres"),
-  firstname: z.string().min(1, "Nombre requerido"),
-  lastname: z.string().min(1, "Apellido requerido"),
-  phone: z.string().min(1, "Teléfono requerido"),
+  email: z.string().email("Invalid email"),
+  password: z.string().min(6, "Password must be at least 6 characters long"),
+  firstname: z.string().min(1, "First name is required"),
+  lastname: z.string().min(1, "Last name is required"),
+  phone: z.string().min(1, "Phone number is required"),
   gender: z.enum(["MALE", "FEMALE"], {
-    errorMap: () => ({ message: "Género no válido" }),
+    errorMap: () => ({ message: "Invalid gender" }),
   }),
-  country: z.string().min(1, "País requerido"),
-  address: z.string().min(1, "Dirección requerida"),
-  postalCode: z.string().min(1, "Código postal requerido"),
-  nationalId: z.string().min(1, "DNI requerido"),
+  country: z.string().min(1, "Country is required"),
+  address: z.string().min(1, "Address is required"),
+  postalCode: z.string().min(1, "Postal code is required"),
+  nationalId: z.string().min(1, "National ID is required"),
 });
 
 const onFormSubmit = async () => {
   const formData = getFormData();
   const result = resolver.safeParse(formData);
-  console.log(result);
-  // limpiar errores
   formFields.value.forEach((f) => (f.error = ""));
 
   if (!result.success) {
@@ -215,13 +155,71 @@ const onFormSubmit = async () => {
     },
   };
 
-  const response = await authStore.register(customer);
-  formStatus.value.status = response.status.toString();
-
-  if (response.status === 201) {
-    formStatus.value.message = "Usuario registrado correctamente";
-  } else {
-    formStatus.value.message = response.data.message;
-  }
+  await authStore
+    .register(customer)
+    .then(() => {
+      formStatus.value.message = "User registered.";
+    })
+    .catch((error) => {
+      formStatus.value.message = error.message;
+    });
 };
 </script>
+<template>
+  <div class="bg-white p-6 rounded-lg shadow-md">
+    <form
+      :resolver="resolver"
+      @submit.prevent="onFormSubmit"
+      class="flex flex-col gap-4"
+    >
+      <div
+        v-for="(field, index) in formFields"
+        :key="index"
+        class="flex flex-col gap-1"
+      >
+        <input
+          v-if="field.type !== 'select'"
+          v-model="field.value"
+          :name="field.name"
+          :type="field.type"
+          :placeholder="field.placeholder"
+          class="border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
+        />
+        <select
+          v-if="field.type === 'select'"
+          v-model="field.value"
+          :name="field.name"
+          class="border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
+        >
+          <option
+            v-for="option in field.options"
+            :key="option.value"
+            :value="option.value"
+          >
+            {{ option.label }}
+          </option>
+        </select>
+        <span v-if="field?.error" class="text-sm text-red-500">{{
+          field.error[0]
+        }}</span>
+      </div>
+      <div v-if="formStatus.message" class="flex flex-col gap-1">
+        <span
+          :class="[
+            'flex items-center border px-4 py-3 rounded relative',
+            formStatus.status === '201'
+              ? 'text-green-700 bg-green-100'
+              : 'text-red-700 bg-red-100',
+          ]"
+          >{{ formStatus.message }}</span
+        >
+      </div>
+      <button
+        type="submit"
+        class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded"
+      >
+        Register
+      </button>
+    </form>
+  </div>
+</template>

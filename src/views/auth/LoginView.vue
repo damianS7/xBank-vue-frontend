@@ -18,7 +18,6 @@ if (authStore.isAuthenticated) {
   redirectBackToLastPage();
 }
 
-// const toast = useToast();
 const form = ref({
   email: "",
   password: "",
@@ -46,21 +45,20 @@ const onFormSubmit = async () => {
   const result = resolver.value.safeParse(form.value);
 
   if (!result.success) {
-    // Extraer errores
     errors.value = result.error.flatten().fieldErrors;
     return;
   }
 
-  // Limpiar errores y hacer login
+  // clean errors
   errors.value = {};
-  try {
-    await authStore.login(email, password);
-    redirectBackToLastPage();
-  } catch (error: unknown) {
-    // toast
-    errors.value.form = error.message || "An error occurred.";
-  }
-  // get customer /me
+  await authStore
+    .login(email, password)
+    .then(() => {
+      redirectBackToLastPage();
+    })
+    .catch((error) => {
+      errors.value.form = error.message || "An error occurred.";
+    });
 };
 </script>
 <template>

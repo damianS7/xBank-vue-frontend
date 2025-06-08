@@ -44,7 +44,7 @@ export const useAuthStore = defineStore("auth", {
         if (error instanceof Error) {
           throw error;
         }
-        throw new Error("Login failed.");
+        throw new Error("Invalid credentials.");
       }
     },
     async register(fields: Customer) {
