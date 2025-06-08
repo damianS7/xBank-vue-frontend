@@ -106,6 +106,10 @@ async function requestCard() {
     .requestBankingCard(accountId.toString(), cardType)
     .then((card) => {
       cardStore.addCard(card);
+      alert.value.showMessage(
+        "Card " + card.cardNumber + " created.",
+        MessageType.SUCCESS
+      );
     })
     .catch((error) => {
       if (error instanceof FieldException) {
