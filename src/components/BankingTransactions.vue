@@ -85,8 +85,11 @@ defineExpose({ reloadTransactions });
           :key="index"
           class="flex flex-col sm:flex-row sm:justify-between sm:items-start bg-gray-50 hover:bg-gray-100 p-3 rounded-md"
         >
-          <div class="text-sm text-gray-700 sm:w-1/2">
-            {{ transaction.description }}
+          <div class="flex flex-col text-sm font-medium text-left">
+            <span>{{ transaction.description }}</span>
+            <span class="text-xs pill-xs pill-blue w-fit">
+              {{ transaction.transactionType.replace(/_/g, " ") }}</span
+            >
           </div>
 
           <div class="flex flex-col text-sm font-medium text-right sm:w-1/2">
