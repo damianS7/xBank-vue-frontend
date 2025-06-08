@@ -19,7 +19,7 @@ export const useTransactionStore = defineStore("transaction", {
       accountId: number,
       page: number,
       size: number
-    ): Promise<BankingTransaction[]> {
+    ): Promise<BankingTransaction> {
       try {
         const token = localStorage.getItem("token");
         const response = await fetch(
