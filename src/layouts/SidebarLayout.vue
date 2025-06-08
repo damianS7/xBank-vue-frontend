@@ -7,8 +7,6 @@ import {
   Settings,
   LogOut,
   ReceiptText,
-  ChartCandlestick,
-  Banknote,
 } from "lucide-vue-next";
 import { useRouter } from "vue-router";
 import { useAuthStore } from "@/stores/auth";
@@ -29,7 +27,11 @@ function logout() {
     <SidebarLink to="/home" :icon="Home" label="Home" />
     <SidebarLink to="/accounts" :icon="Accounts" label="Accounts" />
     <SidebarLink to="/cards" :icon="CreditCard" label="Cards" />
-    <SidebarLink to="/cards" :icon="ReceiptText" label="Sign Operations" />
+    <SidebarLink
+      to="/transactions"
+      :icon="ReceiptText"
+      label="Pending transactions"
+    />
     <SidebarLink to="/profile" :icon="Profile" label="Profile" />
     <SidebarLink to="/settings" :icon="Settings" label="Settings" />
     <a href="#" @click.prevent="logout">

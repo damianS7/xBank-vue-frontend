@@ -11,6 +11,7 @@ import RegisterView from "@/views/auth/RegisterView.vue";
 import SettingsView from "@/views/SettingsView.vue";
 import ProfileView from "@/views/profile/ProfileView.vue";
 import ResetPasswordView from "@/views/auth/ResetPasswordView.vue";
+import PendingTransactionsView from "@/views/PendingTransactionsView.vue";
 import { useAuthStore } from "@/stores/auth";
 
 const routes: Array<RouteRecordRaw> = [
@@ -34,6 +35,11 @@ const routes: Array<RouteRecordRaw> = [
         path: "account/:id",
         name: "account",
         component: BankingAccountView,
+      },
+      {
+        path: "transactions",
+        name: "transactions",
+        component: PendingTransactionsView,
       },
       {
         path: "cards",
