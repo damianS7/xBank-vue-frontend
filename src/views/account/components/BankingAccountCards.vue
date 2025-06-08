@@ -2,7 +2,11 @@
 import { computed, onMounted, ref, watch } from "vue";
 import { defineProps } from "vue";
 import { useCardStore } from "@/stores/card";
-import { CircleChevronDown, CircleChevronUp } from "lucide-vue-next";
+import {
+  CreditCard,
+  CircleChevronDown,
+  CircleChevronUp,
+} from "lucide-vue-next";
 const cardStore = useCardStore();
 const props = defineProps({
   accountId: {
@@ -68,17 +72,29 @@ onMounted(() => {
           <li v-for="(card, index) in cards" :key="index">
             <router-link
               :to="`/card/${card.id}`"
-              class="flex justify-between items-center bg-blue-50 hover:bg-blue-100 rounded-md p-3"
+              class="flex justify-between items-center bg-gray-50 hover:bg-gray-100 rounded-md p-3"
             >
               <!-- Número de tarjeta a la izquierda -->
-              <div class="font-medium text-gray-700">
-                {{ formatCardNumber(card.cardNumber) }}
+              <div class="flex items-center font-medium text-gray-700">
+                <CreditCard class="text-blue-600" />
+                &nbsp;
+                <span class="text-gray-500">
+                  {{ formatCardNumber(card.cardNumber) }}
+                </span>
               </div>
 
               <!-- Datos a la derecha -->
-              <div class="flex flex-col text-sm font-medium justify-end">
+              <div class="flex flex-wrap gap-1 text-sm font-medium justify-end">
                 <span class="pill pill-xs pill-blue">
                   {{ card.cardType }}
+                </span>
+                <span class="pill pill-xs pill-blue">
+                  {{
+                    card?.expiredDate.toLocaleDateString("en-US", {
+                      year: "numeric",
+                      month: "2-digit",
+                    })
+                  }}
                 </span>
               </div>
             </router-link>
