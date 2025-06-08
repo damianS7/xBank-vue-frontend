@@ -1,3 +1,11 @@
+<script setup lang="ts">
+import { onMounted } from "vue";
+import { useRoute } from "vue-router";
+const route = useRoute();
+onMounted(() => {
+  // console.log("mounted authlayout");
+});
+</script>
 <template>
   <div
     class="min-h-screen flex flex-col items-center justify-center bg-gray-100 px-2 py-8"
@@ -11,37 +19,22 @@
         to="/auth/login"
         class="block hover:underline text-blue-600"
       >
-        Iniciar sesión
+        Sign in
       </RouterLink>
       <RouterLink
         v-if="!route.path.includes('/auth/register')"
         to="/auth/register"
         class="block hover:underline text-blue-600"
       >
-        ¿No tienes cuenta? Regístrate
+        ¿Dont you have an account? Sign up
       </RouterLink>
-      <RouterLink
+      <!-- <RouterLink
         v-if="!route.path.includes('/auth/reset-password')"
         to="/auth/reset-password"
         class="block hover:underline text-blue-600"
       >
         ¿Olvidaste tu contraseña?
-      </RouterLink>
+      </RouterLink> -->
     </div>
   </div>
 </template>
-
-<script setup lang="ts">
-import { onMounted } from "vue";
-import { useRoute } from "vue-router";
-const route = useRoute();
-onMounted(() => {
-  // console.log("mounted authlayout");
-});
-</script>
-
-<!-- Add "scoped" attribute to limit CSS to this component only -->
-<style scoped>
-.auth-layout {
-}
-</style>
