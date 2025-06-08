@@ -1,21 +1,20 @@
 <script setup lang="ts">
 import { ref, defineExpose } from "vue";
 import {
-  BankingAccountType,
-  BankingAccountCurrency,
+  BankingAccountCurrencies as currencies,
+  BankingAccountTypes as accountTypes,
 } from "@/types/BankingAccount";
-const accountTypes: BankingAccountType[] = ["SAVINGS", "CHECKING"];
-const accountCurrencies: BankingAccountCurrency[] = ["USD", "EUR"];
+
 const visible = ref(false);
 const newAccount = ref({
   type: "CHECKING",
   currency: "USD",
 });
 
-let _resolve: (value: string) => void;
+let _resolve: (value: object) => void;
 
 // open modal
-function open(): Promise<string> {
+function open(): Promise<object> {
   visible.value = true;
 
   return new Promise((resolve) => {
@@ -63,7 +62,7 @@ defineExpose({ open });
             class="w-full border rounded p-2"
           >
             <option
-              v-for="currency in accountCurrencies"
+              v-for="currency in currencies"
               :key="currency"
               :value="currency"
             >
