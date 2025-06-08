@@ -3,9 +3,9 @@ import { ref, defineExpose } from "vue";
 //MG03 4336 3953 2165 4585 8151
 const visible = ref(false);
 const transferData = ref({
-  destinationAccount: "BR59 0780 7819 8411 0728 6106",
+  destinationAccount: "",
   amount: 10,
-  concept: "a gift!!!",
+  description: "",
 });
 
 let _resolve: (value: object) => void;
@@ -29,7 +29,7 @@ function submit() {
   _resolve({
     accountNumber,
     amount: transferData.value.amount,
-    concept: transferData.value.concept,
+    description: transferData.value.description,
   });
 }
 
@@ -56,7 +56,7 @@ defineExpose({ open });
           <input
             v-model="transferData.destinationAccount"
             type="text"
-            placeholder="Número de cuenta"
+            placeholder="Account number"
             class="w-full border rounded p-2"
             required
           />
@@ -79,12 +79,11 @@ defineExpose({ open });
 
         <div class="mb-4">
           <label class="block mb-1 text-sm font-medium text-gray-700"
-            >Concept</label
+            >Description</label
           >
           <input
-            v-model="transferData.concept"
+            v-model="transferData.description"
             type="text"
-            placeholder="Pago de servicios, regalo, etc."
             class="w-full border rounded p-2"
             required
           />
