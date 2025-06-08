@@ -17,7 +17,7 @@ const accountStore = useAccountStore();
 const cardStore = useCardStore();
 const accountId = parseInt(route.params.id as string, 10);
 const account = computed(() => accountStore.getBankingAccount(accountId));
-
+const transactionRefs = ref();
 // alert
 const alert = ref();
 
@@ -44,14 +44,14 @@ async function transferTo() {
       accountId.toString(),
       transferData.accountNumber,
       transferData.amount,
-      transferData.concept,
+      transferData.description,
       "TRANSFER_TO",
       password
     )
     .then((transaction) => {
-      alert.value.showMessage("Transfered funds.", MessageType.SUCCESS);
       accountStore.setBalance(accountId, transaction.accountBalance);
-      accountStore.addTransaction(transaction);
+      transactionRefs.value.reloadTransactions();
+      alert.value.showMessage("Transfered funds.", MessageType.SUCCESS);
     })
     .catch((error) => {
       if (error instanceof FieldException) {
@@ -167,6 +167,7 @@ onMounted(() => {
         <BankingTransactions
           :id="account.id"
           :currency="account.accountCurrency"
+          ref="transactionRefs"
           :fetch="
             (id: number, page: number, size: number) => accountStore.fetchTransactions(id, page, size)
           "

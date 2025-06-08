@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { onMounted, PropType, ref } from "vue";
-import { defineProps } from "vue";
-import { ChevronRight, ChevronLeft, Currency } from "lucide-vue-next";
+import { defineProps, defineExpose } from "vue";
+import { ChevronRight, ChevronLeft } from "lucide-vue-next";
 // TODO implement cached transactions so we dont have to call the endpoint all the time
 const props = defineProps({
   id: {
@@ -18,7 +18,7 @@ const props = defineProps({
 });
 
 // pagination
-const cachedPagination = [{ pageable: { pageNumber: -1 } }];
+let cachedPagination = [{ pageable: { pageNumber: -1 } }];
 const currentPage = ref(0); // Spring usa 0-indexed
 const pageSize = 4;
 const paginator = ref<any>(null);
@@ -34,6 +34,11 @@ function nextPage() {
     currentPage.value++;
     fetchTransactions();
   }
+}
+
+function reloadTransactions() {
+  cachedPagination = [{ pageable: { pageNumber: -1 } }];
+  fetchTransactions();
 }
 
 async function fetchTransactions() {
@@ -66,6 +71,7 @@ onMounted(() => {
   fetchTransactions();
   // isViewReady.value = true;
 });
+defineExpose({ reloadTransactions });
 </script>
 <template>
   <div v-if="paginator">
