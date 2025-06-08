@@ -16,7 +16,7 @@ function totalBalance(currency: string) {
 }
 </script>
 <template>
-  <div v-if="accounts" class="flex flex-col gap-4">
+  <div v-if="accounts" class="main-container flex flex-col gap-4">
     <!-- Balance -->
     <div
       class="grid grid-cols-1 md:grid-cols-2 bg-gray-50 gap-4 p-4 shadow rounded"
