@@ -228,14 +228,14 @@ export const useCardStore = defineStore("card", {
       }
     },
     async setDailyLimit(
-      cardId: number,
+      id: number,
       dailyLimit: number,
       password: string
     ): Promise<BankingCard> {
       try {
         const token = localStorage.getItem("token");
         const response = await fetch(
-          `${process.env.VUE_APP_API_URL}/customers/me/banking/cards/${cardId}/daily-limit`,
+          `${process.env.VUE_APP_API_URL}/customers/me/banking/cards/${id}/daily-limit`,
           {
             method: "PATCH",
             headers: {

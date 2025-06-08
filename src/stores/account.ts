@@ -302,7 +302,6 @@ export const useAccountStore = defineStore("account", {
       }
     },
     addAccount(account: BankingAccount) {
-      console.log(account);
       // this.bankingAccounts.push(account);
       this.bankingAccounts = [...this.bankingAccounts, account];
     },
