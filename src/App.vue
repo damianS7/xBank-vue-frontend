@@ -18,7 +18,7 @@ onMounted(() => {
 header,
 nav,
 .main-container {
-  @apply bg-stone-100;
+  @apply bg-gray-100;
 }
 
 .main-container {

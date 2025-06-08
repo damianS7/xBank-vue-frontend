@@ -33,7 +33,7 @@ function formatIban(iban: string): string {
 }
 </script>
 <template>
-  <div v-if="account" class="bg-blue-100 p-4 rounded shadow mt-6 w-full">
+  <div v-if="account" class="bg-gray-50 p-4 rounded-xl shadow mt-6 w-full">
     <div
       class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2"
     >

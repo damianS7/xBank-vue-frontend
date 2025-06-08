@@ -77,7 +77,7 @@ onMounted(() => {
         <li
           v-for="(transaction, index) in paginator?.content"
           :key="index"
-          class="flex flex-col sm:flex-row sm:justify-between sm:items-start bg-blue-50 hover:bg-blue-100 p-3 rounded-md"
+          class="flex flex-col sm:flex-row sm:justify-between sm:items-start bg-gray-50 hover:bg-gray-100 p-3 rounded-md"
         >
           <div class="text-sm text-gray-700 sm:w-1/2">
             {{ transaction.description }}
