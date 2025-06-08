@@ -30,13 +30,11 @@ const modals = {
 
 async function transferTo() {
   const transferData = await modals.transfer.value.open();
-
-  if (!transferData) {
+  if (!transferData || !transferData.accountNumber) {
     return;
   }
 
   const password = await modals.confirmPassword.value.open();
-
   if (!password) {
     return;
   }

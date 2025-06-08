@@ -20,13 +20,12 @@ const modals = {
 // function to handle the submission of the open account modal
 async function openAccount() {
   const accountData = await modals.openAccount.value.open();
-
   // if modal is cancelled, accountData will be undefined
-  if (!accountData) {
+  if (!accountData.type) {
     return;
   }
 
-  accountStore
+  await accountStore
     .requestBankingAccount(accountData.type, accountData.currency)
     .then((account) => {
       accountStore.addAccount(account);
@@ -54,7 +53,7 @@ onMounted(() => {
     <MessageAlert ref="alert" />
 
     <div class="flex justify-end rounded gap-1 mb-6">
-      <button type="button" @click="openAccount" class="btn btn-blue">
+      <button type="button" @click="openAccount" class="btn btn-blue btn-sm">
         Open account
       </button>
     </div>
